@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>The Anamika Lux | Luxury Doorstep Salon, Patna</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Pro Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts: Cinzel, Playfair Display & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            50: '#FDFBF7',
+                            100: '#FAF4E3',
+                            200: '#F3E5AB',
+                            300: '#E7CE75',
+                            400: '#DCBA45',
+                            500: '#D4AF37', // 24K Royal Gold
+                            600: '#B89222',
+                            700: '#8F6E13',
+                            800: '#694F0C',
+                            900: '#433105'
+                        },
+                        obsidian: {
+                            950: '#050507',
+                            900: '#09090D',
+                            850: '#101017',
+                            800: '#171720',
+                            750: '#1E1E2B',
+                            700: '#2A2A3C'
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        playfair: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #050507;
+            padding-bottom: env(safe-area-inset-bottom, 24px);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFF6DC 0%, #F3E5AB 25%, #D4AF37 55%, #AA7C11 85%, #FFDF78 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shimmerGold 5s linear infinite;
+        }
+        @keyframes shimmerGold {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass-card {
+            background: radial-gradient(120% 120% at 50% 0%, rgba(35, 35, 48, 0.45) 0%, rgba(9, 9, 13, 0.95) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(14px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-card-featured {
+            background: radial-gradient(120% 120% at 50% 0%, rgba(55, 45, 18, 0.45) 0%, rgba(9, 9, 13, 0.98) 100%);
+            border: 1.5px solid rgba(212, 175, 55, 0.65);
+            box-shadow: 0 15px 45px -8px rgba(212, 175, 55, 0.25), inset 0 1px 0 rgba(243, 229, 171, 0.4);
+        }
+        .btn-gold-solid {
+            background: linear-gradient(135deg, #F3E5AB 0%, #D4AF37 50%, #9F7612 100%);
+            color: #050507;
+            font-weight: 700;
+            box-shadow: 0 6px 20px -3px rgba(212, 175, 55, 0.45);
+            transition: all 0.2s ease;
+        }
+        .btn-gold-solid:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 10px rgba(212, 175, 55, 0.25);
+        }
+        .btn-gold-outline {
+            background: rgba(212, 175, 55, 0.06);
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            color: #F3E5AB;
+            transition: all 0.2s ease;
+        }
+        .btn-gold-outline:active {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: #D4AF37;
+            transform: scale(0.97);
+        }
+        .bottom-sheet {
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+        }
+        .bottom-sheet.sheet-closed {
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .bottom-sheet.sheet-open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .festive-ambient {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(40px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-neutral-200 font-sans min-h-screen relative overflow-x-hidden antialiased">
+
+    <!-- Ambient Festive Glow -->
+    <div class="festive-ambient top-0 left-1/2 -translate-x-1/2"></div>
+    <div class="festive-ambient top-[45%] right-[-80px]"></div>
+
+    <!-- Top Status Ribbon -->
+    <div class="relative z-30 bg-obsidian-900/90 border-b border-gold-500/20 py-1.5 px-3">
+        <div class="max-w-5xl mx-auto flex items-center justify-between text-[11px] text-gold-300">
+            <div class="flex items-center gap-1.5 font-medium">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span class="font-cinzel tracking-wider text-white">Doorstep Salon Experience</span>
+            </div>
+            <div class="flex items-center gap-2 text-neutral-400 font-light">
+                <span class="text-gold-400"><i class="fa-solid fa-location-dot text-[10px]"></i></span>
+                <span>Serving All Across Patna</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Bar Navigation -->
+    <nav class="sticky top-0 z-40 bg-obsidian-950/90 backdrop-blur-xl border-b border-white/5 px-4 py-2.5 transition-all">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <!-- Brand -->
+            <a href="#" class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-full border border-gold-400/50 flex items-center justify-center bg-gradient-to-tr from-gold-500/20 to-transparent text-gold-300 shadow-[0_0_15px_rgba(212,175,55,0.25)]">
+                    <i class="fa-solid fa-crown text-sm"></i>
+                </div>
+                <div>
+                    <span class="font-cinzel text-sm sm:text-base font-black tracking-[0.18em] text-white block leading-tight">THE ANAMIKA LUX</span>
+                    <span class="text-[9px] tracking-[0.24em] text-gold-400 uppercase font-semibold">Home Service Beauty Salon</span>
+                </div>
+            </a>
+
+            <!-- Right Actions -->
+            <div class="flex items-center gap-2">
+                <a href="tel:8893645998" class="w-8 h-8 rounded-full border border-gold-500/30 flex items-center justify-center text-gold-300 active:scale-95 transition-transform" title="Direct Phone Call">
+                    <i class="fa-solid fa-phone text-xs"></i>
+                </a>
+                <button onclick="openBookingSheet('Doorstep Appointment')" class="btn-gold-solid px-3.5 py-1.5 rounded-full text-[11px] tracking-wider uppercase font-bold flex items-center gap-1.5 active:scale-95 shadow-sm">
+                    <i class="fa-regular fa-calendar-check text-[10px]"></i>
+                    <span>Book</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-28">
+
+        <!-- Permanent Royal Branding Hero Section -->
+        <section class="glass-card rounded-3xl p-6 sm:p-12 text-center relative overflow-hidden mb-10 border-gold-500/40">
+            <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-48 h-48 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Royal Crest / Emblem Logo -->
+            <div class="inline-flex flex-col items-center justify-center mb-4">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-b from-gold-400/20 via-obsidian-900 to-obsidian-950 border-2 border-gold-400/60 p-1 flex items-center justify-center shadow-[0_0_25px_rgba(212,175,55,0.3)]">
+                    <div class="w-full h-full rounded-full border border-gold-400/30 flex items-center justify-center bg-obsidian-900/80">
+                        <i class="fa-solid fa-crown text-gold-400 text-2xl sm:text-3xl filter drop-shadow-[0_2px_10px_rgba(212,175,55,0.7)]"></i>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="w-8 h-[1px] bg-gradient-to-r from-transparent to-gold-400/60"></span>
+                    <span class="text-[9px] uppercase tracking-[0.3em] text-gold-300 font-cinzel font-semibold">Est. Luxury Care</span>
+                    <span class="w-8 h-[1px] bg-gradient-to-l from-transparent to-gold-400/60"></span>
+                </div>
+            </div>
+
+            <!-- Brand Title -->
+            <h1 class="font-cinzel text-2xl sm:text-5xl font-black gold-gradient-text tracking-[0.16em] uppercase mb-1">
+                The Anamika Lux
+            </h1>
+            <p class="font-cinzel text-xs sm:text-sm tracking-[0.28em] text-gold-200/90 uppercase font-semibold mb-3">
+                Home Service Beauty Salon &bull; Patna
+            </p>
+
+            <p class="text-xs sm:text-sm text-neutral-300 max-w-lg mx-auto leading-relaxed mb-6 font-light">
+                Indulge in 5-star salon care without leaving your home. Certified female beauticians, 100% single-use disposable kits, and premium branded skincare brought directly to your doorstep.
+            </p>
+
+            <!-- Quick Badges -->
+            <div class="grid grid-cols-3 gap-2.5 max-w-md mx-auto mb-6">
+                <div class="bg-obsidian-900/80 border border-white/5 rounded-2xl p-2.5">
+                    <i class="fa-solid fa-sparkles text-gold-400 text-xs mb-1 block"></i>
+                    <span class="text-gold-200 font-cinzel text-xs sm:text-sm font-bold block">100% Sealed</span>
+                    <span class="text-[9px] text-neutral-400 uppercase tracking-wider">Hygienic Kits</span>
+                </div>
+                <div class="bg-obsidian-900/80 border border-white/5 rounded-2xl p-2.5">
+                    <i class="fa-solid fa-car-side text-gold-400 text-xs mb-1 block"></i>
+                    <span class="text-gold-200 font-cinzel text-xs sm:text-sm font-bold block">₹0 Fee</span>
+                    <span class="text-[9px] text-neutral-400 uppercase tracking-wider">Doorstep Travel</span>
+                </div>
+                <div class="bg-obsidian-900/80 border border-white/5 rounded-2xl p-2.5">
+                    <i class="fa-solid fa-venus text-gold-400 text-xs mb-1 block"></i>
+                    <span class="text-gold-200 font-cinzel text-xs sm:text-sm font-bold block">Female Experts</span>
+                    <span class="text-[9px] text-neutral-400 uppercase tracking-wider">Verified & Safe</span>
+                </div>
+            </div>
+
+            <!-- Hero Actions (Clean, No WhatsApp Clutter) -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a href="#festiveOffersSection" class="w-full sm:w-auto btn-gold-solid py-3 px-6 rounded-2xl text-xs uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 active:scale-95 shadow-lg">
+                    <i class="fa-solid fa-gift"></i>
+                    <span>View Festive & Special Offers</span>
+                </a>
+                <button onclick="openBookingSheet('Doorstep Salon Booking')" class="w-full sm:w-auto btn-gold-outline py-3 px-6 rounded-2xl text-xs uppercase tracking-wider font-bold flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fa-regular fa-calendar-check text-gold-400"></i>
+                    <span>Book Appointment Slot</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- SEPARATE DEDICATED FESTIVE & SEASONAL OFFERS SECTION -->
+        <section id="festiveOffersSection" class="mb-12">
+            <!-- Dynamic Section Header controlled by Admin Panel -->
+            <div class="glass-card rounded-2xl p-4 sm:p-5 mb-6 border-gold-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-obsidian-900 via-obsidian-850 to-obsidian-900">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold-500/10 border border-gold-400/30 mb-2">
+                        <span class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
+                        <span id="displayFestiveTag" class="font-cinzel text-[10px] uppercase tracking-widest text-gold-300 font-bold">Seasonal Exclusive</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <h2 id="displayFestiveTitle" class="text-xl sm:text-2xl font-cinzel font-bold text-white">Chhath Puja Special Offers</h2>
+                    </div>
+                    <p id="displayFestiveSubtitle" class="text-xs text-neutral-400 mt-0.5">Special curated festive packages &bull; Limited doorstep slots available</p>
+                </div>
+                <div class="flex items-center gap-2 self-start sm:self-center">
+                    <span class="text-[11px] font-mono text-gold-400 bg-gold-500/10 border border-gold-500/20 px-3 py-1 rounded-xl">
+                        <i class="fa-solid fa-tags text-[10px] mr-1"></i> Special Pricing Active
+                    </span>
+                </div>
+            </div>
+
+            <!-- Category Filter Tabs -->
+            <div class="mb-5 sticky top-14 z-30 bg-obsidian-950/85 backdrop-blur-md py-2 -mx-4 px-4 overflow-x-auto no-scrollbar">
+                <div class="flex items-center gap-2 min-w-max" id="comboFilters">
+                    <button onclick="filterPackages('all', this)" class="filter-tab active bg-gold-500 text-obsidian-950 font-bold px-4 py-1.5 rounded-full text-xs font-cinzel tracking-wider transition-all">
+                        All Festive Combos (5)
+                    </button>
+                    <button onclick="filterPackages('popular', this)" class="filter-tab bg-obsidian-900 border border-white/10 text-neutral-300 px-4 py-1.5 rounded-full text-xs font-cinzel tracking-wider transition-all">
+                        Most Popular
+                    </button>
+                    <button onclick="filterPackages('value', this)" class="filter-tab bg-obsidian-900 border border-white/10 text-neutral-300 px-4 py-1.5 rounded-full text-xs font-cinzel tracking-wider transition-all">
+                        Best Value
+                    </button>
+                    <button onclick="filterPackages('bridal', this)" class="filter-tab bg-obsidian-900 border border-white/10 text-neutral-300 px-4 py-1.5 rounded-full text-xs font-cinzel tracking-wider transition-all">
+                        Bridal Luxury
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Packages Container -->
+            <div id="packagesContainer" class="space-y-5 sm:space-y-6">
+                <!-- Dynamically rendered by renderPackages() -->
+            </div>
+        </section>
+
+        <!-- Interactive Custom Combo Builder -->
+        <section class="glass-card rounded-3xl p-5 sm:p-8 mb-12 border-gold-500/30">
+            <div class="text-center mb-6">
+                <span class="text-[10px] uppercase font-cinzel text-gold-400 tracking-[0.2em] font-semibold block mb-1">Tailored Experience</span>
+                <h3 class="text-xl sm:text-2xl font-cinzel font-bold text-white">Custom Add-on Builder</h3>
+                <p class="text-xs text-neutral-400 mt-1">Pick a base combo and add special treatments to see live price</p>
+            </div>
+
+            <!-- Base Picker -->
+            <div class="mb-4">
+                <label class="block text-[11px] uppercase tracking-wider font-cinzel text-gold-300 font-bold mb-1.5">
+                    Step 1: Choose Core Package
+                </label>
+                <select id="builderSelect" onchange="updateCustomTotal()" class="w-full bg-obsidian-850 border border-neutral-700 rounded-2xl px-3.5 py-3 text-xs sm:text-sm text-white focus:outline-none focus:border-gold-400">
+                    <option value="1500" data-title="Basic Glow Combo">Basic Glow Combo — ₹1,500</option>
+                    <option value="2000" data-title="Lotus Beauty Combo">Lotus Beauty Combo — ₹2,000</option>
+                    <option value="2500" data-title="Premium Glow Combo">Premium Glow Combo — ₹2,500</option>
+                    <option value="3000" data-title="Luxury Skin Combo" selected>Luxury Skin Combo — ₹3,000</option>
+                    <option value="4000" data-title="Bridal Glow Combo">Bridal Glow Combo — ₹4,000</option>
+                    <option value="0" data-title="Only Custom Treatments">Only Add-on Treatments (₹0)</option>
+                </select>
+            </div>
+
+            <!-- Add-on Toggles -->
+            <div class="mb-5">
+                <label class="block text-[11px] uppercase tracking-wider font-cinzel text-gold-300 font-bold mb-2">
+                    Step 2: Add Extra Care (Optional)
+                </label>
+                <div class="space-y-2" id="addonList">
+                    <label class="flex items-center justify-between p-3 rounded-2xl bg-obsidian-850 border border-neutral-800 active:border-gold-500/50 cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" value="499" data-name="L'Oreal Hair Spa & Steam" onchange="updateCustomTotal()" class="w-4 h-4 accent-gold-500 rounded">
+                            <div>
+                                <span class="text-xs text-white font-medium block">L'Oreal Hair Spa & Steam</span>
+                                <span class="text-[10px] text-neutral-400">Deep hair nourishment & relaxation</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-semibold text-gold-400 font-mono">+₹499</span>
+                    </label>
+
+                    <label class="flex items-center justify-between p-3 rounded-2xl bg-obsidian-850 border border-neutral-800 active:border-gold-500/50 cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" value="350" data-name="Rica White Chocolate Wax Upgrade" onchange="updateCustomTotal()" class="w-4 h-4 accent-gold-500 rounded">
+                            <div>
+                                <span class="text-xs text-white font-medium block">Rica Wax Upgrade</span>
+                                <span class="text-[10px] text-neutral-400">Gentle on sensitive skin & painless</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-semibold text-gold-400 font-mono">+₹350</span>
+                    </label>
+
+                    <label class="flex items-center justify-between p-3 rounded-2xl bg-obsidian-850 border border-neutral-800 active:border-gold-500/50 cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" value="249" data-name="Oxy Glow Face & Neck Bleach" onchange="updateCustomTotal()" class="w-4 h-4 accent-gold-500 rounded">
+                            <div>
+                                <span class="text-xs text-white font-medium block">Oxy Glow Bleach</span>
+                                <span class="text-[10px] text-neutral-400">Instant golden skin tone enhancer</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-semibold text-gold-400 font-mono">+₹249</span>
+                    </label>
+
+                    <label class="flex items-center justify-between p-3 rounded-2xl bg-obsidian-850 border border-neutral-800 active:border-gold-500/50 cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" value="299" data-name="Rose Petal Aroma Foot Spa" onchange="updateCustomTotal()" class="w-4 h-4 accent-gold-500 rounded">
+                            <div>
+                                <span class="text-xs text-white font-medium block">Rose Foot Reflexology</span>
+                                <span class="text-[10px] text-neutral-400">Relieve tired feet after puja preparations</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-semibold text-gold-400 font-mono">+₹299</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Builder Price Summary -->
+            <div class="bg-obsidian-950 border border-gold-500/40 rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] text-neutral-400 uppercase tracking-wider block font-medium">Calculated Total</span>
+                    <span class="text-2xl font-cinzel font-black text-gold-300" id="builderTotalPrice">₹3000</span>
+                </div>
+                <button onclick="bookCustomComboSheet()" class="btn-gold-solid px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider active:scale-95 shadow-md">
+                    <span>Book Combo</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Touch Before/After Glow Slider -->
+        <section class="glass-card rounded-3xl p-5 sm:p-7 mb-12">
+            <div class="text-center mb-5">
+                <span class="text-[10px] uppercase font-cinzel text-gold-400 tracking-[0.2em] font-semibold block mb-1">Proven Results</span>
+                <h3 class="text-lg sm:text-2xl font-cinzel font-bold text-white">Skin Glow Transformation</h3>
+                <p class="text-xs text-neutral-400">Drag or swipe slider horizontally to reveal before & after</p>
+            </div>
+
+            <div class="relative w-full h-[250px] sm:h-[350px] rounded-2xl overflow-hidden select-none touch-none border border-gold-500/20" id="sliderBox">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=700&auto=format&fit=crop" alt="Before" class="absolute inset-0 w-full h-full object-cover filter brightness-75 contrast-90">
+                <span class="absolute top-3 left-3 bg-black/80 backdrop-blur-md text-neutral-300 text-[10px] font-semibold px-2.5 py-1 rounded-full border border-white/10 uppercase tracking-wider">
+                    Before Care
+                </span>
+
+                <div id="sliderAfterClip" class="absolute inset-0 overflow-hidden w-1/2">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=700&auto=format&fit=crop" alt="After" class="absolute inset-0 w-full h-full object-cover filter brightness-110 saturate-110">
+                    <span class="absolute top-3 right-3 bg-gold-500 text-obsidian-950 text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md uppercase tracking-wider">
+                        After Anamika Lux ✨
+                    </span>
+                </div>
+
+                <div id="sliderHandle" class="absolute top-0 bottom-0 w-1 bg-gold-400 left-1/2 -translate-x-1/2 flex items-center justify-center">
+                    <div class="w-8 h-8 rounded-full bg-gold-400 text-obsidian-950 flex items-center justify-center shadow-2xl text-[11px]">
+                        <i class="fa-solid fa-left-right"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trust & Hygiene Safeguards -->
+        <section class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-12">
+            <div class="bg-obsidian-900 border border-white/5 rounded-2xl p-4 text-center">
+                <div class="w-10 h-10 rounded-full bg-gold-500/10 text-gold-400 mx-auto flex items-center justify-center text-sm mb-2">
+                    <i class="fa-solid fa-box-tissue"></i>
+                </div>
+                <h4 class="text-xs font-cinzel font-bold text-white mb-0.5">100% Sealed Kits</h4>
+                <p class="text-[10px] text-neutral-400">Single-use disposables only</p>
+            </div>
+            <div class="bg-obsidian-900 border border-white/5 rounded-2xl p-4 text-center">
+                <div class="w-10 h-10 rounded-full bg-gold-500/10 text-gold-400 mx-auto flex items-center justify-center text-sm mb-2">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <h4 class="text-xs font-cinzel font-bold text-white mb-0.5">Verified Females</h4>
+                <p class="text-[10px] text-neutral-400">Trained & safe beauticians</p>
+            </div>
+            <div class="bg-obsidian-900 border border-white/5 rounded-2xl p-4 text-center">
+                <div class="w-10 h-10 rounded-full bg-gold-500/10 text-gold-400 mx-auto flex items-center justify-center text-sm mb-2">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <h4 class="text-xs font-cinzel font-bold text-white mb-0.5">Original Brands</h4>
+                <p class="text-[10px] text-neutral-400">Genuine O3+ & Lotus</p>
+            </div>
+            <div class="bg-obsidian-900 border border-white/5 rounded-2xl p-4 text-center">
+                <div class="w-10 h-10 rounded-full bg-gold-500/10 text-gold-400 mx-auto flex items-center justify-center text-sm mb-2">
+                    <i class="fa-solid fa-broom"></i>
+                </div>
+                <h4 class="text-xs font-cinzel font-bold text-white mb-0.5">Zero Mess</h4>
+                <p class="text-[10px] text-neutral-400">Full cleanup after service</p>
+            </div>
+        </section>
+
+        <!-- Social Channels & Contact -->
+        <section class="glass-card rounded-3xl p-6 text-center border-gold-500/30 mb-8">
+            <h4 class="font-cinzel text-sm sm:text-base font-bold text-white mb-1">Connect with Anamika Lohar</h4>
+            <p class="text-xs text-neutral-400 mb-4">Follow our daily bridal makeovers & real client results</p>
+            <div class="flex items-center justify-center gap-3">
+                <a href="https://instagram.com/anamika__lohar__?psln=c2x5NG55M3N6c3pn" target="_blank" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-obsidian-850 border border-white/10 text-gold-300 text-xs font-semibold hover:border-gold-400 active:scale-95 transition-all">
+                    <i class="fa-brands fa-instagram text-sm"></i>
+                    <span>@anamika__lohar__</span>
+                </a>
+                <a href="https://www.facebook.com/share/1CZQzSJQeo/" target="_blank" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-obsidian-850 border border-white/10 text-gold-300 text-xs font-semibold hover:border-gold-400 active:scale-95 transition-all">
+                    <i class="fa-brands fa-facebook-f text-sm"></i>
+                    <span>Facebook Page</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Footer with Guaranteed Accessible Admin Link -->
+        <footer class="text-center text-[11px] text-neutral-500 space-y-2 pt-4 border-t border-white/5">
+            <p>&copy; <span id="currentYear"></span> The Anamika Lux &bull; Home Service Salon, Patna</p>
+            <p>Direct Booking Helpline: <a href="tel:8893645998" class="text-gold-400 underline">+91 8893645998</a></p>
+        </footer>
+    </main>
+
+    <!-- Native App Bottom Navigation Dock (Sticky on Mobile) -->
+    <div class="fixed bottom-0 left-0 right-0 z-40 bg-obsidian-950/95 backdrop-blur-xl border-t border-gold-500/25 px-4 py-2.5 sm:hidden flex items-center justify-between gap-3 shadow-[0_-10px_25px_rgba(0,0,0,0.8)]">
+        <a href="tel:8893645998" class="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-obsidian-850 border border-gold-500/40 text-gold-300 text-xs font-bold uppercase tracking-wider active:scale-95 transition-all flex-1">
+            <i class="fa-solid fa-phone text-xs"></i>
+            <span>Call</span>
+        </a>
+        <button onclick="openBookingSheet('Doorstep Fast Booking')" class="btn-gold-solid py-3 px-5 rounded-2xl text-xs font-black uppercase tracking-wider active:scale-95 transition-all flex-[2] flex items-center justify-center gap-2 shadow-lg">
+            <i class="fa-regular fa-calendar-check text-xs"></i>
+            <span>Select Package</span>
+        </button>
+    </div>
+
+    <!-- Native-Style Booking Bottom Sheet Modal -->
+    <div id="bookingBackdrop" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden transition-opacity" onclick="closeBookingSheet()"></div>
+
+    <div id="bookingSheet" class="fixed inset-x-0 bottom-0 z-50 bottom-sheet sheet-closed bg-obsidian-900 border-t border-gold-400/50 rounded-t-[32px] p-5 sm:p-7 max-w-lg mx-auto shadow-2xl max-h-[92vh] overflow-y-auto">
+        <div class="w-12 h-1 bg-neutral-600 rounded-full mx-auto mb-4 cursor-pointer" onclick="closeBookingSheet()"></div>
+
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <span class="text-[10px] uppercase font-cinzel text-gold-400 tracking-wider font-bold block">Doorstep Reservation</span>
+                <h3 class="text-lg font-cinzel font-bold text-white">Book Your Slot</h3>
+            </div>
+            <button onclick="closeBookingSheet()" class="w-8 h-8 rounded-full bg-obsidian-800 text-neutral-400 hover:text-white flex items-center justify-center active:scale-95">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="mb-4 bg-gold-500/10 border border-gold-500/30 rounded-xl px-3.5 py-2 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2 text-gold-300 font-semibold truncate mr-2">
+                <i class="fa-solid fa-sparkles text-xs"></i>
+                <span id="sheetPackageName">Selected Package</span>
+            </div>
+            <span class="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full whitespace-nowrap">₹0 Doorstep Fee</span>
+        </div>
+
+        <form id="sheetBookingForm" onsubmit="handleSheetFormSubmit(event)" class="space-y-3">
+            <input type="hidden" id="sheetHiddenPackage" value="">
+
+            <div>
+                <label class="block text-[11px] uppercase tracking-wider text-neutral-300 font-semibold mb-1">Full Name *</label>
+                <input type="text" id="custName" required placeholder="Enter client's full name" class="w-full bg-obsidian-800 border border-neutral-700 focus:border-gold-400 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                    <label class="block text-[11px] uppercase tracking-wider text-neutral-300 font-semibold mb-1">Phone Number *</label>
+                    <input type="tel" id="custPhone" required pattern="[0-9]{10}" placeholder="10-digit number" class="w-full bg-obsidian-800 border border-neutral-700 focus:border-gold-400 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] uppercase tracking-wider text-neutral-300 font-semibold mb-1">Service Date *</label>
+                    <input type="date" id="custDate" required class="w-full bg-obsidian-800 border border-neutral-700 focus:border-gold-400 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] uppercase tracking-wider text-neutral-300 font-semibold mb-1">Preferred Slot *</label>
+                <select id="custSlot" required class="w-full bg-obsidian-800 border border-neutral-700 focus:border-gold-400 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none">
+                    <option value="Morning (08:00 AM - 11:00 AM)">Morning (08:00 AM - 11:00 AM)</option>
+                    <option value="Midday (11:00 AM - 02:00 PM)">Midday (11:00 AM - 02:00 PM)</option>
+                    <option value="Afternoon (02:00 PM - 05:00 PM)">Afternoon (02:00 PM - 05:00 PM)</option>
+                    <option value="Evening (05:00 PM - 08:00 PM)">Evening (05:00 PM - 08:00 PM)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[11px] uppercase tracking-wider text-neutral-300 font-semibold mb-1">Patna Address & Landmark *</label>
+                <textarea id="custAddress" required rows="2" placeholder="House/Flat No., Road/Colony (e.g., Kankarbagh, Boring Road, Bailey Road)" class="w-full bg-obsidian-800 border border-neutral-700 focus:border-gold-400 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none"></textarea>
+            </div>
+
+            <button type="submit" id="sheetSubmitBtn" class="w-full btn-gold-solid py-3.5 rounded-xl text-xs uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 active:scale-95 shadow-xl mt-3">
+                <i class="fa-regular fa-calendar-check text-xs"></i>
+                <span id="sheetBtnText">Confirm & Reserve Slot</span>
+            </button>
+
+            <p class="text-[10px] text-center text-neutral-400 pt-1">
+                <i class="fa-solid fa-shield-halved text-gold-400 mr-1"></i> No advance payment required. Pay via UPI or Cash after service.
+            </p>
+        </form>
+    </div>
+
+    <!-- ========================================== -->
+    <script>
+const SALON_WHATSAPP_NUMBER = "918893645998";
+
+        // Initial Seed Packages
+        const DEFAULT_PACKAGES = [
+            {
+                id: "pkg1",
+                name: "Basic Glow Combo",
+                price: 1500,
+                originalPrice: 2200,
+                category: "value",
+                badge: "Economy Care",
+                desc: "Refreshing basic facial combined with hand & underarm grooming essentials.",
+                inclusions: ["Basic Facial", "Eyebrow Threading", "Forehead Threading", "Upper Lips Threading", "Full Hand Wax", "Underarms Wax"]
+            },
+            {
+                id: "pkg2",
+                name: "Lotus Beauty Combo",
+                price: 2000,
+                originalPrice: 2800,
+                category: "popular",
+                badge: "Top Pick",
+                desc: "Authentic Lotus botanical facial for long-lasting natural glow with relaxing pedicure.",
+                inclusions: ["Lotus Facial", "Eyebrow Threading", "Forehead Threading", "Upper Lips Threading", "Full Hand Wax", "Underarms Wax", "Basic Pedicure Included"]
+            },
+            {
+                id: "pkg3",
+                name: "Premium Glow Combo",
+                price: 2500,
+                originalPrice: 3600,
+                category: "value",
+                badge: "Radiance Boost",
+                desc: "Instafair facial radiance treatment paired with complete dual hand and foot care.",
+                inclusions: ["Instafair Facial", "Eyebrow Threading", "Forehead Threading", "Upper Lips Threading", "Full Hand Wax", "Underarms Wax", "Basic Pedicure", "Basic Manicure"]
+            },
+            {
+                id: "pkg4",
+                name: "Luxury Skin Combo",
+                price: 3000,
+                originalPrice: 4500,
+                category: "value",
+                badge: "Best Value",
+                desc: "Professional O3+ whitening facial with full body waxing and manicure-pedicure suite.",
+                inclusions: ["O3+ Whitening Facial", "Full Legs Wax", "Full Hand Wax", "Underarms Wax", "Basic Pedicure", "Basic Manicure", "Eyebrow Threading", "Forehead Threading"]
+            },
+            {
+                id: "pkg5",
+                name: "Bridal Glow Combo",
+                price: 4000,
+                originalPrice: 6500,
+                category: "bridal",
+                badge: "Royal VIP Pack",
+                desc: "The ultimate head-to-toe festive transformation featuring authentic O3+ Bridal Facial kit and deep de-tan therapy.",
+                inclusions: ["O3+ Bridal Facial", "De-tan Treatment", "Basic Cleanup", "Full Hand Wax", "Full Legs Wax", "Underarms Wax", "Basic Pedicure", "Basic Manicure", "Eyebrow Threading", "Forehead Threading", "Upper Lips Threading"]
+            }
+        ];
+
+        // Local Storage Keys
+        const STORAGE_KEY_PACKAGES = "anamika_packages_data";
+        const STORAGE_KEY_BOOKINGS = "anamika_bookings_list";
+        const STORAGE_KEY_CAMPAIGN = "anamika_campaign_cfg";
+        const STORAGE_KEY_PIN      = "anamika_admin_pin";
+
+        // State Getters & Initializers
+        function getPackages() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY_PACKAGES);
+                return data ? JSON.parse(data) : DEFAULT_PACKAGES;
+            } catch (e) {
+                return DEFAULT_PACKAGES;
+            }
+        }
+
+        function setPackages(pkgs) {
+            try {
+                localStorage.setItem(STORAGE_KEY_PACKAGES, JSON.stringify(pkgs));
+            } catch(e) {}
+        }
+
+        function getBookings() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY_BOOKINGS);
+                return data ? JSON.parse(data) : [];
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function setBookings(bks) {
+            try {
+                localStorage.setItem(STORAGE_KEY_BOOKINGS, JSON.stringify(bks));
+            } catch(e) {}
+        }
+
+        function getCampaignConfig() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY_CAMPAIGN);
+                return data ? JSON.parse(data) : {
+                    tag: "Seasonal Exclusive",
+                    title: "Chhath Puja Special Offers",
+                    subtitle: "Special curated festive packages &bull; Limited doorstep slots available"
+                };
+            } catch(e) {
+                return {
+                    tag: "Seasonal Exclusive",
+                    title: "Chhath Puja Special Offers",
+                    subtitle: "Special curated festive packages &bull; Limited doorstep slots available"
+                };
+            }
+        }
+
+        function getAdminPin() {
+            try {
+                return localStorage.getItem(STORAGE_KEY_PIN) || "1234";
+            } catch(e) {
+                return "1234";
+            }
+        }
+
+        // Render Dynamic Packages into Front Page
+        function renderPackages(category = 'all') {
+            const container = document.getElementById('packagesContainer');
+            if (!container) return;
+
+            const pkgs = getPackages();
+            const filtered = (category === 'all') ? pkgs : pkgs.filter(p => p.category === category);
+
+            container.innerHTML = filtered.map(pkg => {
+                const isFeatured = pkg.id === 'pkg5' || pkg.badge.includes('Royal');
+                return `
+                    <div class="${isFeatured ? 'glass-card-featured' : 'glass-card'} rounded-3xl p-5 sm:p-7 relative overflow-hidden transition-all">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                            <div>
+                                <span class="inline-block text-[10px] uppercase font-cinzel font-bold text-gold-400 tracking-wider bg-gold-500/10 border border-gold-500/30 px-3 py-1 rounded-full mb-1">
+                                    ${pkg.badge}
+                                </span>
+                                <h3 class="text-xl sm:text-2xl font-cinzel font-bold text-white">${pkg.name}</h3>
+                                <p class="text-xs text-neutral-400 mt-0.5">${pkg.desc}</p>
+                            </div>
+                            <div class="flex items-baseline gap-2.5 self-start sm:self-center">
+                                <span class="text-2xl sm:text-3xl font-cinzel font-black text-gold-300">₹${pkg.price.toLocaleString('en-IN')}</span>
+                                ${pkg.originalPrice ? `<span class="text-xs text-neutral-500 line-through font-mono">₹${pkg.originalPrice.toLocaleString('en-IN')}</span>` : ''}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-5">
+                            ${pkg.inclusions.map(inc => `
+                                <div class="flex items-center gap-2 text-xs text-neutral-300">
+                                    <i class="fa-solid fa-sparkles text-gold-400 text-[10px]"></i>
+                                    <span>${inc}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3 pt-4 border-t border-white/5">
+                            <span class="text-[11px] text-emerald-400 flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check text-[10px]"></i> Doorstep Kit Included
+                            </span>
+                            <button onclick="openBookingSheet('${pkg.name} (₹${pkg.price})')" class="btn-gold-solid px-6 py-2.5 rounded-xl text-xs uppercase font-extrabold tracking-wider active:scale-95 shadow-md">
+                                <span>Select Package</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Apply Festive Campaign Header
+        function applyCampaignHeaders() {
+            const cfg = getCampaignConfig();
+            const tagEl = document.getElementById('displayFestiveTag');
+            const titleEl = document.getElementById('displayFestiveTitle');
+            const subEl = document.getElementById('displayFestiveSubtitle');
+            if (tagEl) tagEl.textContent = cfg.tag;
+            if (titleEl) titleEl.textContent = cfg.title;
+            if (subEl) subEl.innerHTML = cfg.subtitle;
+        }
+
+        // Category Filter
+        function filterPackages(category, btnElement) {
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('bg-gold-500', 'text-obsidian-950', 'font-bold');
+                tab.classList.add('bg-obsidian-900', 'border', 'border-white/10', 'text-neutral-300');
+            });
+            if (btnElement) {
+                btnElement.classList.add('bg-gold-500', 'text-obsidian-950', 'font-bold');
+                btnElement.classList.remove('bg-obsidian-900', 'border', 'border-white/10', 'text-neutral-300');
+            }
+            renderPackages(category);
+        }
+
+        // Customer Booking Flow
+        function openBookingSheet(packageName) {
+            document.getElementById('sheetHiddenPackage').value = packageName;
+            document.getElementById('sheetPackageName').textContent = packageName;
+
+            const backdrop = document.getElementById('bookingBackdrop');
+            const sheet = document.getElementById('bookingSheet');
+
+            backdrop.classList.remove('hidden');
+            sheet.classList.remove('sheet-closed');
+            sheet.classList.add('sheet-open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeBookingSheet() {
+            const backdrop = document.getElementById('bookingBackdrop');
+            const sheet = document.getElementById('bookingSheet');
+
+            backdrop.classList.add('hidden');
+            sheet.classList.remove('sheet-open');
+            sheet.classList.add('sheet-closed');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Handle Booking Submission: Save to Storage + Direct WhatsApp Redirect
+        function handleSheetFormSubmit(e) {
+            e.preventDefault();
+            const btnText = document.getElementById('sheetBtnText');
+
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const date = document.getElementById('custDate').value;
+            const slot = document.getElementById('custSlot').value;
+            const address = document.getElementById('custAddress').value.trim();
+            const pkg = document.getElementById('sheetHiddenPackage').value || 'Salon Package';
+
+            // Extract price estimate from package string if available
+            const priceMatch = pkg.match(/₹([0-9,]+)/);
+            const estPrice = priceMatch ? parseInt(priceMatch[1].replace(/,/g, ''), 10) : 2000;
+
+            // 1. Save locally for Admin Portal
+            const newBooking = {
+                id: "BK" + Math.floor(100000 + Math.random() * 900000),
+                timestamp: new Date().toLocaleString('en-IN'),
+                name,
+                phone,
+                date,
+                slot,
+                address,
+                package: pkg,
+                amount: estPrice,
+                status: "Pending"
+            };
+
+            const bookings = getBookings();
+            bookings.unshift(newBooking);
+            setBookings(bookings);
+
+            btnText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Reserving...`;
+
+            // 2. Open WhatsApp immediately with all client details
+            setTimeout(() => {
+                const textMessage = 
+                    `✨ *THE ANAMIKA LUX - DOORSTEP BOOKING* ✨%0A` +
+                    `---------------------------------------%0A` +
+                    `👤 *Client Name:* ${encodeURIComponent(name)}%0A` +
+                    `📞 *Phone Number:* ${encodeURIComponent(phone)}%0A` +
+                    `💅 *Package:* ${encodeURIComponent(pkg)}%0A` +
+                    `📅 *Date:* ${encodeURIComponent(date)}%0A` +
+                    `⏰ *Time Slot:* ${encodeURIComponent(slot)}%0A` +
+                    `📍 *Address:* ${encodeURIComponent(address)}%0A` +
+                    `---------------------------------------%0A` +
+                    `*Namaste Anamika ji! Kripya mera doorstep slot confirm karein.*`;
+
+                window.open(`https://wa.me/${SALON_WHATSAPP_NUMBER}?text=${textMessage}`, '_blank');
+                closeBookingSheet();
+                btnText.textContent = "Confirm & Reserve Slot";
+                document.getElementById('sheetBookingForm').reset();
+            }, 300);
+        }
+
+        // ==========================================
+        // Custom Add-on Builder Calculator
+        function updateCustomTotal() {
+            const baseSelect = document.getElementById('builderSelect');
+            const basePrice = parseInt(baseSelect.value, 10) || 0;
+
+            const checkedBoxes = document.querySelectorAll('#addonList input[type="checkbox"]:checked');
+            let extras = 0;
+            checkedBoxes.forEach(box => {
+                extras += parseInt(box.value, 10);
+            });
+
+            const total = basePrice + extras;
+            document.getElementById('builderTotalPrice').textContent = '₹' + total;
+        }
+
+        function bookCustomComboSheet() {
+            const baseSelect = document.getElementById('builderSelect');
+            const selectedOpt = baseSelect.options[baseSelect.selectedIndex];
+            const baseName = selectedOpt.getAttribute('data-title');
+            const basePrice = parseInt(baseSelect.value, 10) || 0;
+
+            const checkedBoxes = document.querySelectorAll('#addonList input[type="checkbox"]:checked');
+            const extrasList = [];
+            let extrasTotal = 0;
+
+            checkedBoxes.forEach(box => {
+                extrasList.push(box.getAttribute('data-name'));
+                extrasTotal += parseInt(box.value, 10);
+            });
+
+            const finalPrice = basePrice + extrasTotal;
+            let fullPackageString = `${baseName} (₹${basePrice})`;
+            if (extrasList.length > 0) {
+                fullPackageString += ` + Add-ons: ${extrasList.join(', ')}`;
+            }
+            fullPackageString += ` [Total: ₹${finalPrice}]`;
+
+            openBookingSheet(fullPackageString);
+        }
+
+        // Touch Before/After Glow Slider
+        const sliderBox = document.getElementById('sliderBox');
+        const sliderAfterClip = document.getElementById('sliderAfterClip');
+        const sliderHandle = document.getElementById('sliderHandle');
+        let isSliding = false;
+
+        function setSliderPos(clientX) {
+            if (!sliderBox) return;
+            const rect = sliderBox.getBoundingClientRect();
+            let x = clientX - rect.left;
+            if (x < 0) x = 0;
+            if (x > rect.width) x = rect.width;
+            const pct = (x / rect.width) * 100;
+            sliderAfterClip.style.width = pct + '%';
+            sliderHandle.style.left = pct + '%';
+        }
+
+        if (sliderBox) {
+            sliderBox.addEventListener('mousedown', () => isSliding = true);
+            window.addEventListener('mouseup', () => isSliding = false);
+            window.addEventListener('mousemove', (e) => {
+                if (!isSliding) return;
+                setSliderPos(e.clientX);
+            });
+
+            sliderBox.addEventListener('touchstart', (e) => {
+                isSliding = true;
+                setSliderPos(e.touches[0].clientX);
+            }, { passive: true });
+            window.addEventListener('touchend', () => isSliding = false);
+            window.addEventListener('touchmove', (e) => {
+                if (!isSliding) return;
+                setSliderPos(e.touches[0].clientX);
+            }, { passive: true });
+        }
+
+        // Public storefront initialization (no fake/demo leads are inserted).
+window.addEventListener('DOMContentLoaded', () => {
+    const yearEl = document.getElementById('currentYear');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    const today = new Date();
+    const localToday = [today.getFullYear(), String(today.getMonth()+1).padStart(2,'0'), String(today.getDate()).padStart(2,'0')].join('-');
+    const dateInput = document.getElementById('custDate');
+    if (dateInput) dateInput.min = localToday;
+
+    applyCampaignHeaders();
+    renderPackages();
+});
+
+</script>
+</body>
+</html>
