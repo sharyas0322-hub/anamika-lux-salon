@@ -944,14 +944,17 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
                             </select>
                         </div>
 
-                        <!-- Direct Connect -->
-                        <div class="flex items-center gap-2">
+                        <!-- Direct Connect & Ready-to-send Confirmation -->
+                        <div class="flex flex-wrap items-center gap-2">
                             <a href="tel:${b.phone}" class="px-3 py-1 bg-obsidian-850 border border-white/10 hover:border-gold-400 rounded-lg text-[11px] text-white flex items-center gap-1 active:scale-95">
                                 <i class="fa-solid fa-phone text-emerald-400 text-[10px]"></i> Call
                             </a>
-                            <a href="https://wa.me/91${b.phone}?text=Namaste%20${encodeURIComponent(b.name)}!%20Anamika%20Lux%20se%20aapka%20doorstep%20booking%20confirm%20ho%20gaya%20hai." target="_blank" class="px-3 py-1 bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 rounded-lg text-[11px] text-emerald-300 flex items-center gap-1 active:scale-95">
-                                <i class="fa-brands fa-whatsapp"></i> Chat WhatsApp
-                            </a>
+                            <button type="button" onclick="openBookingConfirmation('${b.id}', 'whatsapp')" class="px-3 py-1 bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 rounded-lg text-[11px] text-emerald-300 flex items-center gap-1 active:scale-95">
+                                <i class="fa-brands fa-whatsapp"></i> WhatsApp Confirmation
+                            </button>
+                            <button type="button" onclick="openBookingConfirmation('${b.id}', 'sms')" class="px-3 py-1 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 rounded-lg text-[11px] text-sky-300 flex items-center gap-1 active:scale-95">
+                                <i class="fa-solid fa-message"></i> SMS
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -959,12 +962,63 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
             }).join('');
         }
 
+        // Build a booking-specific confirmation message for WhatsApp or SMS.
+        function buildBookingConfirmationMessage(booking) {
+            return `Namaste ${booking.name || "Customer"} ji! 🌸
+
+The Anamika Lux mein aapki doorstep salon booking CONFIRM ho gayi hai.
+
+Booking ID: ${booking.id || "N/A"}
+Package: ${booking.package || "Salon Service"}
+Amount: ₹${booking.amount || 0}
+Date: ${booking.date || "As discussed"}
+Time: ${booking.slot || "As discussed"}
+Address: ${booking.address || "As provided"}
+
+Kripya appointment ke liye apni Booking ID sambhal kar rakhein.
+Dhanyavaad!
+The Anamika Lux | Patna`;
+        }
+
+        function openBookingConfirmation(bookingId, channel = "whatsapp") {
+            const booking = getBookings().find(b => b.id === bookingId);
+            if (!booking) {
+                showToast("Booking not found.");
+                return;
+            }
+
+            const rawPhone = String(booking.phone || "").replace(/\\D/g, "");
+            const customerPhone = rawPhone.length === 10 ? "91" + rawPhone : rawPhone;
+            if (customerPhone.length < 10) {
+                showToast("Customer phone number is missing or invalid.");
+                return;
+            }
+
+            const message = buildBookingConfirmationMessage(booking);
+            const encodedMessage = encodeURIComponent(message);
+
+            if (channel === "sms") {
+                window.location.href = `sms:+${customerPhone}?body=${encodedMessage}`;
+            } else {
+                // Opens WhatsApp with the complete message filled in; owner presses Send.
+                window.open(`https://wa.me/${customerPhone}?text=${encodedMessage}`, "_blank");
+            }
+        }
+
         function updateBookingStatus(bookingId, newStatus) {
             const bookings = getBookings();
             const target = bookings.find(b => b.id === bookingId);
             if (target) {
+                const wasAlreadyConfirmed = target.status === "Confirmed";
                 target.status = newStatus;
                 setBookings(bookings);
+
+                // When status first changes to Confirmed, open the customer's WhatsApp
+                // chat with booking ID and appointment details already typed in.
+                if (newStatus === "Confirmed" && !wasAlreadyConfirmed) {
+                    openBookingConfirmation(bookingId, "whatsapp");
+                }
+
                 showToast(`Booking marked as ${newStatus}`);
                 loadDashboardMetrics();
                 filterBookingsDisplay();
