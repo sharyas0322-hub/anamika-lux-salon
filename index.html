@@ -240,6 +240,10 @@
                     <i class="fa-solid fa-gift"></i>
                     <span>View Festive & Special Offers</span>
                 </a>
+                <a href="#serviceMenu" class="w-full sm:w-auto btn-gold-outline py-3 px-6 rounded-2xl text-xs uppercase tracking-wider font-bold flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>View Full Service Menu</span>
+                </a>
                 <button onclick="openBookingSheet('Doorstep Salon Booking')" class="w-full sm:w-auto btn-gold-outline py-3 px-6 rounded-2xl text-xs uppercase tracking-wider font-bold flex items-center justify-center gap-2 active:scale-95">
                     <i class="fa-regular fa-calendar-check text-gold-400"></i>
                     <span>Book Appointment Slot</span>
@@ -290,6 +294,50 @@
             <div id="packagesContainer" class="space-y-5 sm:space-y-6">
                 <!-- Dynamically rendered by renderPackages() -->
             </div>
+        </section>
+
+
+
+        <!-- COMPLETE SERVICE MENU FROM THE ANAMIKA LUX PRINTED RATE CARD -->
+        <section id="serviceMenu" class="mb-12 scroll-mt-24">
+            <div class="text-center mb-6">
+                <span class="text-[10px] uppercase font-cinzel text-gold-400 tracking-[0.2em] font-semibold block mb-1">The Anamika Lux • Patna</span>
+                <h2 class="text-xl sm:text-3xl font-cinzel font-bold text-white">Complete Service Menu & Price List</h2>
+                <p class="text-xs text-neutral-400 mt-2 max-w-2xl mx-auto">Premium beauty services at your doorstep. Choose a service below to request your appointment.</p>
+            </div>
+
+            <div id="rateCardGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+            <div class="glass-card-featured rounded-3xl p-5 sm:p-7 mt-5">
+                <div class="text-center mb-5">
+                    <span class="text-[10px] uppercase font-cinzel text-gold-300 tracking-[0.2em] font-semibold">Special Packages</span>
+                    <h3 class="text-lg sm:text-2xl font-cinzel font-bold text-white mt-1">Signature Beauty Packages</h3>
+                    <p class="text-xs text-neutral-400 mt-1">Curated combinations copied from the printed Anamika Lux package card.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-obsidian-950/80 border border-gold-500/25 rounded-2xl p-4">
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <h4 class="font-cinzel font-bold text-gold-200">Signature Beauty Package</h4>
+                            <span class="text-xl font-cinzel font-black text-gold-300">₹5,000</span>
+                        </div>
+                        <ul class="text-[11px] text-neutral-300 grid grid-cols-1 sm:grid-cols-2 gap-1.5 mb-4 list-disc pl-4">
+                            <li>Full Leg Wax</li><li>Full Hand Wax</li><li>Full Leg Detan</li><li>Full Hand Detan</li><li>Facial</li><li>Face Detan</li><li>Eyebrow Threading</li><li>Forehead Threading</li><li>Upper Lip Threading</li><li>Basic Haircut</li>
+                        </ul>
+                        <button type="button" onclick="openBookingSheet('Signature Beauty Package (₹5000)')" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Book ₹5,000 Package</button>
+                    </div>
+                    <div class="bg-obsidian-950/80 border border-gold-500/40 rounded-2xl p-4">
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <h4 class="font-cinzel font-bold text-gold-200">Royal Complete Care Package</h4>
+                            <span class="text-xl font-cinzel font-black text-gold-300">₹7,000</span>
+                        </div>
+                        <ul class="text-[11px] text-neutral-300 grid grid-cols-1 sm:grid-cols-2 gap-1.5 mb-4 list-disc pl-4">
+                            <li>Full Body Wax</li><li>Full Body Polishing</li><li>Eyebrow Threading</li><li>Forehead Threading</li><li>Upper Lip Threading</li><li>O3+ Facial</li><li>Face Detan</li><li>Manicure</li><li>Pedicure</li><li>Haircut</li>
+                        </ul>
+                        <button type="button" onclick="openBookingSheet('Royal Complete Care Package (₹7000)')" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Book ₹7,000 Package</button>
+                    </div>
+                </div>
+            </div>
+            <p class="text-[10px] text-neutral-500 text-center mt-4">Prices are in Indian Rupees (₹). “Starting from” rates and multi-option services are confirmed with the client before appointment confirmation. Services marked “Price on enquiry” are quoted by the salon.</p>
         </section>
 
         <!-- Interactive Custom Combo Builder -->
@@ -896,6 +944,138 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
         }
 
         // Public storefront initialization (no fake/demo leads are inserted).
+
+        // Printed rate card service catalogue. The booking form receives the chosen service and displayed rate.
+        const RATE_CARD_CATEGORIES = [
+            {
+                title: "Hair Care & Styling",
+                icon: "fa-scissors",
+                items: [
+                    ["Hair Cut & Blow Dry", "₹500", "₹500"],
+                    ["Hair Spa", "Starting ₹800", "₹800"],
+                    ["Hair Colour", "Starting ₹1,500", "₹1500"],
+                    ["Keratin / Smoothening", "Starting ₹2,500", "₹2500"],
+                    ["Full Arms Wax — Honey", "₹200", "₹200"],
+                    ["Full Arms Wax — Chocolate", "₹350", "₹350"],
+                    ["Full Arms Wax — Rica", "₹500", "₹500"],
+                    ["Under Arms Wax — Honey", "₹70", "₹70"],
+                    ["Under Arms Wax — Chocolate", "₹90", "₹90"],
+                    ["Under Arms Wax — Rica", "₹110", "₹110"],
+                    ["Upper Lips Wax", "₹70", "₹70"]
+                ]
+            },
+            {
+                title: "Skin Care",
+                icon: "fa-spa",
+                items: [
+                    ["Basic Facial", "₹1,000", "₹1000"],
+                    ["Lotus Facial", "₹1,500", "₹1500"],
+                    ["Detan Facial", "₹2,000", "₹2000"],
+                    ["O3+ Facial", "₹2,300", "₹2300"],
+                    ["Bridal Facial", "₹4,000", "₹4000"],
+                    ["Basic White Facial", "₹3,000", "₹3000"],
+                    ["Cleanup — available options", "₹450 / ₹700 / ₹1,200", "₹450"],
+                    ["Body Bleach / Detan", "₹2,500", "₹2500"],
+                    ["Face Detan", "Included in special packages", "₹0 (quote to confirm)"]
+                ]
+            },
+            {
+                title: "Waxing",
+                icon: "fa-leaf",
+                items: [
+                    ["Half Legs Wax — Honey", "₹250", "₹250"],
+                    ["Half Legs Wax — Chocolate", "₹400", "₹400"],
+                    ["Half Legs Wax — Rica", "₹550", "₹550"],
+                    ["Full Legs Wax — Honey", "₹250", "₹250"],
+                    ["Full Legs Wax — Chocolate", "₹400", "₹400"],
+                    ["Full Legs Wax — Rica", "₹550", "₹550"],
+                    ["Full Back Wax — Honey", "₹500", "₹500"],
+                    ["Full Back Wax — Chocolate", "₹800", "₹800"],
+                    ["Full Back Wax — Rica", "₹1,100", "₹1100"],
+                    ["Bikini Line", "₹2,000", "₹2000"]
+                ]
+            },
+            {
+                title: "Manicure & Pedicure",
+                icon: "fa-hand-sparkles",
+                items: [
+                    ["Basic Pedicure", "₹700", "₹700"],
+                    ["Basic Manicure", "₹400", "₹400"],
+                    ["Lotus Pedicure", "₹900", "₹900"],
+                    ["Lotus Manicure", "₹600", "₹600"],
+                    ["Aroma Magic Pedicure", "₹1,000", "₹1000"],
+                    ["Aroma Magic Manicure", "₹800", "₹800"],
+                    ["Crystal Spa Body Polishing", "₹3,200", "₹3200"],
+                    ["Nail Art / Polish Change", "Add-on ₹150", "₹150"],
+                    ["Body Massage — options", "₹1,500 / ₹2,000", "₹1500"]
+                ]
+            },
+            {
+                title: "Bridal & Party Makeup",
+                icon: "fa-crown",
+                items: [
+                    ["Party Makeup — options", "₹2,000 / ₹2,500 / ₹3,000", "₹2000"],
+                    ["Bridal Basic HD Makeup — options", "₹8,000 / ₹10,000 / ₹12,000", "₹8000"],
+                    ["Engagement Makeup — options", "₹5,000 / ₹6,000 / ₹7,000", "₹5000"],
+                    ["Airbrush Makeup", "₹15,000", "₹15000"],
+                    ["Groom Makeup", "₹3,500", "₹3500"],
+                    ["Reception Makeup", "₹7,000", "₹7000"],
+                    ["Saree Draping", "₹450", "₹450"],
+                    ["Hair Styling (Bridal / Party) — options", "₹500 / ₹1,000 / ₹1,500", "₹500"],
+                    ["Couples Makeup — Bride & Groom", "₹12,000", "₹12000"],
+                    ["Couples Makeup — Bride & Groom HD", "₹15,000", "₹15000"]
+                ]
+            },
+            {
+                title: "Threading & Other Package Services",
+                icon: "fa-eye",
+                items: [
+                    ["Eyebrow Threading", "Price on enquiry", "₹0 (quote to confirm)"],
+                    ["Forehead Threading", "Price on enquiry", "₹0 (quote to confirm)"],
+                    ["Upper Lip Threading", "Price on enquiry", "₹0 (quote to confirm)"],
+                    ["Full Body Wax", "Included in ₹7,000 package", "₹0 (quote to confirm)"],
+                    ["Full Body Polishing", "Included in ₹7,000 package", "₹0 (quote to confirm)"],
+                    ["Full Leg Detan", "Included in ₹5,000 package", "₹0 (quote to confirm)"],
+                    ["Full Hand Detan", "Included in ₹5,000 package", "₹0 (quote to confirm)"],
+                    ["Basic Haircut", "Price on enquiry", "₹0 (quote to confirm)"],
+                    ["Haircut", "Price on enquiry", "₹0 (quote to confirm)"]
+                ]
+            }
+        ];
+
+        function renderRateCardMenu() {
+            const root = document.getElementById("rateCardGrid");
+            if (!root) return;
+            root.innerHTML = RATE_CARD_CATEGORIES.map(category => `
+                <article class="glass-card rounded-2xl p-4 sm:p-5 border-gold-500/25">
+                    <div class="flex items-center gap-2 pb-3 mb-2 border-b border-gold-500/20">
+                        <span class="w-9 h-9 rounded-full bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-300"><i class="fa-solid ${category.icon}"></i></span>
+                        <h3 class="font-cinzel text-sm sm:text-base font-bold text-gold-200">${category.title}</h3>
+                    </div>
+                    <div class="space-y-1.5">
+                        ${category.items.map(item => `
+                            <div class="flex items-center justify-between gap-2 border-b border-white/5 py-1.5 last:border-0">
+                                <div class="min-w-0">
+                                    <p class="text-[11px] sm:text-xs text-neutral-200">${item[0]}</p>
+                                    <p class="text-[10px] text-gold-300 font-mono">${item[1]}</p>
+                                </div>
+                                <button type="button" data-rate-book data-service="${encodeURIComponent(item[0])}" data-price="${encodeURIComponent(item[2])}" class="shrink-0 px-3 py-1.5 rounded-lg bg-gold-500/10 border border-gold-500/35 text-gold-200 text-[10px] font-bold hover:bg-gold-500 hover:text-obsidian-950 transition-all">Book</button>
+                            </div>
+                        `).join("")}
+                    </div>
+                </article>
+            `).join("");
+
+            root.querySelectorAll("[data-rate-book]").forEach(button => {
+                button.addEventListener("click", () => {
+                    const service = decodeURIComponent(button.dataset.service || "");
+                    const price = decodeURIComponent(button.dataset.price || "");
+                    openBookingSheet(`${service} (${price})`);
+                });
+            });
+        }
+
+
 window.addEventListener('DOMContentLoaded', () => {
     const yearEl = document.getElementById('currentYear');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -907,6 +1087,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     applyCampaignHeaders();
     renderPackages();
+    renderRateCardMenu();
 });
 
 </script>
