@@ -134,6 +134,7 @@
             scrollbar-width: none;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="text-neutral-200 font-sans min-h-screen relative overflow-x-hidden antialiased">
 
@@ -151,16 +152,16 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h3 class="font-cinzel text-lg font-bold text-white tracking-wider">Owner & Staff Portal</h3>
-                <p class="text-xs text-neutral-400 mt-1">Enter your owner PIN to access the salon dashboard</p>
+                <p class="text-xs text-neutral-400 mt-1">Sign in with your owner email and password</p>
             </div>
 
             <form onsubmit="handleAdminPinSubmit(event)" class="space-y-4">
                 <div>
-                    <input type="password" id="pinDirectInput" maxlength="6" inputmode="numeric" placeholder="Enter owner PIN" autofocus required class="w-full text-center text-2xl tracking-[0.4em] font-mono font-bold bg-obsidian-950 border-2 border-neutral-700 focus:border-gold-400 rounded-2xl py-3 text-gold-300 focus:outline-none transition-all">
+                    <input type="email" id="adminEmailInput" autocomplete="username" placeholder="Owner email address" required class="w-full bg-obsidian-950 border-2 border-neutral-700 focus:border-gold-400 rounded-2xl py-3 px-4 text-sm text-white focus:outline-none transition-all"><input type="password" id="adminPasswordInput" autocomplete="current-password" placeholder="Password" required class="w-full bg-obsidian-950 border-2 border-neutral-700 focus:border-gold-400 rounded-2xl py-3 px-4 text-sm text-white focus:outline-none transition-all mt-3">
                 </div>
 
                 <div id="pinErrorMessage" class="hidden text-center text-xs text-rose-400 font-medium">
-                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Incorrect PIN. Please try again.
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Login failed. Check your email and password.
                 </div>
 
                 <div class="space-y-2">
@@ -168,7 +169,7 @@
                         Unlock Admin Dashboard
                     </button>
                 </div>
-            <p class="text-[10px] text-center text-amber-300/80 mt-3">Temporary browser-only PIN lock. Backend authentication is required before using this with real customer data.</p>
+            <p class="text-[10px] text-center text-amber-300/80 mt-3">Secure sign-in is verified against the salon's Supabase admin access list.</p>
             </form>
             <a href="index.html" class="block text-center text-[11px] text-gold-300 underline mt-3">Back to public website</a>
         </div>
@@ -417,7 +418,7 @@
                 <div id="adminTab-packages" class="hidden space-y-5">
                     <div class="border-b border-white/5 pb-3">
                         <h2 class="text-base font-cinzel font-bold text-white">All Combos & Service Prices</h2>
-                        <p class="text-xs text-neutral-400">Yahin se combo aur individual service ke rates edit karein. Save karne ke baad isi browser mein public page par naye rates dikhte hain.</p>
+                        <p class="text-xs text-neutral-400">Yahin se combo aur individual service ke rates edit karein. Save karte hi shared website par sabhi customers ko latest rates dikhte hain.</p>
                     </div>
                     <section class="glass-card rounded-2xl p-4 sm:p-5 border-gold-500/30 space-y-3">
                         <div class="flex flex-wrap items-center justify-between gap-2">
@@ -443,7 +444,7 @@
                         <div id="adminServicePricesEditor" class="space-y-3"><!-- Service price rows generated here --></div>
                         <button type="button" onclick="saveAllServicePriceChanges()" class="btn-gold-solid px-6 py-3 rounded-xl text-xs uppercase font-extrabold tracking-wider active:scale-95 shadow-xl">Save All Service Prices</button>
                     </section>
-                    <p class="text-[10px] text-amber-200/80 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">Important: is static version mein saved rates isi browser/device mein save hote hain. Har customer ke phone par rates ek jaise update karne ke liye shared online database connection abhi zaroori hai.</p>
+                    <p class="text-[10px] text-emerald-200/80 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3">Shared database active: saved rates are stored online and published to all visitors.</p>
                 </div>
 
                 <!-- VIEW 5: SECURITY & SETTINGS -->
@@ -453,20 +454,7 @@
                         <p class="text-xs text-neutral-400">Configure your secret passcode and business routing.</p>
                     </div>
 
-                    <form onsubmit="changeAdminPin(event)" class="glass-card p-5 rounded-2xl border-gold-500/30 space-y-3">
-                        <h3 class="text-xs font-bold text-gold-300 uppercase tracking-wider">Change Admin PIN</h3>
-                        <div>
-                            <label class="block text-[11px] text-neutral-300 mb-1">Current PIN</label>
-                            <input type="password" id="curPinInput" required maxlength="6" class="w-full bg-obsidian-850 border border-neutral-700 focus:border-gold-400 rounded-xl px-3 py-2 text-xs text-white">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] text-neutral-300 mb-1">New PIN (4-6 digits)</label>
-                            <input type="password" id="newPinInput" required maxlength="6" class="w-full bg-obsidian-850 border border-neutral-700 focus:border-gold-400 rounded-xl px-3 py-2 text-xs text-white">
-                        </div>
-                        <button type="submit" class="btn-gold-solid px-4 py-2 rounded-xl text-xs font-bold tracking-wider active:scale-95">
-                            Update PIN
-                        </button>
-                    </form>
+                    <div class="glass-card p-5 rounded-2xl border-gold-500/30 space-y-2"><h3 class="text-xs font-bold text-gold-300 uppercase tracking-wider">Secure Owner Account</h3><p class="text-xs text-neutral-300">Admin access is controlled by Supabase email/password authentication and the private owner allowlist. PIN-based browser login has been disabled.</p><p class="text-[10px] text-neutral-500">Password management is handled securely by your Supabase Auth account.</p></div>
 
                     <div class="glass-card p-5 rounded-2xl border-white/10 space-y-2 text-xs">
                         <h3 class="font-bold text-white">Configured Business Line</h3>
@@ -1744,5 +1732,277 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+
+<script>
+(function () {
+  const DB_URL = "https://uwbcgwvrvtvggmaejxfu.supabase.co";
+  const DB_KEY = "sb_publishable_CqhbUiMSpMpBSl2X_vKdHg_WimgwESl";
+  const db = window.supabase.createClient(DB_URL, DB_KEY);
+  window.ANAMIKA_DB = db;
+  window.ANAMIKA_PACKAGES = [];
+  window.ANAMIKA_BOOKINGS = [];
+  window.ANAMIKA_CAMPAIGN = {tag:"Seasonal Exclusive", title:"Special Offers", subtitle:"Salon offers"};
+  window.ANAMIKA_SERVICE_PRICE_CONFIG = {};
+  window.ANAMIKA_SIGNATURE_PRICES = {signature:5000, royal:7000};
+  let adminChannel = null;
+
+  function mapBooking(row) {
+    return {
+      id: row.booking_code, dbId: row.id,
+      timestamp: row.created_at ? new Date(row.created_at).toLocaleString("en-IN") : "",
+      name: row.customer_name, phone: row.customer_phone,
+      date: row.appointment_date, slot: row.appointment_slot,
+      address: row.address, package: row.selected_package,
+      amount: Number(row.total_amount) || 0, status: row.status
+    };
+  }
+
+  async function refreshAdminCloudData() {
+    const results = await Promise.all([
+      db.from("salon_services").select("*").order("sort_order"),
+      db.from("salon_packages").select("*").order("sort_order"),
+      db.from("salon_campaign").select("*").eq("id", true).maybeSingle(),
+      db.from("bookings").select("*").order("created_at", {ascending:false})
+    ]);
+    results.forEach(function (result) { if (result.error) throw result.error; });
+    const services = results[0].data || [];
+    const packages = results[1].data || [];
+    const campaign = results[2].data;
+    const bookings = results[3].data || [];
+    window.ANAMIKA_PACKAGES = packages.filter(function (p) { return p.package_type === "combo"; }).map(function (p) {
+      return {id:p.package_id, name:p.name, price:Number(p.price), originalPrice:Number(p.original_price),
+        category:p.category, badge:p.badge, desc:p.description, inclusions:Array.isArray(p.inclusions)?p.inclusions:[]};
+    });
+    const signature = packages.find(function (p) { return p.package_type === "signature"; });
+    const royal = packages.find(function (p) { return p.package_type === "royal"; });
+    window.ANAMIKA_SIGNATURE_PRICES = {
+      signature:signature ? Number(signature.price) : 5000,
+      royal:royal ? Number(royal.price) : 7000
+    };
+    window.ANAMIKA_SERVICE_PRICE_CONFIG = Object.fromEntries(services.map(function (s) {
+      return [s.name, {display:s.display_price, amount:Number(s.cart_price) || 0}];
+    }));
+    window.ANAMIKA_CAMPAIGN = campaign ? {
+      tag:campaign.tag, title:campaign.title, subtitle:campaign.subtitle
+    } : window.ANAMIKA_CAMPAIGN;
+    window.ANAMIKA_BOOKINGS = bookings.map(mapBooking);
+  }
+
+  window.getPackages = function () { return window.ANAMIKA_PACKAGES || []; };
+  window.setPackages = function (packages) { window.ANAMIKA_PACKAGES = packages; };
+  window.getBookings = function () { return window.ANAMIKA_BOOKINGS || []; };
+  window.setBookings = function (bookings) { window.ANAMIKA_BOOKINGS = bookings; };
+  window.getCampaignConfig = function () { return window.ANAMIKA_CAMPAIGN; };
+  window.getSavedServicePriceConfig = function () { return window.ANAMIKA_SERVICE_PRICE_CONFIG || {}; };
+  window.getSavedSignaturePrices = function () { return window.ANAMIKA_SIGNATURE_PRICES || {signature:5000,royal:7000}; };
+
+  const baseOpenAdminPortal = window.openAdminPortal;
+  const baseCloseAdminPortal = window.closeAdminPortal;
+
+  window.openAdminAuth = function () {
+    const modal = document.getElementById("adminPinModal");
+    const error = document.getElementById("pinErrorMessage");
+    const email = document.getElementById("adminEmailInput");
+    if (modal) modal.style.display = "flex";
+    if (error) error.classList.add("hidden");
+    if (email) setTimeout(function () { email.focus(); }, 100);
+  };
+
+  window.handleAdminPinSubmit = async function (event) {
+    if (event) event.preventDefault();
+    const email = document.getElementById("adminEmailInput").value.trim();
+    const password = document.getElementById("adminPasswordInput").value;
+    const errorBox = document.getElementById("pinErrorMessage");
+    const button = document.querySelector("#adminPinModal button[type='submit']");
+    if (button) button.disabled = true;
+    if (errorBox) { errorBox.classList.add("hidden"); errorBox.textContent = ""; }
+    try {
+      const login = await db.auth.signInWithPassword({email:email, password:password});
+      if (login.error) throw login.error;
+      const access = await db.from("admin_users").select("user_id").eq("user_id", login.data.user.id).maybeSingle();
+      if (access.error) throw access.error;
+      if (!access.data) {
+        await db.auth.signOut();
+        throw new Error("This account is not authorised as a salon admin yet.");
+      }
+      const modal = document.getElementById("adminPinModal");
+      if (modal) modal.style.display = "none";
+      await window.openAdminPortal();
+    } catch (error) {
+      console.error("Admin sign-in failed:", error);
+      if (errorBox) {
+        errorBox.textContent = error.message || "Email or password is incorrect.";
+        errorBox.classList.remove("hidden");
+      }
+    } finally {
+      if (button) button.disabled = false;
+    }
+  };
+
+  window.openAdminPortal = async function () {
+    try {
+      await refreshAdminCloudData();
+      if (baseOpenAdminPortal) baseOpenAdminPortal();
+      if (adminChannel) db.removeChannel(adminChannel);
+      adminChannel = db.channel("anamika-admin-live-updates")
+        .on("postgres_changes", {event:"*", schema:"public", table:"bookings"}, async function () {
+          await refreshAdminCloudData();
+          window.loadDashboardMetrics();
+          window.filterBookingsDisplay();
+        })
+        .on("postgres_changes", {event:"*", schema:"public", table:"salon_services"}, async function () {
+          await refreshAdminCloudData();
+          window.loadAdminServicePrices();
+        })
+        .on("postgres_changes", {event:"*", schema:"public", table:"salon_packages"}, async function () {
+          await refreshAdminCloudData();
+          window.loadAdminPackages();
+        })
+        .on("postgres_changes", {event:"*", schema:"public", table:"salon_campaign"}, async function () {
+          await refreshAdminCloudData();
+          window.loadAdminCampaign();
+          window.loadDashboardMetrics();
+        })
+        .subscribe();
+    } catch (error) {
+      console.error("Could not load admin cloud data:", error);
+      window.showToast("Database load failed: " + (error.message || "Please retry."));
+    }
+  };
+
+  window.closeAdminPortal = async function () {
+    if (adminChannel) { await db.removeChannel(adminChannel); adminChannel = null; }
+    if (baseCloseAdminPortal) baseCloseAdminPortal();
+    await db.auth.signOut();
+    window.ANAMIKA_BOOKINGS = [];
+  };
+
+  window.saveAllPackageChanges = async function () {
+    const packages = window.getPackages();
+    const updates = packages.map(function (p, index) {
+      const name = document.getElementById("pkgName_" + index);
+      const price = document.getElementById("pkgPrice_" + index);
+      const original = document.getElementById("pkgOrig_" + index);
+      return db.from("salon_packages").update({
+        name:name ? name.value.trim() : p.name,
+        price:Math.max(0, Number(price ? price.value : p.price) || 0),
+        original_price:Math.max(0, Number(original ? original.value : p.originalPrice) || 0)
+      }).eq("package_id", p.id);
+    });
+    updates.push(db.from("salon_packages").update({price:Math.max(0, Number(document.getElementById("signaturePackagePrice").value)||0)}).eq("package_id","signature"));
+    updates.push(db.from("salon_packages").update({price:Math.max(0, Number(document.getElementById("royalPackagePrice").value)||0)}).eq("package_id","royal"));
+    const results = await Promise.all(updates);
+    const failure = results.find(function (result) { return result.error; });
+    if (failure) { window.showToast("Save failed: " + failure.error.message); return; }
+    await refreshAdminCloudData();
+    window.loadAdminPackages();
+    window.renderPackages("all");
+    window.showToast("Combo prices published to all visitors.");
+  };
+
+  window.resetPackagesToDefault = async function () {
+    const defaults = DEFAULT_PACKAGES.map(function (p) {
+      return {package_id:p.id, name:p.name, price:p.price, original_price:p.originalPrice};
+    });
+    for (const p of defaults) {
+      const result = await db.from("salon_packages").update({name:p.name,price:p.price,original_price:p.original_price}).eq("package_id",p.package_id);
+      if (result.error) { window.showToast(result.error.message); return; }
+    }
+    await db.from("salon_packages").update({price:5000}).eq("package_id","signature");
+    await db.from("salon_packages").update({price:7000}).eq("package_id","royal");
+    await refreshAdminCloudData();
+    window.loadAdminPackages();
+    window.renderPackages("all");
+    window.showToast("Default packages restored online.");
+  };
+
+  window.saveAllServicePriceChanges = async function () {
+    const editor = document.getElementById("adminServicePricesEditor");
+    if (!editor) return;
+    const rows = [];
+    editor.querySelectorAll("[data-service-display]").forEach(function (displayInput) {
+      const key = decodeURIComponent(displayInput.dataset.serviceKey || "");
+      const row = displayInput.parentElement;
+      const amountInput = row.querySelector("[data-service-amount]");
+      if (key) rows.push({service_key:key,display_price:displayInput.value.trim(),cart_price:Math.max(0,Number(amountInput && amountInput.value)||0)});
+    });
+    const result = await db.from("salon_services").upsert(rows, {onConflict:"service_key"});
+    if (result.error) { window.showToast("Save failed: " + result.error.message); return; }
+    await refreshAdminCloudData();
+    window.loadAdminServicePrices();
+    window.showToast("Service prices published to all visitors.");
+  };
+
+  window.resetServicePricesToDefault = async function () {
+    const rows = [];
+    DEFAULT_SERVICE_PRICE_CATEGORIES.forEach(function (category) {
+      category.items.forEach(function (item) {
+        rows.push({service_key:item[0], display_price:String(item[1]), cart_price:Number(item[2])||0});
+      });
+    });
+    const result = await db.from("salon_services").upsert(rows, {onConflict:"service_key"});
+    if (result.error) { window.showToast(result.error.message); return; }
+    await refreshAdminCloudData();
+    window.loadAdminServicePrices();
+    window.showToast("Default service rates restored online.");
+  };
+
+  window.saveCampaignSettings = async function (event) {
+    if (event) event.preventDefault();
+    const cfg = {
+      id:true,
+      tag:document.getElementById("cfgTag").value.trim() || "Seasonal Exclusive",
+      title:document.getElementById("cfgTitle").value.trim() || "Special Offers",
+      subtitle:document.getElementById("cfgSubtitle").value.trim() || "Special curated doorstep packages"
+    };
+    const result = await db.from("salon_campaign").upsert(cfg, {onConflict:"id"});
+    if (result.error) { window.showToast("Publish failed: " + result.error.message); return; }
+    await refreshAdminCloudData();
+    window.applyCampaignHeaders && window.applyCampaignHeaders();
+    window.loadDashboardMetrics();
+    window.showToast("Campaign published to all visitors.");
+  };
+
+  window.updateBookingStatus = async function (bookingId, newStatus) {
+    const booking = window.getBookings().find(function (b) { return b.id === bookingId; });
+    if (!booking) return;
+    const result = await db.from("bookings").update({status:newStatus}).eq("id",booking.dbId);
+    if (result.error) { window.showToast(result.error.message); return; }
+    await refreshAdminCloudData();
+    if (newStatus === "Confirmed") window.openBookingConfirmation(bookingId,"whatsapp");
+    window.showToast("Booking marked as " + newStatus);
+    window.loadDashboardMetrics();
+    window.filterBookingsDisplay();
+  };
+
+  window.deleteBooking = async function (bookingId) {
+    if (!window.confirm("Delete this booking permanently?")) return;
+    const booking = window.getBookings().find(function (b) { return b.id === bookingId; });
+    if (!booking) return;
+    const result = await db.from("bookings").delete().eq("id",booking.dbId);
+    if (result.error) { window.showToast(result.error.message); return; }
+    await refreshAdminCloudData();
+    window.loadDashboardMetrics();
+    window.filterBookingsDisplay();
+    window.showToast("Booking deleted.");
+  };
+
+  window.clearAllBookings = async function () {
+    if (!window.confirm("Delete ALL salon bookings permanently? This cannot be undone.")) return;
+    const result = await db.from("bookings").delete().gte("created_at","1970-01-01T00:00:00Z");
+    if (result.error) { window.showToast(result.error.message); return; }
+    await refreshAdminCloudData();
+    window.loadDashboardMetrics();
+    window.filterBookingsDisplay();
+    window.showToast("All bookings deleted.");
+  };
+
+  window.changeAdminPin = function (event) {
+    if (event) event.preventDefault();
+    window.showToast("Use your secure Supabase account to manage your password.");
+  };
+})();
+</script>
+
 </body>
 </html>
