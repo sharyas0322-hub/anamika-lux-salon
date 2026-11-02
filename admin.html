@@ -1926,8 +1926,13 @@ window.addEventListener('DOMContentLoaded', () => {
       const amountInput = row.querySelector("[data-service-amount]");
       if (key) rows.push({service_key:key,display_price:displayInput.value.trim(),cart_price:Math.max(0,Number(amountInput && amountInput.value)||0)});
     });
-    const result = await db.from("salon_services").upsert(rows, {onConflict:"service_key"});
-    if (result.error) { window.showToast("Save failed: " + result.error.message); return; }
+    const results = await Promise.all(rows.map(function (row) {
+      return db.from("salon_services").update({
+        display_price:row.display_price, cart_price:row.cart_price
+      }).eq("service_key", row.service_key);
+    }));
+    const failure = results.find(function (result) { return result.error; });
+    if (failure) { window.showToast("Save failed: " + failure.error.message); return; }
     await refreshAdminCloudData();
     window.loadAdminServicePrices();
     window.showToast("Service prices published to all visitors.");
@@ -1940,8 +1945,13 @@ window.addEventListener('DOMContentLoaded', () => {
         rows.push({service_key:item[0], display_price:String(item[1]), cart_price:Number(item[2])||0});
       });
     });
-    const result = await db.from("salon_services").upsert(rows, {onConflict:"service_key"});
-    if (result.error) { window.showToast(result.error.message); return; }
+    const results = await Promise.all(rows.map(function (row) {
+      return db.from("salon_services").update({
+        display_price:row.display_price, cart_price:row.cart_price
+      }).eq("service_key", row.service_key);
+    }));
+    const failure = results.find(function (result) { return result.error; });
+    if (failure) { window.showToast("Reset failed: " + failure.error.message); return; }
     await refreshAdminCloudData();
     window.loadAdminServicePrices();
     window.showToast("Default service rates restored online.");
