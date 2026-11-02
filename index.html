@@ -261,9 +261,9 @@
                         <span id="displayFestiveTag" class="font-cinzel text-[10px] uppercase tracking-widest text-gold-300 font-bold">Seasonal Exclusive</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <h2 id="displayFestiveTitle" class="text-xl sm:text-2xl font-cinzel font-bold text-white">Chhath Puja Special Offers</h2>
+                        <h2 id="displayFestiveTitle" class="text-xl sm:text-2xl font-cinzel font-bold text-white">Combo Packages & Special Offers</h2>
                     </div>
-                    <p id="displayFestiveSubtitle" class="text-xs text-neutral-400 mt-0.5">Special curated festive packages &bull; Limited doorstep slots available</p>
+                    <p id="displayFestiveSubtitle" class="text-xs text-neutral-400 mt-0.5">Choose a ready-made combo or build your own service cart</p>
                 </div>
                 <div class="flex items-center gap-2 self-start sm:self-center">
                     <span class="text-[11px] font-mono text-gold-400 bg-gold-500/10 border border-gold-500/20 px-3 py-1 rounded-xl">
@@ -272,22 +272,12 @@
                 </div>
             </div>
 
-            <!-- Category Filter Tabs -->
-            <div class="mb-5 sticky top-14 z-30 bg-obsidian-950/85 backdrop-blur-md py-2 -mx-4 px-4 overflow-x-auto no-scrollbar">
-                <div class="flex items-center gap-2 min-w-max" id="comboFilters">
-                    <button onclick="filterPackages('all', this)" class="filter-tab active bg-gold-500 text-obsidian-950 font-bold px-4 py-1.5 rounded-full text-xs font-cinzel tracking-wider transition-all">
-                        All Festive Combos (5)
-                    </button>
-                    <button onclick="filterPackages('popular', this)" class="filter-tab bg-obsidian-900 border border-white/10 text-neutral-300 px-4 py-1.5 rounded-full text-xs font-cinzel tracking-wider transition-all">
-                        Most Popular
-                    </button>
-                    <button onclick="filterPackages('value', this)" class="filter-tab bg-obsidian-900 border border-white/10 text-neutral-300 px-4 py-1.5 rounded-full text-xs font-cinzel tracking-wider transition-all">
-                        Best Value
-                    </button>
-                    <button onclick="filterPackages('bridal', this)" class="filter-tab bg-obsidian-900 border border-white/10 text-neutral-300 px-4 py-1.5 rounded-full text-xs font-cinzel tracking-wider transition-all">
-                        Bridal Luxury
-                    </button>
+            <div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-2xl border border-gold-500/20 bg-obsidian-900/70 px-4 py-3">
+                <div>
+                    <h3 class="font-cinzel text-sm font-bold text-gold-200">All 7 Combo Packages</h3>
+                    <p class="text-[10px] text-neutral-400 mt-0.5">Ready-made combos ek hi jagah — apna package choose karke book karein.</p>
                 </div>
+                <span class="text-[10px] uppercase tracking-wider text-gold-300">5 Salon Combos + 2 Signature Packages</span>
             </div>
 
             <!-- Dynamic Packages Container -->
@@ -302,129 +292,15 @@
         <section id="serviceMenu" class="mb-12 scroll-mt-24">
             <div class="text-center mb-6">
                 <span class="text-[10px] uppercase font-cinzel text-gold-400 tracking-[0.2em] font-semibold block mb-1">The Anamika Lux • Patna</span>
-                <h2 class="text-xl sm:text-3xl font-cinzel font-bold text-white">Complete Service Menu & Price List</h2>
-                <p class="text-xs text-neutral-400 mt-2 max-w-2xl mx-auto">Premium beauty services at your doorstep. Choose a service below to request your appointment.</p>
+                <h2 class="text-xl sm:text-3xl font-cinzel font-bold text-white">Build Your Own Service Cart</h2>
+                <p class="text-xs text-neutral-400 mt-2 max-w-2xl mx-auto">Ek ya 2–3 individual services select karein, cart mein add karein aur sabki booking ek saath karein.</p>
             </div>
 
             <div id="rateCardGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            <div id="serviceCartSummary" class="mt-5"></div>
+            <p class="text-[10px] text-neutral-500 text-center mt-3">Multi-price services: select your preferred rate first. “Price on enquiry” and package-included services can be confirmed with the salon before booking.</p>
 
-            <div class="glass-card-featured rounded-3xl p-5 sm:p-7 mt-5">
-                <div class="text-center mb-5">
-                    <span class="text-[10px] uppercase font-cinzel text-gold-300 tracking-[0.2em] font-semibold">Special Packages</span>
-                    <h3 class="text-lg sm:text-2xl font-cinzel font-bold text-white mt-1">Signature Beauty Packages</h3>
-                    <p class="text-xs text-neutral-400 mt-1">Curated combinations copied from the printed Anamika Lux package card.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-obsidian-950/80 border border-gold-500/25 rounded-2xl p-4">
-                        <div class="flex items-center justify-between gap-3 mb-3">
-                            <h4 class="font-cinzel font-bold text-gold-200">Signature Beauty Package</h4>
-                            <span class="text-xl font-cinzel font-black text-gold-300">₹5,000</span>
-                        </div>
-                        <ul class="text-[11px] text-neutral-300 grid grid-cols-1 sm:grid-cols-2 gap-1.5 mb-4 list-disc pl-4">
-                            <li>Full Leg Wax</li><li>Full Hand Wax</li><li>Full Leg Detan</li><li>Full Hand Detan</li><li>Facial</li><li>Face Detan</li><li>Eyebrow Threading</li><li>Forehead Threading</li><li>Upper Lip Threading</li><li>Basic Haircut</li>
-                        </ul>
-                        <button type="button" onclick="openBookingSheet('Signature Beauty Package (₹5000)')" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Book ₹5,000 Package</button>
-                    </div>
-                    <div class="bg-obsidian-950/80 border border-gold-500/40 rounded-2xl p-4">
-                        <div class="flex items-center justify-between gap-3 mb-3">
-                            <h4 class="font-cinzel font-bold text-gold-200">Royal Complete Care Package</h4>
-                            <span class="text-xl font-cinzel font-black text-gold-300">₹7,000</span>
-                        </div>
-                        <ul class="text-[11px] text-neutral-300 grid grid-cols-1 sm:grid-cols-2 gap-1.5 mb-4 list-disc pl-4">
-                            <li>Full Body Wax</li><li>Full Body Polishing</li><li>Eyebrow Threading</li><li>Forehead Threading</li><li>Upper Lip Threading</li><li>O3+ Facial</li><li>Face Detan</li><li>Manicure</li><li>Pedicure</li><li>Haircut</li>
-                        </ul>
-                        <button type="button" onclick="openBookingSheet('Royal Complete Care Package (₹7000)')" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Book ₹7,000 Package</button>
-                    </div>
-                </div>
-            </div>
-            <p class="text-[10px] text-neutral-500 text-center mt-4">Prices are in Indian Rupees (₹). “Starting from” rates and multi-option services are confirmed with the client before appointment confirmation. Services marked “Price on enquiry” are quoted by the salon.</p>
-        </section>
 
-        <!-- Interactive Custom Combo Builder -->
-        <section class="glass-card rounded-3xl p-5 sm:p-8 mb-12 border-gold-500/30">
-            <div class="text-center mb-6">
-                <span class="text-[10px] uppercase font-cinzel text-gold-400 tracking-[0.2em] font-semibold block mb-1">Tailored Experience</span>
-                <h3 class="text-xl sm:text-2xl font-cinzel font-bold text-white">Custom Add-on Builder</h3>
-                <p class="text-xs text-neutral-400 mt-1">Pick a base combo and add special treatments to see live price</p>
-            </div>
-
-            <!-- Base Picker -->
-            <div class="mb-4">
-                <label class="block text-[11px] uppercase tracking-wider font-cinzel text-gold-300 font-bold mb-1.5">
-                    Step 1: Choose Core Package
-                </label>
-                <select id="builderSelect" onchange="updateCustomTotal()" class="w-full bg-obsidian-850 border border-neutral-700 rounded-2xl px-3.5 py-3 text-xs sm:text-sm text-white focus:outline-none focus:border-gold-400">
-                    <option value="1500" data-title="Basic Glow Combo">Basic Glow Combo — ₹1,500</option>
-                    <option value="2000" data-title="Lotus Beauty Combo">Lotus Beauty Combo — ₹2,000</option>
-                    <option value="2500" data-title="Premium Glow Combo">Premium Glow Combo — ₹2,500</option>
-                    <option value="3000" data-title="Luxury Skin Combo" selected>Luxury Skin Combo — ₹3,000</option>
-                    <option value="4000" data-title="Bridal Glow Combo">Bridal Glow Combo — ₹4,000</option>
-                    <option value="0" data-title="Only Custom Treatments">Only Add-on Treatments (₹0)</option>
-                </select>
-            </div>
-
-            <!-- Add-on Toggles -->
-            <div class="mb-5">
-                <label class="block text-[11px] uppercase tracking-wider font-cinzel text-gold-300 font-bold mb-2">
-                    Step 2: Add Extra Care (Optional)
-                </label>
-                <div class="space-y-2" id="addonList">
-                    <label class="flex items-center justify-between p-3 rounded-2xl bg-obsidian-850 border border-neutral-800 active:border-gold-500/50 cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" value="499" data-name="L'Oreal Hair Spa & Steam" onchange="updateCustomTotal()" class="w-4 h-4 accent-gold-500 rounded">
-                            <div>
-                                <span class="text-xs text-white font-medium block">L'Oreal Hair Spa & Steam</span>
-                                <span class="text-[10px] text-neutral-400">Deep hair nourishment & relaxation</span>
-                            </div>
-                        </div>
-                        <span class="text-xs font-semibold text-gold-400 font-mono">+₹499</span>
-                    </label>
-
-                    <label class="flex items-center justify-between p-3 rounded-2xl bg-obsidian-850 border border-neutral-800 active:border-gold-500/50 cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" value="350" data-name="Rica White Chocolate Wax Upgrade" onchange="updateCustomTotal()" class="w-4 h-4 accent-gold-500 rounded">
-                            <div>
-                                <span class="text-xs text-white font-medium block">Rica Wax Upgrade</span>
-                                <span class="text-[10px] text-neutral-400">Gentle on sensitive skin & painless</span>
-                            </div>
-                        </div>
-                        <span class="text-xs font-semibold text-gold-400 font-mono">+₹350</span>
-                    </label>
-
-                    <label class="flex items-center justify-between p-3 rounded-2xl bg-obsidian-850 border border-neutral-800 active:border-gold-500/50 cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" value="249" data-name="Oxy Glow Face & Neck Bleach" onchange="updateCustomTotal()" class="w-4 h-4 accent-gold-500 rounded">
-                            <div>
-                                <span class="text-xs text-white font-medium block">Oxy Glow Bleach</span>
-                                <span class="text-[10px] text-neutral-400">Instant golden skin tone enhancer</span>
-                            </div>
-                        </div>
-                        <span class="text-xs font-semibold text-gold-400 font-mono">+₹249</span>
-                    </label>
-
-                    <label class="flex items-center justify-between p-3 rounded-2xl bg-obsidian-850 border border-neutral-800 active:border-gold-500/50 cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" value="299" data-name="Rose Petal Aroma Foot Spa" onchange="updateCustomTotal()" class="w-4 h-4 accent-gold-500 rounded">
-                            <div>
-                                <span class="text-xs text-white font-medium block">Rose Foot Reflexology</span>
-                                <span class="text-[10px] text-neutral-400">Relieve tired feet after puja preparations</span>
-                            </div>
-                        </div>
-                        <span class="text-xs font-semibold text-gold-400 font-mono">+₹299</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Builder Price Summary -->
-            <div class="bg-obsidian-950 border border-gold-500/40 rounded-2xl p-4 flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] text-neutral-400 uppercase tracking-wider block font-medium">Calculated Total</span>
-                    <span class="text-2xl font-cinzel font-black text-gold-300" id="builderTotalPrice">₹3000</span>
-                </div>
-                <button onclick="bookCustomComboSheet()" class="btn-gold-solid px-5 py-2.5 rounded-xl text-xs uppercase font-bold tracking-wider active:scale-95 shadow-md">
-                    <span>Book Combo</span>
-                </button>
-            </div>
         </section>
 
         <!-- Touch Before/After Glow Slider -->
@@ -518,9 +394,9 @@
             <i class="fa-solid fa-phone text-xs"></i>
             <span>Call</span>
         </a>
-        <button onclick="openBookingSheet('Doorstep Fast Booking')" class="btn-gold-solid py-3 px-5 rounded-2xl text-xs font-black uppercase tracking-wider active:scale-95 transition-all flex-[2] flex items-center justify-center gap-2 shadow-lg">
+        <button onclick="scrollToServiceCart()" class="btn-gold-solid py-3 px-5 rounded-2xl text-xs font-black uppercase tracking-wider active:scale-95 transition-all flex-[2] flex items-center justify-center gap-2 shadow-lg">
             <i class="fa-regular fa-calendar-check text-xs"></i>
-            <span>Select Package</span>
+            <span id="mobileCartLabel">View Cart (0)</span>
         </button>
     </div>
 
@@ -1090,6 +966,254 @@ window.addEventListener('DOMContentLoaded', () => {
     renderRateCardMenu();
 });
 
+</script>
+<script>
+(function () {
+    // Cart lives in this browser until the current booking form is submitted.
+    window.serviceCart = window.serviceCart || [];
+    window.__bookingUsesCart = false;
+
+    function escapeMenuText(value) {
+        return String(value).replace(/[&<>"']/g, function (ch) {
+            return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch];
+        });
+    }
+
+    function getDisplayedPrices(displayText) {
+        return (String(displayText).match(/₹\s*[\d,]+/g) || []).map(function (value) {
+            return parseInt(value.replace(/[^\d]/g, ""), 10);
+        }).filter(function (value) { return Number.isFinite(value) && value > 0; });
+    }
+
+    function formatINR(amount) {
+        return "₹" + Number(amount || 0).toLocaleString("en-IN");
+    }
+
+    function getCartQuantity() {
+        return window.serviceCart.reduce(function (sum, item) { return sum + item.qty; }, 0);
+    }
+
+    function getCartTotal() {
+        return window.serviceCart.reduce(function (sum, item) { return sum + (item.price * item.qty); }, 0);
+    }
+
+    function showCartNotice(message) {
+        if (typeof window.showToast === "function") window.showToast(message);
+        else window.alert(message);
+    }
+
+    window.renderRateCardMenu = function () {
+        var root = document.getElementById("rateCardGrid");
+        if (!root || !window.RATE_CARD_CATEGORIES && typeof RATE_CARD_CATEGORIES === "undefined") return;
+
+        root.innerHTML = RATE_CARD_CATEGORIES.map(function (category, categoryIndex) {
+            var rows = category.items.map(function (item, itemIndex) {
+                var displayText = item[1];
+                var prices = getDisplayedPrices(displayText);
+                var quoteOnly = /price on enquiry|included in/i.test(displayText) || prices.length === 0;
+                var action = "";
+
+                if (quoteOnly) {
+                    action = '<span class="text-[10px] text-neutral-400 border border-neutral-700 rounded-lg px-2.5 py-2 whitespace-nowrap">Ask price</span>';
+                } else if (prices.length > 1) {
+                    action = '<div class="flex items-center gap-1.5 shrink-0">'
+                        + '<select data-price-choice class="max-w-[112px] bg-obsidian-950 border border-gold-500/30 text-gold-200 rounded-lg px-2 py-2 text-[10px]">'
+                        + '<option value="">Choose rate</option>'
+                        + prices.map(function (price) { return '<option value="' + price + '">' + formatINR(price) + '</option>'; }).join("")
+                        + '</select>'
+                        + '<button type="button" data-cart-add data-category-index="' + categoryIndex + '" data-item-index="' + itemIndex + '" class="px-2.5 py-2 rounded-lg bg-gold-500/10 border border-gold-500/35 text-gold-200 text-[10px] font-bold hover:bg-gold-500 hover:text-obsidian-950">Add</button>'
+                        + '</div>';
+                } else {
+                    action = '<button type="button" data-cart-add data-category-index="' + categoryIndex + '" data-item-index="' + itemIndex + '" data-price="' + prices[0] + '" class="shrink-0 px-3 py-2 rounded-lg bg-gold-500/10 border border-gold-500/35 text-gold-200 text-[10px] font-bold hover:bg-gold-500 hover:text-obsidian-950">+ Add to Cart</button>';
+                }
+
+                var rateNote = quoteOnly ? "Price to be confirmed with salon" : displayText;
+                return '<div data-service-row class="flex items-center justify-between gap-3 border-b border-white/5 py-2 last:border-0">'
+                    + '<div class="min-w-0"><p class="text-[11px] sm:text-xs text-neutral-100">' + escapeMenuText(item[0]) + '</p>'
+                    + '<p class="text-[10px] text-gold-300 font-mono mt-0.5">' + escapeMenuText(rateNote) + '</p></div>'
+                    + action + '</div>';
+            }).join("");
+
+            return '<article class="glass-card rounded-2xl p-4 sm:p-5 border-gold-500/25">'
+                + '<div class="flex items-center gap-2 pb-3 mb-2 border-b border-gold-500/20">'
+                + '<span class="w-9 h-9 rounded-full bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-300"><i class="fa-solid ' + escapeMenuText(category.icon) + '"></i></span>'
+                + '<h3 class="font-cinzel text-sm sm:text-base font-bold text-gold-200">' + escapeMenuText(category.title) + '</h3></div>'
+                + '<div class="space-y-0.5">' + rows + '</div></article>';
+        }).join("");
+
+        root.querySelectorAll("[data-cart-add]").forEach(function (button) {
+            button.addEventListener("click", function () {
+                var category = RATE_CARD_CATEGORIES[Number(button.dataset.categoryIndex)];
+                var item = category && category.items[Number(button.dataset.itemIndex)];
+                if (!item) return;
+
+                var row = button.closest("[data-service-row]");
+                var choice = row ? row.querySelector("[data-price-choice]") : null;
+                var price = choice ? Number(choice.value) : Number(button.dataset.price);
+                if (!price || price <= 0) {
+                    showCartNotice("Please choose a service price first.");
+                    return;
+                }
+                window.addServiceToCart(item[0], price, category.title);
+            });
+        });
+    };
+
+    window.addServiceToCart = function (name, price, category) {
+        var existing = window.serviceCart.find(function (item) { return item.name === name && item.price === Number(price); });
+        if (existing) existing.qty += 1;
+        else window.serviceCart.push({name:name, price:Number(price), qty:1, category:category || ""});
+        window.renderServiceCartSummary();
+        showCartNotice(name + " added to cart.");
+    };
+
+    window.changeServiceCartQty = function (index, change) {
+        var item = window.serviceCart[index];
+        if (!item) return;
+        item.qty += change;
+        if (item.qty <= 0) window.serviceCart.splice(index, 1);
+        window.renderServiceCartSummary();
+    };
+
+    window.removeServiceFromCart = function (index) {
+        window.serviceCart.splice(index, 1);
+        window.renderServiceCartSummary();
+    };
+
+    window.clearServiceCart = function () {
+        window.serviceCart = [];
+        window.renderServiceCartSummary();
+    };
+
+    window.renderServiceCartSummary = function () {
+        var panel = document.getElementById("serviceCartSummary");
+        if (!panel) return;
+
+        var quantity = getCartQuantity();
+        var total = getCartTotal();
+        var label = document.getElementById("mobileCartLabel");
+        if (label) label.textContent = "View Cart (" + quantity + ")";
+
+        if (!window.serviceCart.length) {
+            panel.innerHTML = '<div class="glass-card rounded-2xl p-4 sm:p-5 text-center">'
+                + '<div class="w-11 h-11 mx-auto mb-2 rounded-full bg-gold-500/10 flex items-center justify-center text-gold-300"><i class="fa-solid fa-basket-shopping text-lg"></i></div>'
+                + '<h3 class="font-cinzel text-sm font-bold text-white">Your Service Cart is Empty</h3>'
+                + '<p class="text-[11px] text-neutral-400 mt-1">Upar se apni pasand ki 2–3 services add karein. Sab ek hi booking mein chali jayengi.</p></div>';
+            return;
+        }
+
+        var rows = window.serviceCart.map(function (item, index) {
+            return '<div class="flex items-center justify-between gap-3 py-2 border-b border-white/5 last:border-0">'
+                + '<div class="min-w-0"><p class="text-xs text-white font-medium">' + escapeMenuText(item.name) + '</p>'
+                + '<p class="text-[10px] text-gold-300">' + formatINR(item.price) + ' each • ' + formatINR(item.price * item.qty) + '</p></div>'
+                + '<div class="flex items-center gap-1.5 shrink-0">'
+                + '<button type="button" data-cart-minus="' + index + '" class="w-7 h-7 rounded-lg bg-obsidian-800 border border-white/10 text-white">−</button>'
+                + '<span class="text-xs text-white w-4 text-center">' + item.qty + '</span>'
+                + '<button type="button" data-cart-plus="' + index + '" class="w-7 h-7 rounded-lg bg-obsidian-800 border border-white/10 text-white">+</button>'
+                + '<button type="button" data-cart-remove="' + index + '" class="ml-1 text-[10px] text-rose-300 px-2 py-1">Remove</button></div></div>';
+        }).join("");
+
+        panel.innerHTML = '<div class="glass-card-featured rounded-2xl p-4 sm:p-5">'
+            + '<div class="flex items-center justify-between gap-3 mb-2"><div><span class="text-[10px] uppercase tracking-wider text-gold-300">Your Selection</span>'
+            + '<h3 class="font-cinzel text-base font-bold text-white">Service Cart (' + quantity + ')</h3></div>'
+            + '<button type="button" id="clearServiceCart" class="text-[10px] text-neutral-400 underline">Clear cart</button></div>'
+            + rows
+            + '<div class="flex items-center justify-between gap-3 pt-3 mt-2 border-t border-gold-500/20"><div><span class="text-[10px] text-neutral-400 uppercase">Estimated Total</span>'
+            + '<p class="text-2xl font-cinzel font-black text-gold-300">' + formatINR(total) + '</p></div>'
+            + '<button type="button" id="bookServiceCartBtn" class="btn-gold-solid px-4 sm:px-5 py-3 rounded-xl text-[11px] uppercase tracking-wider font-extrabold"><i class="fa-regular fa-calendar-check mr-1"></i> Book Selected Services</button></div>'
+            + '<p class="text-[10px] text-neutral-400 mt-2">Final service details and any starting-rate variation will be confirmed by the salon.</p></div>';
+
+        panel.querySelectorAll("[data-cart-minus]").forEach(function (button) {
+            button.addEventListener("click", function () { window.changeServiceCartQty(Number(button.dataset.cartMinus), -1); });
+        });
+        panel.querySelectorAll("[data-cart-plus]").forEach(function (button) {
+            button.addEventListener("click", function () { window.changeServiceCartQty(Number(button.dataset.cartPlus), 1); });
+        });
+        panel.querySelectorAll("[data-cart-remove]").forEach(function (button) {
+            button.addEventListener("click", function () { window.removeServiceFromCart(Number(button.dataset.cartRemove)); });
+        });
+
+        var clearButton = document.getElementById("clearServiceCart");
+        if (clearButton) clearButton.addEventListener("click", window.clearServiceCart);
+        var bookButton = document.getElementById("bookServiceCartBtn");
+        if (bookButton) bookButton.addEventListener("click", window.bookServiceCart);
+    };
+
+    window.scrollToServiceCart = function () {
+        var target = document.getElementById("serviceCartSummary") || document.getElementById("serviceMenu");
+        if (target) target.scrollIntoView({behavior:"smooth", block:"center"});
+    };
+
+    window.bookServiceCart = function () {
+        if (!window.serviceCart.length) {
+            showCartNotice("Please add at least one service to your cart.");
+            return;
+        }
+        var total = getCartTotal();
+        var details = window.serviceCart.map(function (item) {
+            return item.name + " x" + item.qty + " @ " + formatINR(item.price);
+        }).join("; ");
+        var bookingText = "Custom Service Selection [Total: " + formatINR(total) + "] — " + details;
+        window.__bookingUsesCart = true;
+        window.openBookingSheet(bookingText);
+    };
+
+    // Keep the original booking modal and WhatsApp request flow, but clear the cart after a submitted cart booking.
+    var originalOpenBookingSheet = window.openBookingSheet;
+    window.openBookingSheet = function (packageName) {
+        window.__bookingUsesCart = false;
+        return originalOpenBookingSheet(packageName);
+    };
+
+    var originalBookingSubmit = window.handleSheetFormSubmit;
+    window.handleSheetFormSubmit = function (event) {
+        var wasCartBooking = window.__bookingUsesCart;
+        originalBookingSubmit(event);
+        if (wasCartBooking) {
+            window.serviceCart = [];
+            window.__bookingUsesCart = false;
+            window.renderServiceCartSummary();
+        }
+    };
+
+    // Add the two printed signature packages directly below the other five combos.
+    var originalRenderPackages = window.renderPackages;
+    window.renderPackages = function (category) {
+        var selectedCategory = category || "all";
+        originalRenderPackages(selectedCategory);
+        if (selectedCategory !== "all") return;
+        var container = document.getElementById("packagesContainer");
+        if (!container) return;
+
+        var signatureCards = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">'
+            + '<article class="glass-card-featured rounded-3xl p-5 border-gold-500/50"><div class="flex items-start justify-between gap-2 mb-3">'
+            + '<div><span class="text-[9px] text-gold-300 uppercase tracking-wider">Printed Rate Card Package</span><h3 class="font-cinzel text-lg font-bold text-white mt-1">Signature Beauty Package</h3></div>'
+            + '<span class="text-xl font-cinzel font-black text-gold-300 whitespace-nowrap">₹5,000</span></div>'
+            + '<ul class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-neutral-300 mb-4 list-disc pl-4">'
+            + '<li>Full Leg Wax</li><li>Full Hand Wax</li><li>Full Leg Detan</li><li>Full Hand Detan</li><li>Facial</li><li>Face Detan</li><li>Eyebrow Threading</li><li>Forehead Threading</li><li>Upper Lip Threading</li><li>Basic Haircut</li></ul>'
+            + '<button type="button" onclick="openBookingSheet(\\'Signature Beauty Package (₹5000)\\')" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Book ₹5,000 Package</button></article>'
+            + '<article class="glass-card-featured rounded-3xl p-5 border-gold-500/50"><div class="flex items-start justify-between gap-2 mb-3">'
+            + '<div><span class="text-[9px] text-gold-300 uppercase tracking-wider">Printed Rate Card Package</span><h3 class="font-cinzel text-lg font-bold text-white mt-1">Royal Complete Care Package</h3></div>'
+            + '<span class="text-xl font-cinzel font-black text-gold-300 whitespace-nowrap">₹7,000</span></div>'
+            + '<ul class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-neutral-300 mb-4 list-disc pl-4">'
+            + '<li>Full Body Wax</li><li>Full Body Polishing</li><li>Eyebrow Threading</li><li>Forehead Threading</li><li>Upper Lip Threading</li><li>O3+ Facial</li><li>Face Detan</li><li>Manicure</li><li>Pedicure</li><li>Haircut</li></ul>'
+            + '<button type="button" onclick="openBookingSheet(\\'Royal Complete Care Package (₹7000)\\')" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Book ₹7,000 Package</button></article></div>';
+        container.insertAdjacentHTML("beforeend", signatureCards);
+    };
+
+    // First render after the markup and the original script have loaded.
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () {
+            window.renderRateCardMenu();
+            window.renderServiceCartSummary();
+            window.renderPackages("all");
+        });
+    } else {
+        window.renderRateCardMenu();
+        window.renderServiceCartSummary();
+        window.renderPackages("all");
+    }
+})();
 </script>
 </body>
 </html>
