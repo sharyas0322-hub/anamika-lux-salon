@@ -1154,8 +1154,8 @@ window.addEventListener('DOMContentLoaded', () => {
             return item.name + " x" + item.qty + " @ " + formatINR(item.price);
         }).join("; ");
         var bookingText = "Custom Service Selection [Total: " + formatINR(total) + "] — " + details;
-        window.__bookingUsesCart = true;
         window.openBookingSheet(bookingText);
+        window.__bookingUsesCart = true;
     };
 
     // Keep the original booking modal and WhatsApp request flow, but clear the cart after a submitted cart booking.
