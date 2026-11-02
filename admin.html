@@ -332,9 +332,13 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-3">
                         <div>
                             <h2 class="text-base font-cinzel font-bold text-white">Client Appointments & Leads</h2>
-                            <p class="text-xs text-neutral-400">Manage bookings saved in this browser. Customer requests are sent to the salon WhatsApp until an online database is connected.</p>
+                            <p class="text-xs text-neutral-400">Online bookings from all customers. Refresh to fetch the latest requests without logging out.</p>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" id="refreshBookingsBtn" onclick="refreshBookingsNow()" class="min-h-[40px] px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold hover:bg-emerald-500/20 flex items-center gap-1.5">
+                                <i class="fa-solid fa-rotate"></i>
+                                <span>Refresh Bookings</span>
+                            </button>
                             <button onclick="exportBookingsToCSV()" class="px-3 py-1.5 rounded-xl bg-gold-500/10 border border-gold-500/30 text-gold-300 text-xs font-semibold hover:bg-gold-500/20 flex items-center gap-1.5">
                                 <i class="fa-solid fa-file-excel text-emerald-400"></i>
                                 <span>Export Excel</span>
@@ -1796,13 +1800,57 @@ window.addEventListener('DOMContentLoaded', () => {
   window.getSavedServicePriceConfig = function () { return window.ANAMIKA_SERVICE_PRICE_CONFIG || {}; };
   window.getSavedSignaturePrices = function () { return window.ANAMIKA_SIGNATURE_PRICES || {signature:5000,royal:7000}; };
 
+  window.refreshBookingsNow = async function () {
+    const button = document.getElementById("refreshBookingsBtn");
+    if (button && button.disabled) return;
+    const original = button ? button.innerHTML : "";
+    if (button) {
+      button.disabled = true;
+      button.innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i><span>Refreshing...</span>';
+      button.classList.add("opacity-70");
+    }
+    try {
+      const result = await db.from("bookings").select("*").order("created_at", {ascending:false});
+      if (result.error) throw result.error;
+      window.ANAMIKA_BOOKINGS = (result.data || []).map(mapBooking);
+      window.loadDashboardMetrics();
+      window.filterBookingsDisplay();
+      window.showToast("Bookings refreshed: " + window.ANAMIKA_BOOKINGS.length + " total.");
+    } catch (error) {
+      console.error("Booking refresh failed:", error);
+      window.showToast("Could not refresh bookings: " + (error.message || "Please try again."));
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.innerHTML = original;
+        button.classList.remove("opacity-70");
+      }
+    }
+  };
+
   const baseOpenAdminPortal = window.openAdminPortal;
   const baseCloseAdminPortal = window.closeAdminPortal;
 
-  window.openAdminAuth = function () {
+  window.openAdminAuth = async function () {
     const modal = document.getElementById("adminPinModal");
     const error = document.getElementById("pinErrorMessage");
     const email = document.getElementById("adminEmailInput");
+    try {
+      const sessionResult = await db.auth.getSession();
+      const session = sessionResult.data && sessionResult.data.session;
+      if (session && session.user) {
+        const access = await db.from("admin_users").select("user_id")
+          .eq("user_id", session.user.id).maybeSingle();
+        if (!access.error && access.data) {
+          if (modal) modal.style.display = "none";
+          await window.openAdminPortal();
+          return;
+        }
+        await db.auth.signOut();
+      }
+    } catch (sessionError) {
+      console.warn("Could not restore previous admin session:", sessionError);
+    }
     if (modal) modal.style.display = "flex";
     if (error) error.classList.add("hidden");
     if (email) setTimeout(function () { email.focus(); }, 100);
