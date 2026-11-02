@@ -134,6 +134,7 @@
             scrollbar-width: none;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="text-neutral-200 font-sans min-h-screen relative overflow-x-hidden antialiased">
 
@@ -1247,5 +1248,153 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 })();
 </script>
+
+<script>
+(function () {
+  const DB_URL = "https://uwbcgwvrvtvggmaejxfu.supabase.co";
+  const DB_KEY = "sb_publishable_CqhbUiMSpMpBSl2X_vKdHg_WimgwESl";
+  const db = window.supabase.createClient(DB_URL, DB_KEY);
+  window.ANAMIKA_DB = db;
+
+  async function loadPublicSalonData() {
+    const results = await Promise.all([
+      db.from("salon_services").select("*").eq("is_active", true).order("sort_order"),
+      db.from("salon_packages").select("*").eq("is_active", true).order("sort_order"),
+      db.from("salon_campaign").select("*").eq("id", true).maybeSingle()
+    ]);
+    const serviceResult = results[0], packageResult = results[1], campaignResult = results[2];
+    if (serviceResult.error) throw serviceResult.error;
+    if (packageResult.error) throw packageResult.error;
+    if (campaignResult.error) throw campaignResult.error;
+
+    const services = serviceResult.data || [];
+    const packages = packageResult.data || [];
+    const grouped = [];
+    services.forEach(function (service) {
+      let category = grouped.find(function (entry) { return entry.title === service.category_name; });
+      if (!category) {
+        category = {title: service.category_name, icon: service.category_icon || "fa-sparkles", items: []};
+        grouped.push(category);
+      }
+      category.items.push([service.name, service.display_price, String(Number(service.cart_price) || 0)]);
+    });
+    localStorage.setItem("anamika_service_prices", JSON.stringify(
+      Object.fromEntries(services.map(function (service) {
+        return [service.name, {display: service.display_price, amount: Number(service.cart_price) || 0}];
+      }))
+    ));
+    localStorage.setItem("anamika_packages_data", JSON.stringify(packages.filter(function (p) {
+      return p.package_type === "combo";
+    }).map(function (p) {
+      return {
+        id: p.package_id, name: p.name, price: Number(p.price), originalPrice: Number(p.original_price),
+        category: p.category, badge: p.badge, desc: p.description,
+        inclusions: Array.isArray(p.inclusions) ? p.inclusions : []
+      };
+    })));
+    const signature = packages.find(function (p) { return p.package_type === "signature"; });
+    const royal = packages.find(function (p) { return p.package_type === "royal"; });
+    localStorage.setItem("anamika_signature_package_prices", JSON.stringify({
+      signature: signature ? Number(signature.price) : 5000,
+      royal: royal ? Number(royal.price) : 7000
+    }));
+    if (campaignResult.data) {
+      localStorage.setItem("anamika_campaign_cfg", JSON.stringify({
+        tag: campaignResult.data.tag, title: campaignResult.data.title, subtitle: campaignResult.data.subtitle
+      }));
+    }
+    window.ANAMIKA_SERVICE_CATEGORIES = grouped;
+    window.renderPackages && window.renderPackages("all");
+    window.renderRateCardMenu && window.renderRateCardMenu();
+    window.renderServiceCartSummary && window.renderServiceCartSummary();
+    window.applyCampaignHeaders && window.applyCampaignHeaders();
+  }
+
+  const publicChannel = db.channel("anamika-public-live-updates")
+    .on("postgres_changes", {event:"*", schema:"public", table:"salon_services"}, loadPublicSalonData)
+    .on("postgres_changes", {event:"*", schema:"public", table:"salon_packages"}, loadPublicSalonData)
+    .on("postgres_changes", {event:"*", schema:"public", table:"salon_campaign"}, loadPublicSalonData)
+    .subscribe();
+
+  window.handleSheetFormSubmit = async function (event) {
+    event.preventDefault();
+    const submitButton = document.getElementById("sheetSubmitBtn");
+    const btnText = document.getElementById("sheetBtnText");
+    const name = document.getElementById("custName").value.trim();
+    const phone = document.getElementById("custPhone").value.trim();
+    const date = document.getElementById("custDate").value;
+    const slot = document.getElementById("custSlot").value;
+    const address = document.getElementById("custAddress").value.trim();
+    const packageText = document.getElementById("sheetHiddenPackage").value || "Salon Service";
+    const usingCart = !!window.__bookingUsesCart && Array.isArray(window.serviceCart) && window.serviceCart.length > 0;
+    let items = [];
+    if (usingCart) {
+      items = window.serviceCart.map(function (item) {
+        return {name:item.name, price:Number(item.price), qty:Number(item.qty), category:item.category || "", type:"service"};
+      });
+    } else {
+      const totalMatch = packageText.match(/\[Total:\s*₹\s*([\d,]+)\]/i);
+      const priceMatch = packageText.match(/₹\s*([\d,]+)/);
+      const priceText = totalMatch ? totalMatch[1] : (priceMatch ? priceMatch[1] : "0");
+      const price = Number(priceText.replace(/,/g, "")) || 0;
+      items = [{name:packageText, price:price, qty:1, category:"Package", type:"package"}];
+    }
+    const total = items.reduce(function (sum, item) { return sum + item.price * item.qty; }, 0);
+    const waWindow = window.open("about:blank", "_blank");
+    if (submitButton) submitButton.disabled = true;
+    if (btnText) btnText.textContent = "Saving booking...";
+    try {
+      const response = await db.rpc("create_public_booking", {
+        p_customer_name:name,
+        p_customer_phone:phone,
+        p_appointment_date:date,
+        p_appointment_slot:slot,
+        p_address:address,
+        p_selected_package:packageText,
+        p_total_amount:total,
+        p_items:items
+      });
+      if (response.error) throw response.error;
+      const booking = response.data || {};
+      const bookingCode = booking.booking_code || "Saved";
+      const message = [
+        "✨ THE ANAMIKA LUX - DOORSTEP BOOKING ✨",
+        "Booking ID: " + bookingCode,
+        "Client Name: " + name,
+        "Phone Number: " + phone,
+        "Package / Services: " + packageText,
+        "Estimated Total: ₹" + total.toLocaleString("en-IN"),
+        "Date: " + date,
+        "Time Slot: " + slot,
+        "Address: " + address,
+        "Namaste Anamika ji! Kripya mera doorstep slot confirm karein."
+      ].join("\n");
+      const whatsappUrl = "https://wa.me/" + SALON_WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
+      if (waWindow) waWindow.location.href = whatsappUrl;
+      else window.location.href = whatsappUrl;
+      window.serviceCart = [];
+      window.__bookingUsesCart = false;
+      window.renderServiceCartSummary && window.renderServiceCartSummary();
+      closeBookingSheet();
+      document.getElementById("sheetBookingForm").reset();
+      if (btnText) btnText.textContent = "Confirm & Reserve Slot";
+      window.alert("Booking saved successfully. Booking ID: " + bookingCode);
+    } catch (error) {
+      if (waWindow) waWindow.close();
+      console.error("Anamika booking save failed:", error);
+      window.alert("Booking save nahi ho payi. Internet check karke dobara try karein. " + (error.message || ""));
+      if (btnText) btnText.textContent = "Confirm & Reserve Slot";
+    } finally {
+      if (submitButton) submitButton.disabled = false;
+    }
+  };
+
+  loadPublicSalonData().catch(function (error) {
+    console.error("Anamika cloud data load failed:", error);
+    window.alert("Live salon rates abhi load nahi ho paaye. Please page refresh karein.");
+  });
+})();
+</script>
+
 </body>
 </html>
