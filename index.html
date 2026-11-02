@@ -1002,11 +1002,30 @@ window.addEventListener('DOMContentLoaded', () => {
         else window.alert(message);
     }
 
+    function getPublishedServicePriceCategories() {
+        var saved = {};
+        try { saved = JSON.parse(localStorage.getItem("anamika_service_prices") || "{}"); }
+        catch (e) { saved = {}; }
+        return RATE_CARD_CATEGORIES.map(function (category) {
+            return {
+                title: category.title,
+                icon: category.icon,
+                items: category.items.map(function (item) {
+                    var override = saved[item[0]];
+                    return override
+                        ? [item[0], String(override.display || item[1]), String(override.amount ?? item[2])]
+                        : item.slice();
+                })
+            };
+        });
+    }
+
     window.renderRateCardMenu = function () {
         var root = document.getElementById("rateCardGrid");
-        if (!root || !window.RATE_CARD_CATEGORIES && typeof RATE_CARD_CATEGORIES === "undefined") return;
+        if (!root || typeof RATE_CARD_CATEGORIES === "undefined") return;
+        var categories = getPublishedServicePriceCategories();
 
-        root.innerHTML = RATE_CARD_CATEGORIES.map(function (category, categoryIndex) {
+        root.innerHTML = categories.map(function (category, categoryIndex) {
             var rows = category.items.map(function (item, itemIndex) {
                 var displayText = item[1];
                 var prices = getDisplayedPrices(displayText);
@@ -1043,7 +1062,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         root.querySelectorAll("[data-cart-add]").forEach(function (button) {
             button.addEventListener("click", function () {
-                var category = RATE_CARD_CATEGORIES[Number(button.dataset.categoryIndex)];
+                var category = categories[Number(button.dataset.categoryIndex)];
                 var item = category && category.items[Number(button.dataset.itemIndex)];
                 if (!item) return;
 
@@ -1185,20 +1204,33 @@ window.addEventListener('DOMContentLoaded', () => {
         var container = document.getElementById("packagesContainer");
         if (!container) return;
 
+        var storedSignaturePrices = {};
+        try { storedSignaturePrices = JSON.parse(localStorage.getItem("anamika_signature_package_prices") || "{}"); } catch (e) {}
+        var signaturePrice = Number.isFinite(Number(storedSignaturePrices.signature)) ? Number(storedSignaturePrices.signature) : 5000;
+        var royalPrice = Number.isFinite(Number(storedSignaturePrices.royal)) ? Number(storedSignaturePrices.royal) : 7000;
         var signatureCards = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">'
             + '<article class="glass-card-featured rounded-3xl p-5 border-gold-500/50"><div class="flex items-start justify-between gap-2 mb-3">'
             + '<div><span class="text-[9px] text-gold-300 uppercase tracking-wider">Printed Rate Card Package</span><h3 class="font-cinzel text-lg font-bold text-white mt-1">Signature Beauty Package</h3></div>'
-            + '<span class="text-xl font-cinzel font-black text-gold-300 whitespace-nowrap">₹5,000</span></div>'
+            + '<span class="text-xl font-cinzel font-black text-gold-300 whitespace-nowrap">₹' + signaturePrice.toLocaleString("en-IN") + '</span></div>'
             + '<ul class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-neutral-300 mb-4 list-disc pl-4">'
             + '<li>Full Leg Wax</li><li>Full Hand Wax</li><li>Full Leg Detan</li><li>Full Hand Detan</li><li>Facial</li><li>Face Detan</li><li>Eyebrow Threading</li><li>Forehead Threading</li><li>Upper Lip Threading</li><li>Basic Haircut</li></ul>'
-            + '<button type="button" onclick="openBookingSheet(\'Signature Beauty Package (₹5000)\')" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Book ₹5,000 Package</button></article>'
+            + '<button type="button" data-signature-book="signature" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Book ₹' + signaturePrice.toLocaleString("en-IN") + ' Package</button></article>'
             + '<article class="glass-card-featured rounded-3xl p-5 border-gold-500/50"><div class="flex items-start justify-between gap-2 mb-3">'
             + '<div><span class="text-[9px] text-gold-300 uppercase tracking-wider">Printed Rate Card Package</span><h3 class="font-cinzel text-lg font-bold text-white mt-1">Royal Complete Care Package</h3></div>'
-            + '<span class="text-xl font-cinzel font-black text-gold-300 whitespace-nowrap">₹7,000</span></div>'
+            + '<span class="text-xl font-cinzel font-black text-gold-300 whitespace-nowrap">₹' + royalPrice.toLocaleString("en-IN") + '</span></div>'
             + '<ul class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-neutral-300 mb-4 list-disc pl-4">'
             + '<li>Full Body Wax</li><li>Full Body Polishing</li><li>Eyebrow Threading</li><li>Forehead Threading</li><li>Upper Lip Threading</li><li>O3+ Facial</li><li>Face Detan</li><li>Manicure</li><li>Pedicure</li><li>Haircut</li></ul>'
-            + '<button type="button" onclick="openBookingSheet(\'Royal Complete Care Package (₹7000)\')" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Book ₹7,000 Package</button></article></div>';
+            + '<button type="button" data-signature-book="royal" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Book ₹' + royalPrice.toLocaleString("en-IN") + ' Package</button></article></div>';
         container.insertAdjacentHTML("beforeend", signatureCards);
+        container.querySelectorAll("[data-signature-book]").forEach(function (button) {
+            button.addEventListener("click", function () {
+                if (button.dataset.signatureBook === "signature") {
+                    window.openBookingSheet("Signature Beauty Package (₹" + signaturePrice + ")");
+                } else {
+                    window.openBookingSheet("Royal Complete Care Package (₹" + royalPrice + ")");
+                }
+            });
+        });
     };
 
     // First render after the markup and the original script have loaded.
