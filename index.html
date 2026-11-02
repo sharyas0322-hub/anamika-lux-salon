@@ -176,6 +176,64 @@
             }
         }
 
+    
+        /* Medium social buttons and tidy small-screen layout */
+        .social-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            width: 100%;
+        }
+        .social-link {
+            min-height: 44px;
+            min-width: 150px;
+            justify-content: center;
+            gap: 9px;
+            padding: 10px 16px !important;
+            font-size: 14px !important;
+            line-height: 1.35 !important;
+            white-space: nowrap;
+        }
+        .social-link i {
+            font-size: 17px;
+        }
+        @media (max-width: 640px) {
+            main {
+                padding-left: 14px !important;
+                padding-right: 14px !important;
+            }
+            .social-links {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+            .social-link {
+                min-width: 0;
+                width: 100%;
+                padding: 10px 7px !important;
+                gap: 6px;
+                font-size: 13px !important;
+            }
+            .social-link i {
+                font-size: 16px;
+            }
+            #festiveOffersSection,
+            #serviceMenu {
+                scroll-margin-top: 84px;
+            }
+            .glass-card,
+            .glass-card-featured {
+                max-width: 100%;
+            }
+        }
+        @media (max-width: 380px) {
+            .social-links {
+                grid-template-columns: 1fr;
+            }
+        }
+
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -412,13 +470,13 @@
         <section class="glass-card rounded-3xl p-6 text-center border-gold-500/30 mb-8">
             <h4 class="font-cinzel text-sm sm:text-base font-bold text-white mb-1">Connect with Anamika Lohar</h4>
             <p class="text-xs text-neutral-400 mb-4">Follow our daily bridal makeovers & real client results</p>
-            <div class="flex items-center justify-center gap-3">
-                <a href="https://instagram.com/anamika__lohar__?psln=c2x5NG55M3N6c3pn" target="_blank" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-obsidian-850 border border-white/10 text-gold-300 text-xs font-semibold hover:border-gold-400 active:scale-95 transition-all">
-                    <i class="fa-brands fa-instagram text-sm"></i>
+            <div class="social-links">
+                <a href="https://instagram.com/anamika__lohar__?psln=c2x5NG55M3N6c3pn" target="_blank" rel="noopener noreferrer" class="social-link flex items-center rounded-xl bg-obsidian-850 border border-white/10 text-gold-300 font-semibold hover:border-gold-400 active:scale-95 transition-all">
+                    <i class="fa-brands fa-instagram"></i>
                     <span>@anamika__lohar__</span>
                 </a>
-                <a href="https://www.facebook.com/share/1CZQzSJQeo/" target="_blank" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-obsidian-850 border border-white/10 text-gold-300 text-xs font-semibold hover:border-gold-400 active:scale-95 transition-all">
-                    <i class="fa-brands fa-facebook-f text-sm"></i>
+                <a href="https://www.facebook.com/share/1CZQzSJQeo/" target="_blank" rel="noopener noreferrer" class="social-link flex items-center rounded-xl bg-obsidian-850 border border-white/10 text-gold-300 font-semibold hover:border-gold-400 active:scale-95 transition-all">
+                    <i class="fa-brands fa-facebook-f"></i>
                     <span>Facebook Page</span>
                 </a>
             </div>
