@@ -234,6 +234,47 @@
             }
         }
 
+    
+        /* Creator credit: discreet premium signature at the very bottom */
+        .creator-credit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            text-align: center;
+        }
+        .creator-credit-kicker {
+            color: #a3a3a3;
+            font-size: 11px;
+            letter-spacing: .18em;
+            line-height: 1.5;
+            text-transform: uppercase;
+        }
+        .creator-credit-name {
+            color: #e7ce75;
+            font-family: 'Cinzel', serif;
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: .12em;
+            line-height: 1.4;
+            text-shadow: 0 0 18px rgba(212,175,55,.22);
+        }
+        .creator-credit-role {
+            color: #d4af37;
+            font-size: 12px;
+            letter-spacing: .06em;
+            line-height: 1.6;
+        }
+        .creator-credit-dot {
+            color: #737373;
+            padding: 0 5px;
+        }
+        @media (max-width: 640px) {
+            .creator-credit-name { font-size: 18px; }
+            .creator-credit-kicker { font-size: 10px; }
+            .creator-credit-role { font-size: 12px; }
+        }
+
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -487,6 +528,11 @@
             <p>&copy; <span id="currentYear"></span> The Anamika Lux &bull; Home Service Salon, Patna</p>
             <p>Direct Booking Helpline: <a href="tel:8893645998" class="text-gold-400 underline">+91 8893645998</a></p>
             <p class="pt-3"><a href="admin.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-obsidian-850 border border-gold-500/50 text-gold-300 text-xs font-bold hover:bg-gold-500 hover:text-obsidian-950 transition-all"><i class="fa-solid fa-lock"></i><span>Owner / Admin Login</span></a></p>
+            <div class="creator-credit mt-7 pt-5 pb-2 border-t border-gold-500/20">
+                <span class="creator-credit-kicker">A Digital Experience Crafted By</span>
+                <span class="creator-credit-name">Shaurya Gupta</span>
+                <span class="creator-credit-role"><i class="fa-solid fa-laptop-code"></i> Digital Solutions <span class="creator-credit-dot">•</span> <i class="fa-solid fa-calendar-star"></i> Events</span>
+            </div>
         </footer>
     </main>
 
