@@ -343,10 +343,7 @@
                                 <i class="fa-solid fa-file-excel text-emerald-400"></i>
                                 <span>Export Excel</span>
                             </button>
-                            <button onclick="clearAllBookings()" class="px-3 py-1.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-semibold hover:bg-red-500/20 flex items-center gap-1.5">
-                                <i class="fa-solid fa-trash-can"></i>
-                                <span>Clear Log</span>
-                            </button>
+                            
                         </div>
                     </div>
 
@@ -371,7 +368,7 @@
                     </div>
                     <div class="flex flex-wrap items-center justify-between gap-2 bg-gold-500/10 border border-gold-500/20 rounded-xl px-3 py-2">
                         <p id="bookingDateSummary" class="text-[11px] text-gold-200">Showing all bookings</p>
-                        <button type="button" onclick="clearBookingFilters()" class="text-[10px] text-neutral-300 underline">Clear search & date</button>
+                        <button type="button" onclick="clearBookingFilters()" class="text-[10px] text-neutral-300 underline">Reset filters</button>
                     </div>
 
                     <!-- Bookings List Output Container -->
@@ -1320,75 +1317,95 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
                     : "Showing " + filtered.length + " of " + bookings.length + " bookings • Estimated total ₹" + filteredAmount.toLocaleString("en-IN");
             }
 
-            if (filtered.length === 0) {
-                listEl.innerHTML = `
-                    <div class="text-center py-10 bg-obsidian-900 border border-neutral-800 rounded-2xl text-neutral-400 text-xs">
-                        <i class="fa-solid fa-inbox text-2xl text-neutral-600 mb-2 block"></i>
-                        No matching appointments found.
-                    </div>
-                `;
-                return;
-            }
+            const sections = [
+                {
+                    title: "Pending Appointments",
+                    note: "Bookings waiting for completion, including confirmed appointments",
+                    accent: "border-amber-500/30",
+                    countStyle: "bg-amber-500/10 text-amber-300",
+                    rows: filtered.filter(b => !["Completed", "Cancelled"].includes(b.status || "Pending"))
+                },
+                {
+                    title: "Completed Appointments",
+                    note: "Successfully completed bookings",
+                    accent: "border-blue-500/30",
+                    countStyle: "bg-blue-500/10 text-blue-300",
+                    rows: filtered.filter(b => b.status === "Completed")
+                },
+                {
+                    title: "Cancelled Appointments",
+                    note: "Bookings cancelled by the customer or salon",
+                    accent: "border-red-500/30",
+                    countStyle: "bg-red-500/10 text-red-300",
+                    rows: filtered.filter(b => b.status === "Cancelled")
+                }
+            ];
 
-            listEl.innerHTML = filtered.map(b => {
-                const statusColor = b.status === 'Confirmed' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
-                                    b.status === 'Completed' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
-                                    b.status === 'Cancelled' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
-                                    'bg-amber-500/20 text-amber-300 border-amber-500/30';
+            const renderBookingCard = (b) => {
+                const currentStatus = b.status || "Pending";
+                const statusColor = currentStatus === "Confirmed" ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" :
+                                    currentStatus === "Completed" ? "bg-blue-500/20 text-blue-400 border-blue-500/30" :
+                                    currentStatus === "Cancelled" ? "bg-red-500/20 text-red-400 border-red-500/30" :
+                                    "bg-amber-500/20 text-amber-300 border-amber-500/30";
 
                 return `
-                <div class="bg-obsidian-900 border border-neutral-800 hover:border-gold-500/30 rounded-2xl p-4 text-xs space-y-2.5 transition-all">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-white text-sm sm:text-base">${b.name}</span>
-                            <span class="text-[9px] font-mono px-2 py-0.5 rounded-full border ${statusColor}">
-                                ${b.status || 'Pending'}
-                            </span>
-                            <span class="text-[10px] font-mono text-neutral-500">ID: ${b.id || 'N/A'}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm font-cinzel font-bold text-gold-300">₹${b.amount || 2000}</span>
-                            <button onclick="deleteBooking('${b.id}')" class="text-neutral-500 hover:text-red-400 p-1 text-xs" title="Delete record">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-neutral-300">
-                        <div><strong class="text-gold-300">Package:</strong> ${b.package}</div>
-                        <div><strong class="text-gold-300">Phone:</strong> <a href="tel:${b.phone}" class="underline text-gold-400 font-mono">${b.phone}</a></div>
-                        <div><strong class="text-gold-300">Date/Slot:</strong> ${b.date} (${b.slot})</div>
-                        <div><strong class="text-gold-300">Address:</strong> ${b.address}</div>
-                    </div>
-
-                    <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5">
-                        <!-- Status Changer -->
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] text-neutral-400 uppercase">Status:</span>
-                            <select onchange="updateBookingStatus('${b.id}', this.value)" class="bg-obsidian-850 border border-neutral-700 text-[11px] text-white rounded-lg px-2 py-1 focus:outline-none focus:border-gold-400">
-                                <option value="Pending" ${b.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                <option value="Confirmed" ${b.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
-                                <option value="Completed" ${b.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                                <option value="Cancelled" ${b.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
-                            </select>
+                    <div class="bg-obsidian-900 border border-neutral-800 hover:border-gold-500/30 rounded-2xl p-4 text-xs space-y-2.5 transition-all">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="font-bold text-white text-sm sm:text-base">${b.name || "Customer"}</span>
+                                <span class="text-[9px] font-mono px-2 py-0.5 rounded-full border ${statusColor}">${currentStatus}</span>
+                                <span class="text-[10px] font-mono text-neutral-500">ID: ${b.id || "N/A"}</span>
+                            </div>
+                            <span class="text-sm font-cinzel font-bold text-gold-300">₹${Number(b.amount) || 0}</span>
                         </div>
 
-                        <!-- Direct Connect & Ready-to-send Confirmation -->
-                        <div class="flex flex-wrap items-center gap-2">
-                            <a href="tel:${b.phone}" class="px-3 py-1 bg-obsidian-850 border border-white/10 hover:border-gold-400 rounded-lg text-[11px] text-white flex items-center gap-1 active:scale-95">
-                                <i class="fa-solid fa-phone text-emerald-400 text-[10px]"></i> Call
-                            </a>
-                            <button type="button" onclick="openBookingConfirmation('${b.id}', 'whatsapp')" class="px-3 py-1 bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 rounded-lg text-[11px] text-emerald-300 flex items-center gap-1 active:scale-95">
-                                <i class="fa-brands fa-whatsapp"></i> WhatsApp Confirmation
-                            </button>
-                            <button type="button" onclick="openBookingConfirmation('${b.id}', 'sms')" class="px-3 py-1 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 rounded-lg text-[11px] text-sky-300 flex items-center gap-1 active:scale-95">
-                                <i class="fa-solid fa-message"></i> SMS
-                            </button>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-neutral-300">
+                            <div><strong class="text-gold-300">Package:</strong> ${b.package || "Salon Service"}</div>
+                            <div><strong class="text-gold-300">Phone:</strong> <a href="tel:${b.phone || ""}" class="underline text-gold-400 font-mono">${b.phone || "N/A"}</a></div>
+                            <div><strong class="text-gold-300">Date/Slot:</strong> ${b.date || "N/A"} (${b.slot || "N/A"})</div>
+                            <div><strong class="text-gold-300">Address:</strong> ${b.address || "N/A"}</div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] text-neutral-400 uppercase">Status:</span>
+                                <select onchange="updateBookingStatus('${b.id}', this.value)" class="bg-obsidian-850 border border-neutral-700 text-[11px] text-white rounded-lg px-2 py-1 focus:outline-none focus:border-gold-400">
+                                    <option value="Pending" ${currentStatus === "Pending" ? "selected" : ""}>Pending</option>
+                                    <option value="Confirmed" ${currentStatus === "Confirmed" ? "selected" : ""}>Confirmed</option>
+                                    <option value="Completed" ${currentStatus === "Completed" ? "selected" : ""}>Completed</option>
+                                    <option value="Cancelled" ${currentStatus === "Cancelled" ? "selected" : ""}>Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <a href="tel:${b.phone || ""}" class="px-3 py-1 bg-obsidian-850 border border-white/10 hover:border-gold-400 rounded-lg text-[11px] text-white flex items-center gap-1 active:scale-95">
+                                    <i class="fa-solid fa-phone text-emerald-400 text-[10px]"></i> Call
+                                </a>
+                                <button type="button" onclick="openBookingConfirmation('${b.id}', 'whatsapp')" class="px-3 py-1 bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 rounded-lg text-[11px] text-emerald-300 flex items-center gap-1 active:scale-95">
+                                    <i class="fa-brands fa-whatsapp"></i> WhatsApp Confirmation
+                                </button>
+                                <button type="button" onclick="openBookingConfirmation('${b.id}', 'sms')" class="px-3 py-1 bg-sky-500/15 border border-sky-500/30 hover:bg-sky-500/25 rounded-lg text-[11px] text-sky-300 flex items-center gap-1 active:scale-95">
+                                    <i class="fa-solid fa-message"></i> SMS
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
-            }).join('');
+                `;
+            };
+
+            listEl.innerHTML = sections.map(section => `
+                <section class="space-y-3">
+                    <div class="flex items-center justify-between gap-3 border-b ${section.accent} pb-2">
+                        <div>
+                            <h3 class="text-sm sm:text-base font-cinzel font-bold text-white">${section.title}</h3>
+                            <p class="text-[10px] text-neutral-500 mt-0.5">${section.note}</p>
+                        </div>
+                        <span class="min-w-8 text-center px-2.5 py-1 rounded-full text-xs font-bold ${section.countStyle}">${section.rows.length}</span>
+                    </div>
+                    ${section.rows.length
+                        ? section.rows.map(renderBookingCard).join("")
+                        : '<div class="text-center py-5 bg-obsidian-900/60 border border-neutral-800 rounded-xl text-neutral-500 text-xs">No appointments in this section.</div>'}
+                </section>
+            `).join("");
         }
 
         function clearBookingFilters() {
@@ -1464,15 +1481,6 @@ The Anamika Lux | Patna`;
             }
         }
 
-        function deleteBooking(bookingId) {
-            let bookings = getBookings();
-            bookings = bookings.filter(b => b.id !== bookingId);
-            setBookings(bookings);
-            showToast("Lead removed.");
-            loadDashboardMetrics();
-            filterBookingsDisplay();
-        }
-
         // Export All Bookings to Excel/CSV
         function exportBookingsToCSV() {
             const bookings = getBookings();
@@ -1508,13 +1516,6 @@ The Anamika Lux | Patna`;
             link.click();
             document.body.removeChild(link);
             showToast("Leads downloaded to CSV / Excel!");
-        }
-
-        function clearAllBookings() {
-            setBookings([]);
-            loadDashboardMetrics();
-            filterBookingsDisplay();
-            showToast("All leads cleared.");
         }
 
         // Festive Presets Helper
@@ -2031,28 +2032,6 @@ window.addEventListener('DOMContentLoaded', () => {
     window.showToast("Booking marked as " + newStatus);
     window.loadDashboardMetrics();
     window.filterBookingsDisplay();
-  };
-
-  window.deleteBooking = async function (bookingId) {
-    if (!window.confirm("Delete this booking permanently?")) return;
-    const booking = window.getBookings().find(function (b) { return b.id === bookingId; });
-    if (!booking) return;
-    const result = await db.from("bookings").delete().eq("id",booking.dbId);
-    if (result.error) { window.showToast(result.error.message); return; }
-    await refreshAdminCloudData();
-    window.loadDashboardMetrics();
-    window.filterBookingsDisplay();
-    window.showToast("Booking deleted.");
-  };
-
-  window.clearAllBookings = async function () {
-    if (!window.confirm("Delete ALL salon bookings permanently? This cannot be undone.")) return;
-    const result = await db.from("bookings").delete().gte("created_at","1970-01-01T00:00:00Z");
-    if (result.error) { window.showToast(result.error.message); return; }
-    await refreshAdminCloudData();
-    window.loadDashboardMetrics();
-    window.filterBookingsDisplay();
-    window.showToast("All bookings deleted.");
   };
 
   window.changeAdminPin = function (event) {
