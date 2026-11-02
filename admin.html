@@ -346,10 +346,10 @@
                     </div>
 
                     <!-- Search & Filter Bar -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
                         <div class="relative sm:col-span-2">
                             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-neutral-500 text-xs"></i>
-                            <input type="text" id="leadSearchInput" oninput="filterBookingsDisplay()" placeholder="Search by client name, mobile or Patna locality..." class="w-full bg-obsidian-900 border border-neutral-700 focus:border-gold-400 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none">
+                            <input type="text" id="leadSearchInput" oninput="filterBookingsDisplay()" placeholder="Search name, mobile or locality..." class="w-full bg-obsidian-900 border border-neutral-700 focus:border-gold-400 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none">
                         </div>
                         <div>
                             <select id="leadStatusFilter" onchange="filterBookingsDisplay()" class="w-full bg-obsidian-900 border border-neutral-700 focus:border-gold-400 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
@@ -360,6 +360,13 @@
                                 <option value="Cancelled">Cancelled</option>
                             </select>
                         </div>
+                        <div>
+                            <input type="date" id="leadDateFilter" onchange="filterBookingsDisplay()" title="Filter bookings by appointment date" class="w-full bg-obsidian-900 border border-neutral-700 focus:border-gold-400 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 bg-gold-500/10 border border-gold-500/20 rounded-xl px-3 py-2">
+                        <p id="bookingDateSummary" class="text-[11px] text-gold-200">Showing all bookings</p>
+                        <button type="button" onclick="clearBookingFilters()" class="text-[10px] text-neutral-300 underline">Clear search & date</button>
                     </div>
 
                     <!-- Bookings List Output Container -->
@@ -406,25 +413,37 @@
                     </form>
                 </div>
 
-                <!-- VIEW 4: COMBOS & PRICING ENGINE -->
-                <div id="adminTab-packages" class="hidden space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
-                        <div>
-                            <h2 class="text-base font-cinzel font-bold text-white">Manage Salon Combos & Pricing</h2>
-                            <p class="text-xs text-neutral-400">Edit combo package titles, offer rates (₹) and original strikethrough prices.</p>
+                <!-- VIEW 4: COMBOS, INDIVIDUAL SERVICE PRICES -->
+                <div id="adminTab-packages" class="hidden space-y-5">
+                    <div class="border-b border-white/5 pb-3">
+                        <h2 class="text-base font-cinzel font-bold text-white">All Combos & Service Prices</h2>
+                        <p class="text-xs text-neutral-400">Yahin se combo aur individual service ke rates edit karein. Save karne ke baad isi browser mein public page par naye rates dikhte hain.</p>
+                    </div>
+                    <section class="glass-card rounded-2xl p-4 sm:p-5 border-gold-500/30 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div><h3 class="font-cinzel text-sm font-bold text-gold-200">Combo Packages</h3><p class="text-[10px] text-neutral-400">5 regular combos plus 2 printed signature packages.</p></div>
+                            <button type="button" onclick="resetPackagesToDefault()" class="text-[10px] text-neutral-400 underline">Reset regular combos</button>
                         </div>
-                        <button onclick="resetPackagesToDefault()" class="text-neutral-400 hover:text-white text-xs underline self-start sm:self-center">
-                            Reset to Default Offers
-                        </button>
-                    </div>
-
-                    <div id="adminPackagesEditor" class="space-y-3">
-                        <!-- Populated by JS -->
-                    </div>
-
-                    <button onclick="saveAllPackageChanges()" class="btn-gold-solid px-6 py-3 rounded-xl text-xs uppercase font-extrabold tracking-wider active:scale-95 shadow-xl">
-                        Save & Apply Pricing Live
-                    </button>
+                        <div id="adminPackagesEditor" class="space-y-3"></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-white/10 pt-3">
+                            <label class="text-[10px] text-neutral-300">Signature Beauty Package (₹5,000 default)
+                                <input type="number" min="0" id="signaturePackagePrice" class="mt-1 w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-sm text-gold-300">
+                            </label>
+                            <label class="text-[10px] text-neutral-300">Royal Complete Care Package (₹7,000 default)
+                                <input type="number" min="0" id="royalPackagePrice" class="mt-1 w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-sm text-gold-300">
+                            </label>
+                        </div>
+                        <button type="button" onclick="saveAllPackageChanges()" class="btn-gold-solid px-6 py-3 rounded-xl text-xs uppercase font-extrabold tracking-wider active:scale-95 shadow-xl">Save All Combo Prices</button>
+                    </section>
+                    <section class="glass-card rounded-2xl p-4 sm:p-5 border-gold-500/30 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div><h3 class="font-cinzel text-sm font-bold text-gold-200">Individual Service Prices</h3><p class="text-[10px] text-neutral-400">“Display rate” customer ko dikhne wala text hai; “Cart price” estimated total mein use hota hai.</p></div>
+                            <button type="button" onclick="resetServicePricesToDefault()" class="text-[10px] text-neutral-400 underline">Reset service rates</button>
+                        </div>
+                        <div id="adminServicePricesEditor" class="space-y-3"><!-- Service price rows generated here --></div>
+                        <button type="button" onclick="saveAllServicePriceChanges()" class="btn-gold-solid px-6 py-3 rounded-xl text-xs uppercase font-extrabold tracking-wider active:scale-95 shadow-xl">Save All Service Prices</button>
+                    </section>
+                    <p class="text-[10px] text-amber-200/80 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">Important: is static version mein saved rates isi browser/device mein save hote hain. Har customer ke phone par rates ek jaise update karne ke liye shared online database connection abhi zaroori hai.</p>
                 </div>
 
                 <!-- VIEW 5: SECURITY & SETTINGS -->
@@ -528,6 +547,409 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
         const STORAGE_KEY_BOOKINGS = "anamika_bookings_list";
         const STORAGE_KEY_CAMPAIGN = "anamika_campaign_cfg";
         const STORAGE_KEY_PIN      = "anamika_admin_pin";
+        const STORAGE_KEY_SERVICE_PRICES = "anamika_service_prices";
+        const STORAGE_KEY_SIGNATURE_PRICES = "anamika_signature_package_prices";
+
+
+        const DEFAULT_SERVICE_PRICE_CATEGORIES = [
+          {
+                    "title": "Hair Care & Styling",
+                    "items": [
+                              [
+                                        "Hair Cut & Blow Dry",
+                                        "₹500",
+                                        500
+                              ],
+                              [
+                                        "Hair Spa",
+                                        "Starting ₹800",
+                                        800
+                              ],
+                              [
+                                        "Hair Colour",
+                                        "Starting ₹1,500",
+                                        1500
+                              ],
+                              [
+                                        "Keratin / Smoothening",
+                                        "Starting ₹2,500",
+                                        2500
+                              ],
+                              [
+                                        "Full Arms Wax — Honey",
+                                        "₹200",
+                                        200
+                              ],
+                              [
+                                        "Full Arms Wax — Chocolate",
+                                        "₹350",
+                                        350
+                              ],
+                              [
+                                        "Full Arms Wax — Rica",
+                                        "₹500",
+                                        500
+                              ],
+                              [
+                                        "Under Arms Wax — Honey",
+                                        "₹70",
+                                        70
+                              ],
+                              [
+                                        "Under Arms Wax — Chocolate",
+                                        "₹90",
+                                        90
+                              ],
+                              [
+                                        "Under Arms Wax — Rica",
+                                        "₹110",
+                                        110
+                              ],
+                              [
+                                        "Upper Lips Wax",
+                                        "₹70",
+                                        70
+                              ]
+                    ]
+          },
+          {
+                    "title": "Skin Care",
+                    "items": [
+                              [
+                                        "Basic Facial",
+                                        "₹1,000",
+                                        1000
+                              ],
+                              [
+                                        "Lotus Facial",
+                                        "₹1,500",
+                                        1500
+                              ],
+                              [
+                                        "Detan Facial",
+                                        "₹2,000",
+                                        2000
+                              ],
+                              [
+                                        "O3+ Facial",
+                                        "₹2,300",
+                                        2300
+                              ],
+                              [
+                                        "Bridal Facial",
+                                        "₹4,000",
+                                        4000
+                              ],
+                              [
+                                        "Basic White Facial",
+                                        "₹3,000",
+                                        3000
+                              ],
+                              [
+                                        "Cleanup — available options",
+                                        "₹450 / ₹700 / ₹1,200",
+                                        450
+                              ],
+                              [
+                                        "Body Bleach / Detan",
+                                        "₹2,500",
+                                        2500
+                              ],
+                              [
+                                        "Face Detan",
+                                        "Included in special packages",
+                                        0
+                              ]
+                    ]
+          },
+          {
+                    "title": "Waxing",
+                    "items": [
+                              [
+                                        "Half Legs Wax — Honey",
+                                        "₹250",
+                                        250
+                              ],
+                              [
+                                        "Half Legs Wax — Chocolate",
+                                        "₹400",
+                                        400
+                              ],
+                              [
+                                        "Half Legs Wax — Rica",
+                                        "₹550",
+                                        550
+                              ],
+                              [
+                                        "Full Legs Wax — Honey",
+                                        "₹250",
+                                        250
+                              ],
+                              [
+                                        "Full Legs Wax — Chocolate",
+                                        "₹400",
+                                        400
+                              ],
+                              [
+                                        "Full Legs Wax — Rica",
+                                        "₹550",
+                                        550
+                              ],
+                              [
+                                        "Full Back Wax — Honey",
+                                        "₹500",
+                                        500
+                              ],
+                              [
+                                        "Full Back Wax — Chocolate",
+                                        "₹800",
+                                        800
+                              ],
+                              [
+                                        "Full Back Wax — Rica",
+                                        "₹1,100",
+                                        1100
+                              ],
+                              [
+                                        "Bikini Line",
+                                        "₹2,000",
+                                        2000
+                              ]
+                    ]
+          },
+          {
+                    "title": "Manicure & Pedicure",
+                    "items": [
+                              [
+                                        "Basic Pedicure",
+                                        "₹700",
+                                        700
+                              ],
+                              [
+                                        "Basic Manicure",
+                                        "₹400",
+                                        400
+                              ],
+                              [
+                                        "Lotus Pedicure",
+                                        "₹900",
+                                        900
+                              ],
+                              [
+                                        "Lotus Manicure",
+                                        "₹600",
+                                        600
+                              ],
+                              [
+                                        "Aroma Magic Pedicure",
+                                        "₹1,000",
+                                        1000
+                              ],
+                              [
+                                        "Aroma Magic Manicure",
+                                        "₹800",
+                                        800
+                              ],
+                              [
+                                        "Crystal Spa Body Polishing",
+                                        "₹3,200",
+                                        3200
+                              ],
+                              [
+                                        "Nail Art / Polish Change",
+                                        "Add-on ₹150",
+                                        150
+                              ],
+                              [
+                                        "Body Massage — options",
+                                        "₹1,500 / ₹2,000",
+                                        1500
+                              ]
+                    ]
+          },
+          {
+                    "title": "Bridal & Party Makeup",
+                    "items": [
+                              [
+                                        "Party Makeup — options",
+                                        "₹2,000 / ₹2,500 / ₹3,000",
+                                        2000
+                              ],
+                              [
+                                        "Bridal Basic HD Makeup — options",
+                                        "₹8,000 / ₹10,000 / ₹12,000",
+                                        8000
+                              ],
+                              [
+                                        "Engagement Makeup — options",
+                                        "₹5,000 / ₹6,000 / ₹7,000",
+                                        5000
+                              ],
+                              [
+                                        "Airbrush Makeup",
+                                        "₹15,000",
+                                        15000
+                              ],
+                              [
+                                        "Groom Makeup",
+                                        "₹3,500",
+                                        3500
+                              ],
+                              [
+                                        "Reception Makeup",
+                                        "₹7,000",
+                                        7000
+                              ],
+                              [
+                                        "Saree Draping",
+                                        "₹450",
+                                        450
+                              ],
+                              [
+                                        "Hair Styling (Bridal / Party) — options",
+                                        "₹500 / ₹1,000 / ₹1,500",
+                                        500
+                              ],
+                              [
+                                        "Couples Makeup — Bride & Groom",
+                                        "₹12,000",
+                                        12000
+                              ],
+                              [
+                                        "Couples Makeup — Bride & Groom HD",
+                                        "₹15,000",
+                                        15000
+                              ]
+                    ]
+          },
+          {
+                    "title": "Threading & Other Package Services",
+                    "items": [
+                              [
+                                        "Eyebrow Threading",
+                                        "Price on enquiry",
+                                        0
+                              ],
+                              [
+                                        "Forehead Threading",
+                                        "Price on enquiry",
+                                        0
+                              ],
+                              [
+                                        "Upper Lip Threading",
+                                        "Price on enquiry",
+                                        0
+                              ],
+                              [
+                                        "Full Body Wax",
+                                        "Included in ₹7,000 package",
+                                        0
+                              ],
+                              [
+                                        "Full Body Polishing",
+                                        "Included in ₹7,000 package",
+                                        0
+                              ],
+                              [
+                                        "Full Leg Detan",
+                                        "Included in ₹5,000 package",
+                                        0
+                              ],
+                              [
+                                        "Full Hand Detan",
+                                        "Included in ₹5,000 package",
+                                        0
+                              ],
+                              [
+                                        "Basic Haircut",
+                                        "Price on enquiry",
+                                        0
+                              ],
+                              [
+                                        "Haircut",
+                                        "Price on enquiry",
+                                        0
+                              ]
+                    ]
+          }
+];
+
+        function escapeAdminPriceText(value) {
+            return String(value ?? "").replace(/[&<>"']/g, ch => ({
+                "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+            }[ch]));
+        }
+
+        function getSavedServicePriceConfig() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_KEY_SERVICE_PRICES) || "{}"); }
+            catch (e) { return {}; }
+        }
+
+        function getSavedSignaturePrices() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_KEY_SIGNATURE_PRICES) || '{"signature":5000,"royal":7000}'); }
+            catch (e) { return {signature:5000, royal:7000}; }
+        }
+
+        function loadAdminServicePrices() {
+            const saved = getSavedServicePriceConfig();
+            const editor = document.getElementById("adminServicePricesEditor");
+            const signature = getSavedSignaturePrices();
+            const signatureInput = document.getElementById("signaturePackagePrice");
+            const royalInput = document.getElementById("royalPackagePrice");
+            if (signatureInput) signatureInput.value = signature.signature ?? 5000;
+            if (royalInput) royalInput.value = signature.royal ?? 7000;
+            if (!editor) return;
+
+            editor.innerHTML = DEFAULT_SERVICE_PRICE_CATEGORIES.map((category, categoryIndex) => {
+                const rows = category.items.map(item => {
+                    const stored = saved[item[0]] || {};
+                    const display = stored.display ?? item[1];
+                    const amount = stored.amount ?? item[2];
+                    const key = encodeURIComponent(item[0]);
+                    return `
+                        <div class="grid grid-cols-1 sm:grid-cols-[1.2fr_1fr_120px] gap-2 items-center py-2 border-b border-white/5 last:border-0">
+                            <span class="text-[11px] text-neutral-200">${escapeAdminPriceText(item[0])}</span>
+                            <input type="text" data-service-display data-service-key="${key}" value="${escapeAdminPriceText(display)}" aria-label="Customer display rate for ${escapeAdminPriceText(item[0])}" class="w-full min-w-0 bg-obsidian-950 border border-neutral-700 rounded-lg px-2.5 py-2 text-[11px] text-gold-200">
+                            <input type="number" min="0" step="1" data-service-amount data-service-key="${key}" value="${Number(amount) || 0}" aria-label="Cart price for ${escapeAdminPriceText(item[0])}" class="w-full bg-obsidian-950 border border-neutral-700 rounded-lg px-2.5 py-2 text-[11px] text-white">
+                        </div>`;
+                }).join("");
+                return `
+                    <details class="bg-obsidian-900 border border-white/10 rounded-xl p-3" ${categoryIndex===0?"open":""}>
+                        <summary class="cursor-pointer flex items-center justify-between gap-2 text-xs text-gold-200 font-bold">
+                            <span>${escapeAdminPriceText(category.title)}</span>
+                            <span class="text-[10px] text-neutral-500 font-normal">${category.items.length} services</span>
+                        </summary>
+                        <div class="grid grid-cols-1 sm:grid-cols-[1.2fr_1fr_120px] gap-2 text-[9px] uppercase text-neutral-500 pt-3 pb-1">
+                            <span>Service</span><span>Display rate</span><span>Cart price ₹</span>
+                        </div>
+                        <div>${rows}</div>
+                    </details>`;
+            }).join("");
+        }
+
+        function saveAllServicePriceChanges() {
+            const editor = document.getElementById("adminServicePricesEditor");
+            if (!editor) return;
+            const config = {};
+            editor.querySelectorAll("[data-service-display]").forEach(displayInput => {
+                const key = decodeURIComponent(displayInput.dataset.serviceKey || "");
+                const row = displayInput.parentElement;
+                const amountInput = row.querySelector("[data-service-amount]");
+                const display = displayInput.value.trim();
+                const amount = Math.max(0, Number(amountInput?.value) || 0);
+                if (key && display) config[key] = {display, amount};
+            });
+            localStorage.setItem(STORAGE_KEY_SERVICE_PRICES, JSON.stringify(config));
+            showToast("Service prices saved in this browser.");
+        }
+
+        function resetServicePricesToDefault() {
+            localStorage.removeItem(STORAGE_KEY_SERVICE_PRICES);
+            loadAdminServicePrices();
+            showToast("Default service rates restored in this browser.");
+        }
+
+
 
         // State Getters & Initializers
         function getPackages() {
@@ -836,6 +1258,10 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
 
             if (tabName === 'overview') loadDashboardMetrics();
             if (tabName === 'leads') loadAdminBookings();
+            if (tabName === 'packages') {
+                loadAdminPackages();
+                loadAdminServicePrices();
+            }
         }
 
         // Dashboard Metrics Calculation
@@ -878,6 +1304,7 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
 
             const searchVal = (document.getElementById('leadSearchInput')?.value || '').toLowerCase();
             const statusFilter = document.getElementById('leadStatusFilter')?.value || 'all';
+            const dateFilter = document.getElementById('leadDateFilter')?.value || '';
 
             const badgeCountEl = document.getElementById('badgeLeadCount');
             if (badgeCountEl) badgeCountEl.textContent = bookings.length;
@@ -888,8 +1315,18 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
                                       b.address.toLowerCase().includes(searchVal) ||
                                       b.package.toLowerCase().includes(searchVal);
                 const matchesStatus = (statusFilter === 'all') || (b.status === statusFilter);
-                return matchesSearch && matchesStatus;
+                const matchesDate = !dateFilter || b.date === dateFilter;
+                return matchesSearch && matchesStatus && matchesDate;
             });
+
+            const summary = document.getElementById("bookingDateSummary");
+            if (summary) {
+                const filteredAmount = filtered.reduce((sum, booking) => sum + (Number(booking.amount) || 0), 0);
+                const dateLabel = dateFilter ? new Date(dateFilter + "T00:00:00").toLocaleDateString("en-IN") : "All dates";
+                summary.textContent = dateFilter
+                    ? filtered.length + " booking(s) on " + dateLabel + " • Estimated total ₹" + filteredAmount.toLocaleString("en-IN")
+                    : "Showing " + filtered.length + " of " + bookings.length + " bookings • Estimated total ₹" + filteredAmount.toLocaleString("en-IN");
+            }
 
             if (filtered.length === 0) {
                 listEl.innerHTML = `
@@ -960,6 +1397,16 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
                 </div>
             `;
             }).join('');
+        }
+
+        function clearBookingFilters() {
+            const search = document.getElementById("leadSearchInput");
+            const status = document.getElementById("leadStatusFilter");
+            const date = document.getElementById("leadDateFilter");
+            if (search) search.value = "";
+            if (status) status.value = "all";
+            if (date) date.value = "";
+            filterBookingsDisplay();
         }
 
         // Build a booking-specific confirmation message for WhatsApp or SMS.
@@ -1123,25 +1570,30 @@ The Anamika Lux | Patna`;
             showToast("Campaign banner updated live!");
         }
 
-        // Load & Save Packages in Admin Editor
+        // Load & Save all five standard salon combos.
         function loadAdminPackages() {
             const pkgs = getPackages();
             const editor = document.getElementById('adminPackagesEditor');
+            const signature = getSavedSignaturePrices();
+            const signatureInput = document.getElementById("signaturePackagePrice");
+            const royalInput = document.getElementById("royalPackagePrice");
+            if (signatureInput) signatureInput.value = signature.signature ?? 5000;
+            if (royalInput) royalInput.value = signature.royal ?? 7000;
             if (!editor) return;
 
             editor.innerHTML = pkgs.map((p, idx) => `
                 <div class="bg-obsidian-900 border border-neutral-800 rounded-2xl p-3.5 text-xs grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
                     <div>
                         <label class="block text-[10px] text-neutral-400 uppercase font-semibold mb-1">Package Name</label>
-                        <input type="text" id="pkgName_${idx}" value="${p.name}" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2 text-xs text-white">
+                        <input type="text" id="pkgName_${idx}" value="${escapeAdminPriceText(p.name)}" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2 text-xs text-white">
                     </div>
                     <div>
                         <label class="block text-[10px] text-neutral-400 uppercase font-semibold mb-1">Offer Price (₹)</label>
-                        <input type="number" id="pkgPrice_${idx}" value="${p.price}" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2 text-xs text-gold-300 font-mono font-bold">
+                        <input type="number" min="0" id="pkgPrice_${idx}" value="${p.price}" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2 text-xs text-gold-300 font-mono font-bold">
                     </div>
                     <div>
                         <label class="block text-[10px] text-neutral-400 uppercase font-semibold mb-1">Original Price (₹)</label>
-                        <input type="number" id="pkgOrig_${idx}" value="${p.originalPrice}" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2 text-xs text-neutral-400 font-mono">
+                        <input type="number" min="0" id="pkgOrig_${idx}" value="${p.originalPrice}" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2 text-xs text-neutral-400 font-mono">
                     </div>
                 </div>
             `).join('');
@@ -1154,12 +1606,16 @@ The Anamika Lux | Patna`;
                 const priceEl = document.getElementById(`pkgPrice_${idx}`);
                 const origEl = document.getElementById(`pkgOrig_${idx}`);
                 if (nameEl) p.name = nameEl.value.trim();
-                if (priceEl) p.price = parseInt(priceEl.value, 10) || 0;
-                if (origEl) p.originalPrice = parseInt(origEl.value, 10) || 0;
+                if (priceEl) p.price = Math.max(0, parseInt(priceEl.value, 10) || 0);
+                if (origEl) p.originalPrice = Math.max(0, parseInt(origEl.value, 10) || 0);
             });
             setPackages(pkgs);
-            renderPackages();
-            showToast("Combos and prices updated on website!");
+            const signature = {
+                signature: Math.max(0, Number(document.getElementById("signaturePackagePrice")?.value) || 0),
+                royal: Math.max(0, Number(document.getElementById("royalPackagePrice")?.value) || 0)
+            };
+            localStorage.setItem(STORAGE_KEY_SIGNATURE_PRICES, JSON.stringify(signature));
+            showToast("Combo prices saved in this browser.");
         }
 
         function resetPackagesToDefault() {
@@ -1284,6 +1740,7 @@ window.addEventListener('DOMContentLoaded', () => {
     loadAdminBookings();
     loadAdminCampaign();
     loadAdminPackages();
+    loadAdminServicePrices();
 });
 
 </script>
