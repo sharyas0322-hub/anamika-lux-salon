@@ -1,0 +1,24 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.anamikalux.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.anamikalux.app'
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    buildTypes {
+        release {
+            // Temporary distributable build. Switch to a private release keystore before Play Store publishing.
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+        }
+    }
+}
