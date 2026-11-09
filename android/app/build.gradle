@@ -7,10 +7,30 @@ android {
     compileSdk 35
 
     defaultConfig {
-        applicationId 'in.anamikalux.app'
         minSdk 23
         targetSdk 35
         versionCode 1
         versionName '1.0.0'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    flavorDimensions += "audience"
+
+    productFlavors {
+        customer {
+            dimension "audience"
+            applicationId "in.anamikalux.customer"
+            resValue "string", "app_name", "The Anamika Lux"
+            buildConfigField "String", "APP_START_URL", "\"https://anamika-lux-salon.onrender.com/app.html?app=customer\""
+        }
+        partner {
+            dimension "audience"
+            applicationId "in.anamikalux.partner"
+            resValue "string", "app_name", "Anamika Lux Partner"
+            buildConfigField "String", "APP_START_URL", "\"https://anamika-lux-salon.onrender.com/app.html?app=partner\""
+        }
     }
 }
