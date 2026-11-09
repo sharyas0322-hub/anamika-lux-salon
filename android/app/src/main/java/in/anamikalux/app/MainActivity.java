@@ -16,21 +16,22 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
-    private static final String APP_URL = "https://anamika-lux-salon.onrender.com/app.html";
+    private static final String APP_URL = BuildConfig.APP_START_URL;
     private WebView webView;
     private ProgressBar progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setStatusBarColor(Color.rgb(41, 19, 52));
-        getWindow().setNavigationBarColor(Color.rgb(41, 19, 52));
+        getWindow().setStatusBarColor(Color.rgb(5, 5, 7));
+        getWindow().setNavigationBarColor(Color.rgb(5, 5, 7));
 
         FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(Color.rgb(5, 5, 7));
         webView = new WebView(this);
         progress = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
         progress.setMax(100);
-        progress.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.rgb(217, 76, 145)));
+        progress.setProgressTintList(android.content.res.ColorStateList.valueOf(Color.rgb(212, 175, 55)));
         progress.setBackgroundColor(Color.TRANSPARENT);
 
         FrameLayout.LayoutParams progressParams = new FrameLayout.LayoutParams(
@@ -50,9 +51,10 @@ public class MainActivity extends Activity {
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
         settings.setSupportMultipleWindows(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-        settings.setUserAgentString(settings.getUserAgentString() + " AnamikaLuxAndroid/1.0");
+        settings.setUserAgentString(settings.getUserAgentString() +
+            (BuildConfig.FLAVOR.equals("partner") ? " AnamikaLuxPartner/1.0" : " AnamikaLuxCustomer/1.0"));
 
-        webView.setBackgroundColor(Color.rgb(255, 250, 252));
+        webView.setBackgroundColor(Color.rgb(5, 5, 7));
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
