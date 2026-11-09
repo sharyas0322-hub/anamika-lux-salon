@@ -38,7 +38,11 @@ jobs:
         run: |
           SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)"
           if [ -z "$SDKMANAGER" ]; then echo "Android SDK manager was not found"; exit 1; fi
+          # sdkmanager may finish accepting licences before the yes process exits.
+          # Disable pipefail for this pipeline only to avoid treating yes' SIGPIPE as a failure.
+          set +o pipefail
           yes | "$SDKMANAGER" --licenses >/dev/null
+          set -o pipefail
           "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
 
       - name: Build installable debug APK
