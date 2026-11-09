@@ -1,6 +1,11 @@
-name: Build Anamika Lux Android APK
+name: Build Anamika Lux Customer and Partner APKs
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - '.github/workflows/android-apk.yml'
   push:
     paths:
       - 'android/**'
@@ -11,7 +16,7 @@ permissions:
   contents: read
 
 jobs:
-  build-apk:
+  build-apks:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -28,20 +33,32 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Install Android SDK platform and build tools
+        shell: bash
+        run: |
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)"
+          if [ -z "$SDKMANAGER" ]; then echo "Android SDK manager was not found"; exit 1; fi
+          set +o pipefail
+          yes | "$SDKMANAGER" --licenses >/dev/null
+          set -o pipefail
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
 
-      - name: Install Android platform and build tools
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-
-      - name: Build installable debug APK
+      - name: Build Customer and Partner APKs
         working-directory: android
-        run: gradle --no-daemon :app:assembleDebug
+        run: gradle --no-daemon :app:assembleCustomerDebug :app:assemblePartnerDebug
 
-      - name: Upload APK
+      - name: Upload Customer APK
         uses: actions/upload-artifact@v4
         with:
-          name: anamika-lux-android-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: anamika-lux-customer-apk
+          path: android/app/build/outputs/apk/customer/debug/app-customer-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload Partner APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: anamika-lux-partner-apk
+          path: android/app/build/outputs/apk/partner/debug/app-partner-debug.apk
           if-no-files-found: error
           retention-days: 30
