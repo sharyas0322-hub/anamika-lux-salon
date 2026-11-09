@@ -117,8 +117,8 @@ const SUPABASE_KEY="sb_publishable_CqhbUiMSpMpBSl2X_vKdHg_WimgwESl";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);
 let authMode="login",selectedRole="customer",currentUser=null,profile=null,beauticianProfile=null;
-let services=[],packages=[],beauticians=[],bookings=[],courses=[],lessons=[],progress=[];
-let isAdmin=false,activeTab="home",selectedItem=null,selectedCategory="all",selectedCourse=null,installPrompt=null,loadingWorkspace=false;
+let services=[],packages=[],beauticians=[],bookings=[],courses=[],lessons=[],progress=[],customerProfiles=[];
+let isAdmin=false,activeTab="home",selectedItem=null,selectedCategory="all",selectedCourse=null,installPrompt=null,loadingWorkspace=false,liveChannel=null;
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function money(v){return Number(v||0).toLocaleString("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0});}
@@ -178,7 +178,7 @@ async function loadWorkspace(){
   if(isAdmin){activeTab="admin";await loadAdminData();}
   else if(profile.account_type==="beautician"){activeTab="dashboard";await loadBeauticianData();}
   else{activeTab="home";await loadCustomerData();}
-  renderNavigation();renderCurrentView();
+  renderNavigation();renderCurrentView();startRealtime();
  }catch(e){toast(niceError(e));}
  finally{loadingWorkspace=false;}
 }
@@ -201,6 +201,8 @@ async function loadBeauticianData(){
  ]);
  results.forEach(r=>{if(r.error)throw r.error;});
  beauticianProfile=results[0].data;bookings=results[1].data||[];courses=results[2].data||[];lessons=results[3].data||[];
+ const ids=[...new Set(bookings.filter(b=>b.beautician_id===currentUser.id).map(b=>b.customer_id))];customerProfiles=[];
+ if(ids.length){const cp=await db.from("app_profiles").select("user_id,full_name,phone").in("user_id",ids);if(cp.error)throw cp.error;customerProfiles=cp.data||[];}
  const pr=await db.from("beautician_lesson_progress").select("lesson_id").eq("user_id",currentUser.id);if(pr.error)throw pr.error;progress=pr.data||[];
 }
 async function loadAdminData(){
@@ -211,7 +213,7 @@ async function loadAdminData(){
   db.from("app_profiles").select("*").order("created_at",{ascending:false})
  ]);
  results.forEach(r=>{if(r.error)throw r.error;});
- beauticians=results[0].data||[];bookings=results[1].data||[];courses=results[2].data||[];adminProfiles=results[3].data||[];
+ beauticians=results[0].data||[];bookings=results[1].data||[];courses=results[2].data||[];adminProfiles=results[3].data||[];customerProfiles=adminProfiles;
 }
 let adminProfiles=[];
 function navItems(){
@@ -235,13 +237,19 @@ function customerHome(){
  html+=cats.map(c=>'<button class="pill '+(c===selectedCategory?'active':'')+'" onclick="chooseCategory('+JSON.stringify(c).replace(/"/g,"&quot;")+')">'+(c==="all"?"All":esc(c))+'</button>').join("");
  html+='</div><div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">';
  if(!shown.length)html+='<div class="col-span-full">'+emptyState("fa-magnifying-glass","No matching services","Try another service name or category.")+'</div>';
- shown.forEach(s=>{const price=Number(s.cart_price)||0;html+='<article class="soft-card rounded-2xl p-4"><div class="flex items-start justify-between gap-2"><div><p class="text-[10px] text-[#bd5796] font-bold uppercase">'+esc(s.category_name)+'</p><h3 class="font-extrabold text-sm mt-1">'+esc(s.name)+'</h3></div><div class="w-10 h-10 rounded-xl bg-[#fff0f7] text-[#c54c92] grid place-items-center"><i class="fa-solid fa-spa"></i></div></div><div class="flex items-center justify-between mt-4"><div><div class="text-sm font-extrabold">'+(price?money(price):esc(s.display_price||"Price on enquiry"))+'</div><div class="text-[10px] text-[#968599]">At-home service</div></div><button class="btn-main text-xs px-4 py-2.5" '+(price?"":"disabled title=\\"Please contact salon for price\\"")+' onclick="openBooking('+JSON.stringify({type:"service",id:s.service_key,name:s.name,category:s.category_name,price:price}).replace(/"/g,"&quot;")+')">Book now</button></div></article>';});
+ shown.forEach(s=>{
+  const price=Number(s.cart_price)||0;
+  const serviceIndex=services.indexOf(s);
+  html+='<article class="soft-card rounded-2xl p-4"><div class="flex items-start justify-between gap-2"><div><p class="text-[10px] text-[#bd5796] font-bold uppercase">'+esc(s.category_name)+'</p><h3 class="font-extrabold text-sm mt-1">'+esc(s.name)+'</h3></div><div class="w-10 h-10 rounded-xl bg-[#fff0f7] text-[#c54c92] grid place-items-center"><i class="fa-solid fa-spa"></i></div></div><div class="flex items-center justify-between mt-4"><div><div class="text-sm font-extrabold">'+(price?money(price):esc(s.display_price||"Price on enquiry"))+'</div><div class="text-[10px] text-[#968599]">At-home service</div></div><button class="btn-main text-xs px-4 py-2.5" '+(price?'':'disabled title="Price on enquiry"')+' onclick="openServiceBooking('+serviceIndex+')">Book now</button></div></article>';
+ });
  html+='</div></div>';
- if(packages.length){html+='<div class="mt-8">'+sectionTitle("Curated for you","Signature packages","Choose a salon package for your next visit")+'<div class="grid sm:grid-cols-2 gap-3">';packages.forEach(p=>{html+='<article class="hero-gradient rounded-2xl p-5 text-white"><span class="text-[10px] text-pink-200 uppercase tracking-widest">'+esc(p.package_type||"Salon package")+'</span><h3 class="serif text-xl font-bold mt-1">'+esc(p.name)+'</h3><p class="text-xs text-white/65 mt-2">'+esc(p.description||"A curated beauty experience.")+'</p><div class="flex items-center justify-between mt-4"><strong>'+money(p.price)+'</strong><button class="bg-white text-[#783761] rounded-xl px-4 py-2 text-xs font-extrabold" onclick="openBooking('+JSON.stringify({type:"package",id:p.package_id,name:p.name,category:"Package",price:Number(p.price)}).replace(/"/g,"&quot;")+')">Book package</button></div></article>';});html+='</div></div>';}
+ if(packages.length){html+='<div class="mt-8">'+sectionTitle("Curated for you","Signature packages","Choose a salon package for your next visit")+'<div class="grid sm:grid-cols-2 gap-3">';packages.forEach((p,i)=>{html+='<article class="hero-gradient rounded-2xl p-5 text-white"><span class="text-[10px] text-pink-200 uppercase tracking-widest">'+esc(p.package_type||"Salon package")+'</span><h3 class="serif text-xl font-bold mt-1">'+esc(p.name)+'</h3><p class="text-xs text-white/65 mt-2">'+esc(p.description||"A curated beauty experience.")+'</p><div class="flex items-center justify-between mt-4"><strong>'+money(p.price)+'</strong><button class="bg-white text-[#783761] rounded-xl px-4 py-2 text-xs font-extrabold" onclick="openPackageBooking('+i+')">Book package</button></div></article>';});html+='</div></div>';}
  if(!beauticians.length)html+='<div class="soft-card rounded-2xl p-4 mt-5 text-xs text-[#876e88]"><i class="fa-solid fa-circle-info text-[#ca5596] mr-1"></i> We are onboarding approved beauticians in your area. You can still send a request and our team will contact you to arrange a professional.</div>';
  return html;
 }
 window.updateServiceSearch=function(v){serviceSearch=v;const y=window.scrollY;renderCurrentView();window.scrollTo(0,y);};
+window.openServiceBooking=function(i){const s=services[i];if(!s||!(Number(s.cart_price)>0))return;window.openBooking({type:"service",id:s.service_key,name:s.name,category:s.category_name,price:Number(s.cart_price)});};
+window.openPackageBooking=function(i){const p=packages[i];if(!p)return;window.openBooking({type:"package",id:p.package_id,name:p.name,category:"Package",price:Number(p.price)});};
 window.chooseCategory=function(c){selectedCategory=c;renderCurrentView();};
 window.openBooking=function(item){
  selectedItem=item;
@@ -301,7 +309,7 @@ window.saveBeauticianProfile=async function(e){
 };
 function jobCard(b){
  const unassigned=!b.beautician_id;
- const c=adminProfiles.find(p=>p.user_id===b.customer_id);
+ const c=customerProfiles.find(p=>p.user_id===b.customer_id);
  return '<article class="soft-card rounded-2xl p-4 mb-3"><div class="flex items-start justify-between gap-2"><div><p class="text-[10px] text-[#bd5796] font-bold uppercase">'+esc(b.booking_code)+'</p><h3 class="font-extrabold mt-1">'+esc(b.service_name)+'</h3><p class="text-[11px] text-[#8e7b90] mt-1">'+esc(b.appointment_date)+' • '+esc(b.appointment_slot)+'</p></div><span class="status '+statusClass(b.status)+'">'+esc(b.status)+'</span></div><div class="text-xs text-[#66576d] mt-3 space-y-1"><p><i class="fa-solid fa-location-dot text-[#c34d91] w-4"></i>'+esc(b.customer_address)+'</p><p><i class="fa-solid fa-indian-rupee-sign text-[#c34d91] w-4"></i>'+money(b.amount)+'</p>'+(c?'<p><i class="fa-solid fa-user text-[#c34d91] w-4"></i>'+esc(c.full_name)+' • '+esc(c.phone)+'</p>':"")+'</div><div class="mt-3 flex flex-wrap gap-2">'+(unassigned?'<button class="btn-main text-xs px-4 py-2" onclick="acceptJob(\''+b.id+'\')">Accept request</button>':b.status==="Pending"?'<button class="btn-main text-xs px-4 py-2" onclick="acceptJob(\''+b.id+'\')">Accept booking</button>':b.status==="Accepted"?'<button class="btn-main text-xs px-4 py-2" onclick="advanceJob(\''+b.id+'\',\'On The Way\')">Start travel</button>':b.status==="On The Way"?'<button class="btn-main text-xs px-4 py-2" onclick="advanceJob(\''+b.id+'\',\'In Progress\')">Start service</button>':b.status==="In Progress"?'<button class="btn-main text-xs px-4 py-2" onclick="advanceJob(\''+b.id+'\',\'Completed\')">Mark completed</button>':'<span class="text-xs text-[#8c7b90]">No action required</span>')+'</div></article>';
 }
 window.acceptJob=async function(id){
@@ -379,7 +387,6 @@ db.auth.onAuthStateChange((event,session)=>{
 });
 db.auth.getSession().then(r=>{if(r.data.session){currentUser=r.data.session.user;loadWorkspace();}}).catch(e=>toast(niceError(e)));
 
-let liveChannel=null;
 function startRealtime(){
  if(liveChannel)db.removeChannel(liveChannel);
  liveChannel=db.channel("anamika-lux-app-live-"+currentUser.id)
@@ -387,8 +394,6 @@ function startRealtime(){
   try{if(isAdmin)await loadAdminData();else if(profile.account_type==="beautician")await loadBeauticianData();else await loadCustomerData();renderCurrentView();}catch(e){}
  }).subscribe();
 }
-const originalLoadWorkspace=loadWorkspace;
-async function wrappedWorkspace(){await originalLoadWorkspace();if(currentUser&&profile)startRealtime();}
 window.addEventListener("online",()=>toast("You are back online."));
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPrompt=e;$("installBtn").classList.remove("hide");});
 window.installApp=async function(){if(!installPrompt){toast("Use your browser menu and choose Add to Home screen.");return;}installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;$("installBtn").classList.add("hide");};
