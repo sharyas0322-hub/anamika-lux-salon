@@ -1,6 +1,11 @@
 name: Build Anamika Lux Android APK
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - '.github/workflows/android-apk.yml'
   push:
     paths:
       - 'android/**'
