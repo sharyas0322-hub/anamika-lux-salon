@@ -477,7 +477,8 @@ function renderCurrentView(){
 }
 window.signOut=async function(){await db.auth.signOut();currentUser=null;profile=null;isAdmin=false;beauticianProfile=null;$("appScreen").classList.add("hide");$("authScreen").classList.remove("hide");setAuthMode("login");};
 db.auth.onAuthStateChange((event,session)=>{
- if(event==="PASSWORD_RECOVERY"){showPasswordRecovery();return;}\n if(session&&session.user&&!currentUser){currentUser=session.user;setTimeout(()=>loadWorkspace().catch(e=>authMessage(niceError(e),true)),0);}
+ if(event==="PASSWORD_RECOVERY"){showPasswordRecovery();return;}
+ if(session&&session.user&&!currentUser){currentUser=session.user;setTimeout(()=>loadWorkspace().catch(e=>authMessage(niceError(e),true)),0);}
  if(event==="SIGNED_OUT"){currentUser=null;}
 });
 db.auth.getSession().then(r=>{if(r.data.session){currentUser=r.data.session.user;loadWorkspace();}}).catch(e=>toast(niceError(e)));
