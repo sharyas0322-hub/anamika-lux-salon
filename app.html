@@ -85,7 +85,7 @@ h1,h2,h3,.serif{font-family:'Playfair Display',serif}
   </header>
   <div class="auth-wrap w-full max-w-md mx-auto -mt-8 relative z-10">
     <div class="glass rounded-[26px] p-5 sm:p-6">
-      <div class="auth-mode-switch grid grid-cols-2 gap-2 p-1 rounded-2xl mb-5">
+      <div id="authModeSwitch" class="auth-mode-switch grid grid-cols-2 gap-2 p-1 rounded-2xl mb-5">
         <button type="button" id="loginModeBtn" class="rounded-xl py-2.5 text-sm font-extrabold bg-white shadow-sm text-[#050507]" onclick="setAuthMode('login')">Login</button>
         <button type="button" id="signupModeBtn" class="rounded-xl py-2.5 text-sm font-extrabold text-[#A3A3A3]" onclick="setAuthMode('signup')">Create account</button>
       </div>
@@ -103,10 +103,10 @@ h1,h2,h3,.serif{font-family:'Playfair Display',serif}
           <div><label class="field-label">City</label><input id="authCity" class="field" value="Patna" maxlength="80"></div>
         </div>
         <div><label class="field-label">Email address</label><input id="authEmail" type="email" class="field" placeholder="you@example.com" required autocomplete="email"></div>
-        <div><label class="field-label">Password</label><input id="authPassword" type="password" class="field" placeholder="At least 8 characters" minlength="8" required autocomplete="current-password"></div>
+        <div><label class="field-label">Password</label><input id="authPassword" type="password" class="field" placeholder="At least 8 characters" minlength="8" required autocomplete="current-password"><div class="text-right mt-1"><button id="forgotPasswordBtn" type="button" onclick="sendPasswordReset()" class="text-xs font-bold text-[#D4AF37]">Forgot password?</button></div></div>
         <button id="authSubmit" class="btn-main w-full mt-2" type="submit"><i class="fa-solid fa-right-to-bracket mr-2"></i>Login securely</button>
       </form>
-      <p id="authMessage" class="text-xs text-center text-[#A3A3A3] mt-4">Your account and bookings stay private.</p>
+      <p id="authMessage" class="text-xs text-center text-[#A3A3A3] mt-4">Your account and bookings stay private.</p><div id="recoveryPanel" class="hide mt-4 space-y-3"><p class="text-sm font-bold text-center">Create a new password</p><input id="recoveryPassword" type="password" class="field" minlength="8" autocomplete="new-password" placeholder="New password (at least 8 characters)"><input id="recoveryPasswordConfirm" type="password" class="field" minlength="8" autocomplete="new-password" placeholder="Confirm new password"><button id="recoverySubmit" type="button" onclick="completePasswordRecovery()" class="btn-main w-full">Save new password</button></div>
     </div>
     <p class="text-center text-[11px] text-[#8A8A8A] mt-4">By continuing, you agree to use the service respectfully and provide accurate booking details.</p>
   </div>
@@ -139,25 +139,29 @@ const SUPABASE_KEY="sb_publishable_CqhbUiMSpMpBSl2X_vKdHg_WimgwESl";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const APP_MODE=new URLSearchParams(window.location.search).get("app");
 const $=id=>document.getElementById(id);
-let authMode="login",selectedRole=APP_MODE==="partner"?"beautician":"customer",currentUser=null,profile=null,beauticianProfile=null;
+let authMode="login",selectedRole=APP_MODE==="partner"?"beautician":"customer",currentUser=null,profile=null,beauticianProfile=null,authRecoveryOpen=false;
 let services=[],packages=[],beauticians=[],bookings=[],courses=[],lessons=[],progress=[],customerProfiles=[];
 let isAdmin=false,activeTab="home",selectedItem=null,selectedCategory="all",selectedCourse=null,installPrompt=null,loadingWorkspace=false,liveChannel=null;
 
+function isPartnerWorkspace(){return APP_MODE==="partner"||(APP_MODE!=="customer"&&!!profile&&profile.account_type==="beautician");}
+function authMessage(message,isError=false){const el=$("authMessage");el.textContent=message;el.className="text-xs text-center mt-4 "+(isError?"text-rose-400":"text-[#A3A3A3]");}
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function money(v){return Number(v||0).toLocaleString("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0});}
 function localDate(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10);}
 function toast(msg){const el=$("toast");el.textContent=msg;el.classList.remove("hidden");clearTimeout(window.__alToastTimer);window.__alToastTimer=setTimeout(()=>el.classList.add("hidden"),3500);}
-function niceError(e){const m=e&&e.message?e.message:"Something went wrong. Please try again.";if(/Invalid login credentials/i.test(m))return "Email ya password sahi nahi hai.";if(/Email not confirmed/i.test(m))return "Pehle email inbox mein confirmation link verify karein.";if(/User already registered/i.test(m))return "Ye email pehle se registered hai. Login karein.";return m;}
+function niceError(e){const m=e&&e.message?e.message:"Something went wrong. Please try again.";if(/Invalid login credentials/i.test(m))return "Email ya password sahi nahi hai. Password bhool gaye hain to Forgot password use karein.";if(/Email not confirmed/i.test(m))return "Pehle email inbox mein confirmation link verify karein.";if(/User already registered/i.test(m))return "Ye email pehle se registered hai. Login karein; naya account mat banayein.";if(/Failed to fetch|NetworkError|Load failed/i.test(m))return "Internet connection check karein aur dobara try karein.";return m;}
 function initials(name){return String(name||"A").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();}
 function statusClass(s){if(s==="Completed")return"status-complete";if(s==="Cancelled")return"status-cancel";if(s==="Accepted")return"status-accepted";if(s==="On The Way"||s==="In Progress")return"status-progress";return"status-pending";}
 function emptyState(icon,title,desc){return '<div class="soft-card rounded-2xl p-7 text-center"><div class="w-12 h-12 rounded-2xl bg-[#171720] text-[#D4AF37] grid place-items-center mx-auto text-xl"><i class="fa-solid '+icon+'"></i></div><h3 class="serif text-lg font-bold mt-3">'+esc(title)+'</h3><p class="text-xs text-[#8c7b90] mt-1">'+esc(desc)+'</p></div>';}
 
 window.setAuthMode=function(mode){
+ if(authRecoveryOpen)return;
  authMode=mode;$("signupFields").classList.toggle("hide",mode!=="signup");
  $("loginModeBtn").className=mode==="login"?"rounded-xl py-2.5 text-sm font-extrabold bg-white shadow-sm text-[#050507]":"rounded-xl py-2.5 text-sm font-extrabold text-[#A3A3A3]";
  $("signupModeBtn").className=mode==="signup"?"rounded-xl py-2.5 text-sm font-extrabold bg-white shadow-sm text-[#050507]":"rounded-xl py-2.5 text-sm font-extrabold text-[#A3A3A3]";
  $("authSubmit").innerHTML=mode==="login"?'<i class="fa-solid fa-right-to-bracket mr-2"></i>Login securely':'<i class="fa-solid fa-user-plus mr-2"></i>Create account';
- $("authMessage").textContent=mode==="login"?"Welcome back. Login to manage your bookings.":"Create your account to get started.";
+ $("forgotPasswordBtn").classList.toggle("hide",mode!=="login");
+ authMessage(mode==="login"?"Welcome back. Login to manage your bookings.":"Create your account to get started.");
  $("authPassword").autocomplete=mode==="login"?"current-password":"new-password";
 };
 window.setRole=function(role){
@@ -183,45 +187,94 @@ function configureAppMode(){
 configureAppMode();
 
 window.submitAuth=async function(event){
- event.preventDefault();const btn=$("authSubmit");btn.disabled=true;btn.textContent="Please wait...";
+ event.preventDefault();const btn=$("authSubmit"),modeAtSubmit=authMode;btn.disabled=true;btn.textContent="Please wait...";
  try{
   const email=$("authEmail").value.trim(),password=$("authPassword").value;
-  if(authMode==="signup"){
+  if(!email)throw new Error("Please enter your email address.");
+  if(password.length<8)throw new Error("Password must be at least 8 characters.");
+  if(modeAtSubmit==="signup"){
    const name=$("authName").value.trim(),phone=$("authPhone").value.trim(),city=$("authCity").value.trim()||"Patna";
    if(name.length<2)throw new Error("Please enter your full name.");
    if(phone.replace(/\D/g,"").length<10)throw new Error("Please enter a valid mobile number.");
    const result=await db.auth.signUp({email,password,options:{data:{full_name:name,phone:phone,city:city,account_type:selectedRole}}});
    if(result.error)throw result.error;
-   if(!result.data.session){$("authMessage").textContent="Account created. Email confirmation enabled hai to inbox se verify karke login karein.";toast("Signup request successful. Check your email.");setAuthMode("login");return;}
+   if(result.data.user&&Array.isArray(result.data.user.identities)&&result.data.user.identities.length===0){
+    setAuthMode("login");
+    authMessage("This email already has an account. Login with the same password, or use Forgot password. You can apply as a beautician from the Partner App.",true);
+    return;
+   }
+   if(!result.data.session){
+    setAuthMode("login");
+    authMessage("Signup request received. Check your email for the confirmation link, then login.");
+    toast("Check your email to confirm your account.");
+    return;
+   }
    currentUser=result.data.user;await loadWorkspace();
   }else{
    const result=await db.auth.signInWithPassword({email,password});if(result.error)throw result.error;
    currentUser=result.data.user;await loadWorkspace();
   }
- }catch(e){$("authMessage").textContent=niceError(e);$("authMessage").className="text-xs text-center text-rose-600 mt-4";}
- finally{btn.disabled=false;setAuthMode(authMode);}
+ }catch(e){authMessage(niceError(e),true);}
+ finally{btn.disabled=false;btn.innerHTML=authMode==="login"?'<i class="fa-solid fa-right-to-bracket mr-2"></i>Login securely':'<i class="fa-solid fa-user-plus mr-2"></i>Create account';}
+};
+
+window.sendPasswordReset=async function(){
+ const email=$("authEmail").value.trim();
+ if(!email){authMessage("Enter your email address first, then tap Forgot password.",true);$("authEmail").focus();return;}
+ const btn=$("forgotPasswordBtn");btn.disabled=true;btn.textContent="Sending...";
+ try{
+  const redirectTo=window.location.origin+window.location.pathname+window.location.search;
+  const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo});
+  if(error)throw error;
+  authMessage("Password reset link sent. Check your inbox and spam folder, then open the link on this device.");
+ }catch(e){authMessage(niceError(e),true);}
+ finally{btn.disabled=false;btn.textContent="Forgot password?";}
+};
+
+function showPasswordRecovery(){
+ authRecoveryOpen=true;
+ $("authModeSwitch").classList.add("hide");$("roleChooser").classList.add("hide");
+ $("authForm").classList.add("hide");$("authMessage").classList.add("hide");
+ $("recoveryPanel").classList.remove("hide");
+}
+
+window.completePasswordRecovery=async function(){
+ const password=$("recoveryPassword").value,confirmPassword=$("recoveryPasswordConfirm").value;
+ const btn=$("recoverySubmit");
+ if(password.length<8){toast("Use at least 8 characters for the new password.");return;}
+ if(password!==confirmPassword){toast("The passwords do not match.");return;}
+ btn.disabled=true;btn.textContent="Saving...";
+ try{
+  const {error}=await db.auth.updateUser({password});if(error)throw error;
+  await db.auth.signOut();currentUser=null;profile=null;beauticianProfile=null;authRecoveryOpen=false;
+  $("recoveryPanel").classList.add("hide");$("authModeSwitch").classList.remove("hide");
+  if(APP_MODE!=="customer"&&APP_MODE!=="partner")$("roleChooser").classList.remove("hide");
+  $("authForm").classList.remove("hide");$("authMessage").classList.remove("hide");
+  $("recoveryPassword").value="";$("recoveryPasswordConfirm").value="";
+  setAuthMode("login");authMessage("Password updated successfully. Login with your new password.");
+ }catch(e){toast(niceError(e));}
+ finally{btn.disabled=false;btn.textContent="Save new password";}
 };
 
 async function loadWorkspace(){
  if(loadingWorkspace)return;loadingWorkspace=true;
  try{
   const u=await db.auth.getUser();if(u.error)throw u.error;currentUser=u.data.user;if(!currentUser)throw new Error("Please login again.");
-  const [p,a]=await Promise.all([
+  const [p,a,bp]=await Promise.all([
    db.from("app_profiles").select("*").eq("user_id",currentUser.id).maybeSingle(),
-   db.from("admin_users").select("user_id").eq("user_id",currentUser.id).maybeSingle()
+   db.from("admin_users").select("user_id").eq("user_id",currentUser.id).maybeSingle(),
+   db.from("beautician_profiles").select("*").eq("user_id",currentUser.id).maybeSingle()
   ]);
-  if(p.error)throw p.error;if(a.error)throw a.error;
-  if(!p.data)throw new Error("Profile is not ready. Please sign out and login again.");
-  profile=p.data;isAdmin=!!a.data;
-  if(APP_MODE==="customer"&&profile.account_type==="beautician"&&!isAdmin)throw new Error("Please use the Anamika Lux Partner app for this beautician account.");
-  if(APP_MODE==="partner"&&profile.account_type!=="beautician")throw new Error("Please use the Anamika Lux Customer app for this customer account.");
+  if(p.error)throw p.error;if(a.error)throw a.error;if(bp.error)throw bp.error;
+  if(!p.data)throw new Error("Profile is not ready. Please use Forgot password or contact support.");
+  profile=p.data;isAdmin=!!a.data;beauticianProfile=bp.data||null;
   $("authScreen").classList.add("hide");$("appScreen").classList.remove("hide");
   $("headerGreeting").textContent="Hello, "+(profile.full_name||"Welcome");
   if(isAdmin){activeTab="admin";await loadAdminData();}
-  else if(profile.account_type==="beautician"){activeTab="dashboard";await loadBeauticianData();}
+  else if(isPartnerWorkspace()){activeTab="dashboard";await loadBeauticianData();}
   else{activeTab="home";await loadCustomerData();}
   renderNavigation();renderCurrentView();startRealtime();
- }catch(e){toast(niceError(e));}
+ }catch(e){toast(niceError(e));throw e;}
  finally{loadingWorkspace=false;}
 }
 async function loadCustomerData(){
@@ -260,7 +313,7 @@ async function loadAdminData(){
 let adminProfiles=[];
 function navItems(){
  if(isAdmin)return[{id:"admin",label:"Overview",icon:"fa-chart-pie"},{id:"providers",label:"Beauticians",icon:"fa-users"},{id:"bookings",label:"App Bookings",icon:"fa-calendar-check"},{id:"training",label:"Training",icon:"fa-graduation-cap"},{id:"profile",label:"Profile",icon:"fa-user"}];
- if(profile&&profile.account_type==="beautician")return[{id:"dashboard",label:"Dashboard",icon:"fa-chart-line"},{id:"jobs",label:"My Jobs",icon:"fa-calendar-check"},{id:"training",label:"Training",icon:"fa-graduation-cap"},{id:"profile",label:"Profile",icon:"fa-user"}];
+ if(isPartnerWorkspace())return[{id:"dashboard",label:"Dashboard",icon:"fa-chart-line"},{id:"jobs",label:"My Jobs",icon:"fa-calendar-check"},{id:"training",label:"Training",icon:"fa-graduation-cap"},{id:"profile",label:"Profile",icon:"fa-user"}];
  return[{id:"home",label:"Explore",icon:"fa-house"},{id:"bookings",label:"My Bookings",icon:"fa-calendar-check"},{id:"profile",label:"Profile",icon:"fa-user"}];
 }
 function renderNavigation(){
@@ -268,7 +321,7 @@ function renderNavigation(){
  $("sideNav").innerHTML=items.map(n=>'<button onclick="navigate(\''+n.id+'\')" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold '+(activeTab===n.id?'bg-[#171720] text-[#D4AF37]':'text-[#A3A3A3] hover:bg-[#171720]')+'"><i class="fa-solid '+n.icon+' w-5"></i>'+n.label+'</button>').join("");
  $("mobileNav").innerHTML=items.map(n=>'<button onclick="navigate(\''+n.id+'\')" class="'+(activeTab===n.id?'active':'')+'"><i class="fa-solid '+n.icon+'"></i><span>'+n.label+'</span></button>').join("");
 }
-window.navigate=async function(tab){activeTab=tab;try{if(isAdmin)await loadAdminData();else if(profile.account_type==="beautician")await loadBeauticianData();else if(tab==="home"||tab==="bookings")await loadCustomerData();renderNavigation();renderCurrentView();}catch(e){toast(niceError(e));}};
+window.navigate=async function(tab){activeTab=tab;try{if(isAdmin)await loadAdminData();else if(isPartnerWorkspace())await loadBeauticianData();else if(tab==="home"||tab==="bookings")await loadCustomerData();renderNavigation();renderCurrentView();}catch(e){toast(niceError(e));}};
 function sectionTitle(kicker,title,sub){return '<div class="mb-5"><p class="text-[10px] uppercase tracking-[.2em] text-[#D4AF37] font-extrabold">'+esc(kicker)+'</p><h1 class="serif text-3xl font-bold mt-1">'+esc(title)+'</h1><p class="text-xs text-[#A3A3A3] mt-1">'+esc(sub)+'</p></div>';}
 function customerHome(){
  const cats=["all",...new Set(services.map(s=>s.category_name).filter(Boolean))];
@@ -419,12 +472,12 @@ function adminTraining(){
 function renderCurrentView(){
  const view=$("appView");if(!view)return;
  if(isAdmin){if(activeTab==="admin")view.innerHTML=adminView();else if(activeTab==="providers")view.innerHTML=adminProviders();else if(activeTab==="bookings")view.innerHTML=adminBookings();else if(activeTab==="training")view.innerHTML=adminTraining();else view.innerHTML=profileView();return;}
- if(profile.account_type==="beautician"){if(activeTab==="dashboard")view.innerHTML=beauticianDashboard();else if(activeTab==="jobs")view.innerHTML=beauticianJobs();else if(activeTab==="training")view.innerHTML=trainingView();else view.innerHTML=profileView();return;}
+ if(isPartnerWorkspace()){if(activeTab==="dashboard")view.innerHTML=beauticianDashboard();else if(activeTab==="jobs")view.innerHTML=beauticianJobs();else if(activeTab==="training")view.innerHTML=trainingView();else view.innerHTML=profileView();return;}
  if(activeTab==="home")view.innerHTML=customerHome();else if(activeTab==="bookings")view.innerHTML=sectionTitle("Your appointments","My bookings","Track the status of your beauty appointments.")+customerBookings();else view.innerHTML=profileView();
 }
 window.signOut=async function(){await db.auth.signOut();currentUser=null;profile=null;isAdmin=false;beauticianProfile=null;$("appScreen").classList.add("hide");$("authScreen").classList.remove("hide");setAuthMode("login");};
 db.auth.onAuthStateChange((event,session)=>{
- if(session&&session.user&&!currentUser){currentUser=session.user;setTimeout(()=>loadWorkspace(),0);}
+ if(event==="PASSWORD_RECOVERY"){showPasswordRecovery();return;}\n if(session&&session.user&&!currentUser){currentUser=session.user;setTimeout(()=>loadWorkspace().catch(e=>authMessage(niceError(e),true)),0);}
  if(event==="SIGNED_OUT"){currentUser=null;}
 });
 db.auth.getSession().then(r=>{if(r.data.session){currentUser=r.data.session.user;loadWorkspace();}}).catch(e=>toast(niceError(e)));
@@ -433,7 +486,7 @@ function startRealtime(){
  if(liveChannel)db.removeChannel(liveChannel);
  liveChannel=db.channel("anamika-lux-app-live-"+currentUser.id)
  .on("postgres_changes",{event:"*",schema:"public",table:"app_bookings"},async()=>{
-  try{if(isAdmin)await loadAdminData();else if(profile.account_type==="beautician")await loadBeauticianData();else await loadCustomerData();renderCurrentView();}catch(e){}
+  try{if(isAdmin)await loadAdminData();else if(isPartnerWorkspace())await loadBeauticianData();else await loadCustomerData();renderCurrentView();}catch(e){}
  }).subscribe();
 }
 window.addEventListener("online",()=>toast("You are back online."));
