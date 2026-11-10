@@ -196,7 +196,8 @@ window.submitAuth=async function(event){
    const name=$("authName").value.trim(),phone=$("authPhone").value.trim(),city=$("authCity").value.trim()||"Patna";
    if(name.length<2)throw new Error("Please enter your full name.");
    if(phone.replace(/\D/g,"").length<10)throw new Error("Please enter a valid mobile number.");
-   const result=await db.auth.signUp({email,password,options:{data:{full_name:name,phone:phone,city:city,account_type:selectedRole}}});
+   const emailRedirectTo=window.location.origin+window.location.pathname+window.location.search;
+   const result=await db.auth.signUp({email,password,options:{emailRedirectTo,data:{full_name:name,phone:phone,city:city,account_type:selectedRole}}});
    if(result.error)throw result.error;
    if(result.data.user&&Array.isArray(result.data.user.identities)&&result.data.user.identities.length===0){
     setAuthMode("login");
