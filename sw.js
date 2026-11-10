@@ -1,4 +1,4 @@
-const CACHE_NAME = "anamika-lux-app-v2";
+const CACHE_NAME = "anamika-lux-app-v3";
 const APP_SHELL = ["/app.html", "/manifest.json", "/app-icon.svg"];
 
 self.addEventListener("install", event => {
