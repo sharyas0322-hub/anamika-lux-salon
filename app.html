@@ -136,7 +136,7 @@ h1,h2,h3,.serif{font-family:'Playfair Display',serif}
 "use strict";
 const SUPABASE_URL="https://uwbcgwvrvtvggmaejxfu.supabase.co";
 const SUPABASE_KEY="sb_publishable_CqhbUiMSpMpBSl2X_vKdHg_WimgwESl";
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const db=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
 const APP_MODE=new URLSearchParams(window.location.search).get("app");
 const APP_DEMO=new URLSearchParams(window.location.search).get("demo")==="1"&&(APP_MODE==="customer"||APP_MODE==="partner");
 const $=id=>document.getElementById(id);
@@ -504,25 +504,50 @@ async function launchDemoPreview(){
  currentUser={id:demoId,email:partner?"partner-preview@anamikalux.demo":"customer-preview@anamikalux.demo"};
  profile={user_id:demoId,full_name:partner?"Demo Beautician":"Demo Customer",phone:"9999999999",city:"Patna",account_type:partner?"beautician":"customer"};
  isAdmin=false;
- const [serviceRes,packageRes,beauticianRes,courseRes,lessonRes]=await Promise.all([
-  db.from("salon_services").select("service_key,category_name,name,display_price,cart_price,sort_order").eq("is_active",true).order("sort_order"),
-  db.from("salon_packages").select("package_id,name,price,original_price,description,inclusions,package_type").eq("is_active",true).order("sort_order"),
-  db.from("beautician_profiles").select("user_id,display_name,city,experience_years,bio,skills,service_areas,is_available,rating,total_reviews").eq("approval_status","Approved").eq("is_available",true).order("rating",{ascending:false}),
-  db.from("beautician_courses").select("*").eq("is_active",true).order("sort_order"),
-  db.from("beautician_lessons").select("*").eq("is_active",true).order("lesson_number")
- ]);
- services=serviceRes.error?[]:(serviceRes.data||[]);
- packages=packageRes.error?[]:(packageRes.data||[]);
- beauticians=beauticianRes.error?[]:(beauticianRes.data||[]);
- courses=courseRes.error?[]:(courseRes.data||[]);
- lessons=lessonRes.error?[]:(lessonRes.data||[]);
+
+ // Render a full local preview immediately, without waiting for a network call.
+ services=[
+  {service_key:"demo-facial",category_name:"Facial",name:"O3+ Premium Facial",display_price:"₹1,499",cart_price:1499,sort_order:1},
+  {service_key:"demo-cleanup",category_name:"Facial",name:"Classic Cleanup",display_price:"₹699",cart_price:699,sort_order:2},
+  {service_key:"demo-wax",category_name:"Waxing",name:"Full Hand Wax",display_price:"₹399",cart_price:399,sort_order:3},
+  {service_key:"demo-threading",category_name:"Threading",name:"Eyebrow & Upper Lip Threading",display_price:"₹149",cart_price:149,sort_order:4},
+  {service_key:"demo-pedicure",category_name:"Nails",name:"Basic Pedicure",display_price:"₹699",cart_price:699,sort_order:5}
+ ];
+ packages=[
+  {package_id:"demo-pkg1",package_type:"combo",name:"Basic Glow Combo",price:1500,original_price:2200,description:"A fresh facial and grooming essentials.",inclusions:["Basic Facial","Eyebrow Threading","Full Hand Wax"]},
+  {package_id:"demo-pkg2",package_type:"combo",name:"Premium Glow Combo",price:2500,original_price:3600,description:"Facial paired with complete hand and foot care.",inclusions:["Instafair Facial","Waxing","Pedicure","Manicure"]},
+  {package_id:"demo-pkg3",package_type:"royal",name:"Royal Complete Care Package",price:7000,original_price:0,description:"A head-to-toe premium beauty experience.",inclusions:["Full Body Wax","Body Polishing","O3+ Facial","Manicure","Pedicure"]}
+ ];
+ beauticians=[
+  {user_id:"demo-provider-1",display_name:"Demo Beauty Expert 1",city:"Patna",experience_years:5,bio:"Sample approved professional.",skills:["Facial","Waxing"],service_areas:["Boring Road","Kankarbagh"],is_available:true,rating:4.9,total_reviews:28},
+  {user_id:"demo-provider-2",display_name:"Demo Beauty Expert 2",city:"Patna",experience_years:3,bio:"Sample approved professional.",skills:["Threading","Nails"],service_areas:["Patliputra","Bailey Road"],is_available:true,rating:4.8,total_reviews:16}
+ ];
+ courses=[
+  {id:"demo-course-1",title:"Skin Care & Facial Basics",category:"Skin Care",level:"Beginner",lessons_count:3,duration_minutes:70,summary:"Understand skin types and safe facial preparation."},
+  {id:"demo-course-2",title:"Professional Customer Service",category:"Professional Skills",level:"Beginner",lessons_count:3,duration_minutes:35,summary:"Build customer trust and professional communication."},
+  {id:"demo-course-3",title:"Hygiene & Safety Standards",category:"Safety",level:"Beginner",lessons_count:3,duration_minutes:45,summary:"Sanitation, tools and client consultation."},
+  {id:"demo-course-4",title:"Waxing & Threading Techniques",category:"Hair Removal",level:"Intermediate",lessons_count:3,duration_minutes:70,summary:"Preparation, technique and aftercare."}
+ ];
+ lessons=[
+  {id:"demo-lesson-1",course_id:"demo-course-1",lesson_number:1,title:"Identify common skin types",description:"Recognise normal, dry, oily and combination skin.",duration_minutes:20},
+  {id:"demo-lesson-2",course_id:"demo-course-1",lesson_number:2,title:"Prepare a facial safely",description:"Learn cleansing, patch testing and product instructions.",duration_minutes:25},
+  {id:"demo-lesson-3",course_id:"demo-course-1",lesson_number:3,title:"Aftercare and home guidance",description:"Give simple, safe aftercare guidance.",duration_minutes:25},
+  {id:"demo-lesson-4",course_id:"demo-course-2",lesson_number:1,title:"Professional communication",description:"Confirm bookings and explain services clearly.",duration_minutes:10},
+  {id:"demo-lesson-5",course_id:"demo-course-2",lesson_number:2,title:"Home visit safety checklist",description:"Follow a clear, professional visit protocol.",duration_minutes:10},
+  {id:"demo-lesson-6",course_id:"demo-course-2",lesson_number:3,title:"Build customer trust",description:"Invite feedback and explain realistic outcomes.",duration_minutes:15},
+  {id:"demo-lesson-7",course_id:"demo-course-3",lesson_number:1,title:"Clean tools and workstation setup",description:"Sanitise tools and prepare a clean work area.",duration_minutes:10},
+  {id:"demo-lesson-8",course_id:"demo-course-3",lesson_number:2,title:"Disposable kits and safe handling",description:"Understand single-use items and waste disposal.",duration_minutes:15},
+  {id:"demo-lesson-9",course_id:"demo-course-3",lesson_number:3,title:"Client consultation and allergies",description:"Ask about sensitivities before starting service.",duration_minutes:20},
+  {id:"demo-lesson-10",course_id:"demo-course-4",lesson_number:1,title:"Waxing preparation and patch testing",description:"Prepare the area and follow product directions.",duration_minutes:25},
+  {id:"demo-lesson-11",course_id:"demo-course-4",lesson_number:2,title:"Threading technique fundamentals",description:"Review hygiene, skin preparation and gentle technique.",duration_minutes:25},
+  {id:"demo-lesson-12",course_id:"demo-course-4",lesson_number:3,title:"Aftercare and irritation prevention",description:"Explain cooling and post-service care.",duration_minutes:20}
+ ];
+ progress=lessons.slice(0,2).map(l=>({lesson_id:l.id}));
  if(partner){
   beauticianProfile={user_id:demoId,display_name:"Demo Beautician",phone:"9999999999",city:"Patna",experience_years:4,bio:"Sample professional profile for preview. Real partner profiles require admin approval.",skills:["Facial","Waxing","Threading","Manicure","Pedicure"],service_areas:["Boring Road","Kankarbagh","Patliputra"],is_available:true,approval_status:"Approved",rating:4.9,total_reviews:28};
-  const day2=new Date();day2.setDate(day2.getDate()+2);
-  const date2=new Date(day2.getTime()-day2.getTimezoneOffset()*60000).toISOString().slice(0,10);
   bookings=[
    {id:"demo-job-open",booking_code:"DEMO-ALX-1001",customer_id:"demo-customer-1",beautician_id:null,service_name:"O3+ Premium Facial",category_name:"Facial",amount:1499,appointment_date:localDate(),appointment_slot:"11:00 AM - 01:00 PM",customer_address:"Boring Road, Patna (sample address)",customer_note:"Demo request",status:"Pending",payment_method:"Pay after service",payment_status:"Unpaid"},
-   {id:"demo-job-active",booking_code:"DEMO-ALX-1002",customer_id:"demo-customer-2",beautician_id:demoId,service_name:"Premium Glow Combo",category_name:"Package",amount:2500,appointment_date:date2,appointment_slot:"03:00 PM - 05:00 PM",customer_address:"Kankarbagh, Patna (sample address)",customer_note:"Demo appointment",status:"Accepted",payment_method:"Cash",payment_status:"Unpaid"},
+   {id:"demo-job-active",booking_code:"DEMO-ALX-1002",customer_id:"demo-customer-2",beautician_id:demoId,service_name:"Premium Glow Combo",category_name:"Package",amount:2500,appointment_date:dateAfterDemoDays(2),appointment_slot:"03:00 PM - 05:00 PM",customer_address:"Kankarbagh, Patna (sample address)",customer_note:"Demo appointment",status:"Accepted",payment_method:"Cash",payment_status:"Unpaid"},
    {id:"demo-job-done",booking_code:"DEMO-ALX-1003",customer_id:"demo-customer-3",beautician_id:demoId,service_name:"Basic Pedicure",category_name:"Nails",amount:699,appointment_date:localDate(),appointment_slot:"09:00 AM - 11:00 AM",customer_address:"Patliputra, Patna (sample address)",customer_note:"Demo completed service",status:"Completed",payment_method:"UPI",payment_status:"Paid"}
   ];
   customerProfiles=[
@@ -530,7 +555,6 @@ async function launchDemoPreview(){
    {user_id:"demo-customer-2",full_name:"Sample Customer Two",phone:"98XXXXXX20"},
    {user_id:"demo-customer-3",full_name:"Sample Customer Three",phone:"98XXXXXX30"}
   ];
-  progress=lessons.slice(0,2).map(l=>({lesson_id:l.id}));
   activeTab="dashboard";
  }else{
   beauticianProfile=null;
@@ -547,6 +571,23 @@ async function launchDemoPreview(){
  const signoutButton=document.querySelector('#appScreen button[onclick="signOut()"]');
  if(signoutButton)signoutButton.classList.add("hide");
  renderNavigation();renderCurrentView();
+
+ // Refresh with the real public catalogue in the background; preview is already visible.
+ if(!db)return;
+ Promise.all([
+  db.from("salon_services").select("service_key,category_name,name,display_price,cart_price,sort_order").eq("is_active",true).order("sort_order"),
+  db.from("salon_packages").select("package_id,name,price,original_price,description,inclusions,package_type").eq("is_active",true).order("sort_order"),
+  db.from("beautician_profiles").select("user_id,display_name,city,experience_years,bio,skills,service_areas,is_available,rating,total_reviews").eq("approval_status","Approved").eq("is_available",true).order("rating",{ascending:false}),
+  db.from("beautician_courses").select("*").eq("is_active",true).order("sort_order"),
+  db.from("beautician_lessons").select("*").eq("is_active",true).order("lesson_number")
+ ]).then(([serviceRes,packageRes,beauticianRes,courseRes,lessonRes])=>{
+  if(!serviceRes.error&&serviceRes.data&&serviceRes.data.length)services=serviceRes.data;
+  if(!packageRes.error&&packageRes.data&&packageRes.data.length)packages=packageRes.data;
+  if(!beauticianRes.error&&beauticianRes.data&&beauticianRes.data.length)beauticians=beauticianRes.data;
+  if(!courseRes.error&&courseRes.data&&courseRes.data.length)courses=courseRes.data;
+  if(!lessonRes.error&&lessonRes.data&&lessonRes.data.length)lessons=lessonRes.data;
+  renderCurrentView();
+ }).catch(error=>console.warn("Demo preview is using local sample data",error));
 }
 function dateAfterDemoDays(days){const d=new Date();d.setDate(d.getDate()+days);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);}
 if(APP_DEMO){
