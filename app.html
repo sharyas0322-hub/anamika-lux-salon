@@ -138,6 +138,7 @@ const SUPABASE_KEY="sb_publishable_CqhbUiMSpMpBSl2X_vKdHg_WimgwESl";
 const db=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
 const APP_MODE=new URLSearchParams(window.location.search).get("app");
 const APP_DEMO=new URLSearchParams(window.location.search).get("demo")==="1"&&(APP_MODE==="customer"||APP_MODE==="partner");
+if(APP_MODE==="customer"&&!APP_DEMO){window.location.replace("/booking.html");return;}
 const $=id=>document.getElementById(id);
 let authMode="login",selectedRole=APP_MODE==="partner"?"beautician":"customer",currentUser=null,profile=null,beauticianProfile=null,authRecoveryOpen=false;
 let services=[],packages=[],beauticians=[],bookings=[],courses=[],lessons=[],progress=[],customerProfiles=[];

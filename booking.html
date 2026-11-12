@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050507">
+<meta name="description" content="Browse The Anamika Lux salon services and book a doorstep appointment in Patna without creating an account.">
+<title>Book Online | The Anamika Lux</title>
+<link rel="icon" href="/app-icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--gold:#D4AF37;--gold2:#F3E5AB;--gold3:#9F7612;--bg:#050507;--panel:#101017;--panel2:#171720;--text:#f3f0e7;--muted:#a3a3a3;--line:rgba(212,175,55,.24)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{margin:0;background:radial-gradient(circle at 90% 0%,rgba(212,175,55,.11),transparent 25%),var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",sans-serif;min-height:100vh}
+a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}
+.topbar{height:70px;position:sticky;top:0;z-index:20;background:rgba(5,5,7,.94);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.wrap{max-width:1120px;padding:0 18px;margin:auto}
+.topinner{height:100%;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px}.crown{width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--line);border-radius:13px;color:var(--gold2);background:rgba(212,175,55,.08)}
+.brandname{font:800 14px Cinzel,serif;letter-spacing:.16em}.brandtag{font-size:9px;letter-spacing:.18em;color:var(--gold2);text-transform:uppercase;margin-top:3px}
+.call{border:1px solid var(--line);border-radius:999px;padding:10px 14px;color:var(--gold2);font-size:12px;font-weight:800}
+.hero{margin:22px auto 0;border:1px solid var(--line);border-radius:26px;padding:30px;background:radial-gradient(100% 130% at 95% 0%,rgba(212,175,55,.18),transparent 55%),linear-gradient(135deg,#050507,#171720);position:relative;overflow:hidden}
+.kicker{font-size:10px;text-transform:uppercase;letter-spacing:.22em;color:var(--gold2);font-weight:800}
+h1,h2,h3{font-family:"Playfair Display",serif;margin:0}
+h1{font-size:clamp(30px,5vw,46px);line-height:1.12;margin-top:12px;max-width:650px}
+.hero p{color:#c4c0b5;font-size:14px;line-height:1.7;max-width:620px;margin:14px 0 0}
+.goldbtn{border:0;border-radius:13px;padding:13px 18px;background:linear-gradient(120deg,var(--gold2),var(--gold),var(--gold3));color:#090909;font-size:12px;font-weight:900;cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0 34px}
+.stat{padding:15px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#171720,#101017)}
+.stat strong{display:block;font-size:23px;margin-top:7px;color:var(--gold2)}.stat span{font-size:10px;color:var(--muted)}
+.section{margin:32px 0}.sectionhead{margin-bottom:16px}.sectionhead .kicker{margin-bottom:8px}.sectionhead h2{font-size:29px}.sectionhead p{font-size:12px;color:var(--muted);margin:7px 0 0}
+.search{width:100%;background:#09090d;border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--text);outline:none;margin-bottom:14px}.search:focus,.field:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.12)}
+.filters{display:flex;gap:8px;overflow-x:auto;padding:0 0 14px;scrollbar-width:thin}
+.chip{white-space:nowrap;padding:9px 14px;border:1px solid var(--line);border-radius:999px;color:var(--gold2);background:#101017;font-size:11px;font-weight:800;cursor:pointer}
+.chip.active{background:var(--gold);color:#080808;border-color:var(--gold)}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card{border:1px solid var(--line);background:linear-gradient(145deg,#171720,#101017 72%);border-radius:18px;padding:16px;min-width:0}
+.cardcat{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:900}
+.card h3{font:800 15px "Plus Jakarta Sans",sans-serif;margin-top:7px;line-height:1.4}
+.cardfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:16px}
+.price{font-size:13px;font-weight:900;color:#f4e5b2}.sub{font-size:9px;color:var(--muted);margin-top:4px}
+.bookbtn{background:linear-gradient(120deg,var(--gold2),var(--gold));color:#090909;border:0;border-radius:11px;padding:10px 12px;font-size:10px;font-weight:900;white-space:nowrap;cursor:pointer}
+.packages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.pkg{border:1px solid rgba(212,175,55,.32);border-radius:20px;padding:19px;background:radial-gradient(130% 100% at 100% 0%,rgba(212,175,55,.16),transparent 60%),linear-gradient(145deg,#171720,#09090d)}
+.pkgtype{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--gold2);font-weight:900}.pkg h3{font-size:21px;margin-top:7px}.pkg p{font-size:11px;line-height:1.6;color:#bbb6a9;margin:8px 0}
+.pkg ul{margin:10px 0 0;padding:0;list-style:none;color:#d1ccbf;font-size:10px;line-height:1.8}.pkg li:before{content:"✓";color:var(--gold);font-weight:900;margin-right:8px}
+.pkgfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:15px}
+.info{border:1px solid var(--line);border-radius:16px;background:#101017;padding:15px;color:var(--muted);font-size:11px;line-height:1.7;margin:30px 0}
+.state{border:1px solid var(--line);background:#101017;padding:25px;text-align:center;border-radius:18px;color:var(--muted);font-size:13px;margin:25px 0}
+.footer{text-align:center;color:#777;font-size:10px;padding:28px 0 40px}
+.hidden{display:none!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(12px);z-index:50;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.modalbox{width:100%;max-width:540px;max-height:94vh;overflow:auto;background:#101017;border:1px solid rgba(212,175,55,.34);border-radius:25px 25px 0 0;padding:22px}
+.modalhead{display:flex;justify-content:space-between;gap:14px}.modalhead h2{font-size:25px;margin-top:6px}.xbtn{width:36px;height:36px;border:1px solid var(--line);border-radius:50%;background:#171720;color:var(--gold2);cursor:pointer}
+.form{display:grid;gap:12px;margin-top:19px}.fieldgroup label{display:block;color:var(--gold2);font-size:11px;font-weight:800;margin-bottom:7px}
+.field{width:100%;background:#09090d;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--text);outline:none;font-size:13px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.hint{font-size:10px;color:var(--muted);line-height:1.6}
+.error{color:#ff9da6;font-size:11px;line-height:1.5}.success{text-align:center;padding:8px 2px}.successicon{width:62px;height:62px;margin:5px auto 18px;border:1px solid var(--line);border-radius:18px;background:rgba(212,175,55,.1);display:grid;place-items:center;font-size:24px;color:var(--gold2)}
+.codebox{margin:18px 0;padding:15px;border-radius:14px;background:#09090d;border:1px solid var(--line)}.codebox strong{display:block;color:var(--gold2);font-size:20px;margin-top:6px}
+@media(max-width:800px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.wrap{padding:0 13px}.hero{padding:23px 19px;margin-top:14px}.cards{grid-template-columns:1fr}.packages{grid-template-columns:1fr}.topbar{height:64px}.brandname{font-size:12px}.call{padding:9px 11px}.modal{align-items:flex-end}.modalbox{padding:19px 16px}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap topinner">
+ <a class="brand" href="/"><div class="crown"><i class="fa-solid fa-crown"></i></div><div><div class="brandname">THE ANAMIKA LUX</div><div class="brandtag">Doorstep Beauty • Patna</div></div></a>
+ <a class="call" href="tel:8893645998"><i class="fa-solid fa-phone"></i> Call</a>
+</div></header>
+<main class="wrap">
+ <section class="hero">
+  <div class="kicker">The Anamika Lux • Patna</div>
+  <h1>Salon care, at your doorstep.</h1>
+  <p>Browse our services and signature packages. Choose what you need, share your appointment details, and send a booking request — no account or login required.</p>
+  <button class="goldbtn" onclick="document.getElementById('servicesSection').scrollIntoView({behavior:'smooth'})">Explore menu <i class="fa-solid fa-arrow-down"></i></button>
+ </section>
+ <div class="stats">
+  <div class="stat"><span><i class="fa-solid fa-spa"></i> SERVICES</span><strong id="serviceCount">—</strong></div>
+  <div class="stat"><span><i class="fa-solid fa-gift"></i> PACKAGES</span><strong id="packageCount">—</strong></div>
+ </div>
+ <div id="loading" class="state"><i class="fa-solid fa-circle-notch fa-spin"></i><br><br>Loading the live salon menu…</div>
+ <div id="loadError" class="state hidden">The menu could not be loaded. Please check your internet connection and try again.<br><br><button class="goldbtn" onclick="loadMenu()">Try again</button></div>
+ <div id="menuArea" class="hidden">
+  <section id="servicesSection" class="section">
+   <div class="sectionhead"><div class="kicker">Browse menu</div><h2>Our services</h2><p>Choose a service and book your preferred slot.</p></div>
+   <input id="searchBox" class="search" placeholder="Search facial, waxing, hair…" oninput="updateSearch(this.value)">
+   <div id="categoryFilters" class="filters"></div>
+   <div id="serviceCards" class="cards"></div>
+  </section>
+  <section class="section">
+   <div class="sectionhead"><div class="kicker">Curated for you</div><h2>Signature packages</h2><p>Complete beauty experiences at special package prices.</p></div>
+   <div id="packageCards" class="packages"></div>
+  </section>
+  <div class="info"><i class="fa-solid fa-circle-info" style="color:var(--gold)"></i> No advance payment is required. Our team will contact you to confirm service availability and your appointment slot. Payment is after the service.</div>
+ </div>
+ <footer class="footer">© <span id="year"></span> The Anamika Lux • Patna, Bihar</footer>
+</main>
+
+<div id="bookingModal" class="modal hidden">
+ <div class="modalbox">
+  <div id="bookingFormPanel">
+   <div class="modalhead"><div><div class="kicker">Booking request • No login</div><h2 id="selectedName">Selected service</h2><div id="selectedPrice" class="price" style="margin-top:7px"></div></div><button class="xbtn" onclick="closeBooking()" aria-label="Close"><i class="fa-solid fa-xmark"></i></button></div>
+   <form id="guestForm" class="form" onsubmit="submitBooking(event)">
+    <div class="fieldgroup"><label for="customerName">Full name</label><input id="customerName" class="field" maxlength="100" autocomplete="name" placeholder="Your name" required></div>
+    <div class="fieldgroup"><label for="customerPhone">Mobile number</label><input id="customerPhone" class="field" type="tel" inputmode="tel" maxlength="16" autocomplete="tel" placeholder="10-digit mobile number" required></div>
+    <div class="grid2">
+     <div class="fieldgroup"><label for="appointmentDate">Appointment date</label><input id="appointmentDate" class="field" type="date" required></div>
+     <div class="fieldgroup"><label for="appointmentSlot">Time slot</label><select id="appointmentSlot" class="field" required><option>Morning (08:00 AM - 11:00 AM)</option><option>Midday (11:00 AM - 02:00 PM)</option><option>Afternoon (02:00 PM - 05:00 PM)</option><option>Evening (05:00 PM - 08:00 PM)</option></select></div>
+    </div>
+    <div class="fieldgroup"><label for="customerAddress">Full address in Patna</label><textarea id="customerAddress" class="field" rows="3" maxlength="1000" autocomplete="street-address" placeholder="House/flat, road, area and landmark" required></textarea></div>
+    <input id="companyWebsite" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <p class="hint">No advance payment. Our team will call you to confirm the slot. Pay after the service.</p>
+    <p id="formError" class="error hidden"></p>
+    <button id="submitButton" class="goldbtn" type="submit" style="width:100%">Send booking request</button>
+   </form>
+  </div>
+  <div id="successPanel" class="success hidden">
+   <div class="successicon"><i class="fa-solid fa-check"></i></div>
+   <div class="kicker">Request received</div>
+   <h2 id="successName" style="font-size:27px;margin-top:7px">Thank you</h2>
+   <p class="hint" style="margin-top:9px">Your booking request has been saved. Our team will contact you to confirm availability.</p>
+   <div class="codebox"><span class="hint">BOOKING ID</span><strong id="bookingCode">—</strong><p id="successDetails" class="hint" style="margin-top:8px"></p></div>
+   <button class="goldbtn" style="width:100%" onclick="closeBooking()">Back to menu</button>
+  </div>
+ </div>
+</div>
+
+<script>
+const SUPABASE_URL="https://uwbcgwvrvtvggmaejxfu.supabase.co";
+const SUPABASE_KEY="sb_publishable_CqhbUiMSpMpBSl2X_vKdHg_WimgwESl";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let services=[],packages=[],activeCategory="all",searchText="",selectedItem=null;
+const byId=id=>document.getElementById(id);
+function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
+function money(value){return Number(value||0).toLocaleString("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0});}
+function todayLocal(){const now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());return now.toISOString().slice(0,10);}
+byId("year").textContent=new Date().getFullYear();
+byId("appointmentDate").min=todayLocal();
+async function loadMenu(){
+ byId("loading").classList.remove("hidden");byId("loadError").classList.add("hidden");byId("menuArea").classList.add("hidden");
+ try{
+  const result=await Promise.all([
+   db.from("salon_services").select("service_key,category_name,name,display_price,cart_price,sort_order").eq("is_active",true).order("sort_order"),
+   db.from("salon_packages").select("package_id,package_type,name,price,original_price,description,inclusions,sort_order").eq("is_active",true).order("sort_order")
+  ]);
+  if(result[0].error)throw result[0].error;if(result[1].error)throw result[1].error;
+  services=result[0].data||[];packages=result[1].data||[];
+  byId("serviceCount").textContent=services.length;byId("packageCount").textContent=packages.length;
+  byId("loading").classList.add("hidden");byId("menuArea").classList.remove("hidden");renderMenu();
+ }catch(error){console.error("Public salon menu load failed:",error);byId("loading").classList.add("hidden");byId("loadError").classList.remove("hidden");}
+}
+function renderMenu(){
+ const categories=["all",...new Set(services.map(item=>item.category_name).filter(Boolean))];
+ byId("categoryFilters").innerHTML=categories.map(category=>'<button type="button" class="chip '+(activeCategory===category?"active":"")+'" data-category="'+escapeHtml(category)+'">'+(category==="all"?"All services":escapeHtml(category))+"</button>").join("");
+ byId("categoryFilters").querySelectorAll("[data-category]").forEach(button=>button.addEventListener("click",()=>{activeCategory=button.dataset.category;renderMenu();}));
+ const shown=services.filter(item=>(activeCategory==="all"||item.category_name===activeCategory)&&(!searchText||(item.name+" "+item.category_name).toLowerCase().includes(searchText)));
+ byId("serviceCards").innerHTML=shown.map(item=>{
+  const index=services.indexOf(item),label=item.display_price|| (Number(item.cart_price)>0?money(item.cart_price):"Price on enquiry");
+  return '<article class="card"><div class="cardcat">'+escapeHtml(item.category_name)+'</div><h3>'+escapeHtml(item.name)+'</h3><div class="cardfoot"><div><div class="price">'+escapeHtml(label)+'</div><div class="sub">At-home service</div></div><button class="bookbtn" type="button" data-service="'+index+'">Book now</button></div></article>';
+ }).join("")||'<div class="state" style="grid-column:1/-1">No matching services found.</div>';
+ byId("serviceCards").querySelectorAll("[data-service]").forEach(button=>button.addEventListener("click",()=>openBooking("service",Number(button.dataset.service))));
+ byId("packageCards").innerHTML=packages.map((item,index)=>{
+  const inclusions=Array.isArray(item.inclusions)?item.inclusions:[];
+  const price=Number(item.price)||0,original=Number(item.original_price)||0;
+  return '<article class="pkg"><div class="pkgtype">'+escapeHtml(item.package_type||"Salon package")+'</div><h3>'+escapeHtml(item.name)+'</h3><p>'+escapeHtml(item.description||"A curated beauty experience.")+'</p>'+(inclusions.length?'<ul>'+inclusions.slice(0,5).map(value=>"<li>"+escapeHtml(value)+"</li>").join("")+"</ul>":"")+'<div class="pkgfoot"><div class="price">'+(price?money(price):"Price on enquiry")+(original>price&&price?'<div class="sub" style="text-decoration:line-through">'+money(original)+"</div>":"")+'</div><button type="button" class="bookbtn" data-package="'+index+'">Book package</button></div></article>';
+ }).join("")||'<div class="state" style="grid-column:1/-1">No packages available right now.</div>';
+ byId("packageCards").querySelectorAll("[data-package]").forEach(button=>button.addEventListener("click",()=>openBooking("package",Number(button.dataset.package))));
+}
+function updateSearch(value){searchText=String(value||"").trim().toLowerCase();renderMenu();}
+function openBooking(type,index){
+ const rows=type==="package"?packages:services,item=rows[index];if(!item)return;
+ const price=Number(type==="package"?item.price:item.cart_price)||0;
+ selectedItem={name:item.name,type:type,category:type==="package"?"Package":(item.category_name||""),price:price};
+ byId("selectedName").textContent=item.name;byId("selectedPrice").textContent=price?money(price):"Price on enquiry";
+ byId("formError").classList.add("hidden");byId("bookingFormPanel").classList.remove("hidden");byId("successPanel").classList.add("hidden");
+ byId("guestForm").reset();byId("appointmentDate").min=todayLocal();byId("bookingModal").classList.remove("hidden");
+ document.body.style.overflow="hidden";
+}
+function closeBooking(){byId("bookingModal").classList.add("hidden");document.body.style.overflow="";selectedItem=null;}
+byId("bookingModal").addEventListener("click",event=>{if(event.target===byId("bookingModal"))closeBooking();});
+async function submitBooking(event){
+ event.preventDefault();if(!selectedItem)return;
+ const name=byId("customerName").value.trim(),phone=byId("customerPhone").value.replace(/\D/g,""),date=byId("appointmentDate").value,slot=byId("appointmentSlot").value,address=byId("customerAddress").value.trim();
+ if(byId("companyWebsite").value)return;
+ const errorBox=byId("formError");errorBox.classList.add("hidden");
+ if(name.length<2||name.length>100){errorBox.textContent="Please enter your full name.";errorBox.classList.remove("hidden");return;}
+ if(phone.length<10||phone.length>15){errorBox.textContent="Please enter a valid mobile number.";errorBox.classList.remove("hidden");return;}
+ if(!date||date<todayLocal()){errorBox.textContent="Please choose today or a future date.";errorBox.classList.remove("hidden");return;}
+ if(address.length<5||address.length>1000){errorBox.textContent="Please enter your full address.";errorBox.classList.remove("hidden");return;}
+ const price=Number(selectedItem.price)||0;
+ const itemList=[{name:selectedItem.name,price:price,qty:1,category:selectedItem.category,type:selectedItem.type}];
+ const selectedLabel=selectedItem.name+" ("+(price?"₹"+price.toLocaleString("en-IN"):"Price on enquiry")+")";
+ const button=byId("submitButton");button.disabled=true;button.textContent="Sending request…";
+ try{
+  const response=await db.rpc("create_public_booking",{
+   p_customer_name:name,p_customer_phone:phone,p_appointment_date:date,p_appointment_slot:slot,
+   p_address:address,p_selected_package:selectedLabel,p_total_amount:price,p_items:itemList
+  });
+  if(response.error)throw response.error;
+  const saved=response.data||{};
+  byId("successName").textContent="Thank you, "+name;
+  byId("bookingCode").textContent=saved.booking_code||"Request received";
+  byId("successDetails").textContent=selectedItem.name+" • "+date+" • "+slot;
+  byId("bookingFormPanel").classList.add("hidden");byId("successPanel").classList.remove("hidden");
+  selectedItem=null;
+ }catch(error){
+  console.error("Guest booking submit failed:",error);
+  errorBox.textContent=error&&error.message?error.message:"Booking could not be saved. Please check your connection and try again.";
+  errorBox.classList.remove("hidden");
+ }finally{button.disabled=false;button.textContent="Send booking request";}
+}
+loadMenu();
+</script>
+</body>
+</html>
