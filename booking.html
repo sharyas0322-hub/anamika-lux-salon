@@ -63,7 +63,33 @@ h1{font-size:clamp(30px,5vw,46px);line-height:1.12;margin-top:12px;max-width:650
 .error{color:#ff9da6;font-size:11px;line-height:1.5}.success{text-align:center;padding:8px 2px}.successicon{width:62px;height:62px;margin:5px auto 18px;border:1px solid var(--line);border-radius:18px;background:rgba(212,175,55,.1);display:grid;place-items:center;font-size:24px;color:var(--gold2)}
 .codebox{margin:18px 0;padding:15px;border-radius:14px;background:#09090d;border:1px solid var(--line)}.codebox strong{display:block;color:var(--gold2);font-size:20px;margin-top:6px}
 @media(max-width:800px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){.wrap{padding:0 13px}.hero{padding:23px 19px;margin-top:14px}.cards{grid-template-columns:1fr}.packages{grid-template-columns:1fr}.topbar{height:64px}.brandname{font-size:12px}.call{padding:9px 11px}.modal{align-items:flex-end}.modalbox{padding:19px 16px}}
+.cart-summary{border:1px solid rgba(212,175,55,.34);border-radius:19px;padding:17px;background:linear-gradient(145deg,#171720,#09090d)}
+.cart-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.cart-row:last-child{border-bottom:0}
+.qty-controls{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.qty-controls button{width:30px;height:30px;border:1px solid var(--line);border-radius:9px;background:#171720;color:var(--gold2);font-weight:900}
+.cart-dock{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:10px 13px calc(10px + env(safe-area-inset-bottom));background:rgba(5,5,7,.96);backdrop-filter:blur(18px);border-top:1px solid var(--line)}
+.cart-dock-inner{max-width:700px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cart-dock-total{font-size:15px;font-weight:900;color:var(--gold2)}
+@media(max-width:520px){
+ .wrap{padding:0 13px}.hero{padding:21px 16px;margin-top:14px}
+ .cards,.packages{grid-template-columns:1fr}.topbar{height:58px}
+ .brand{gap:8px;min-width:0}.brandlogo{width:38px;height:38px;flex:0 0 38px;border-radius:9px}
+ .brandname{font-size:10px;letter-spacing:.07em;white-space:nowrap;line-height:1.2}
+ .brandtag{font-size:7px;letter-spacing:.07em;white-space:nowrap;line-height:1.2}
+ .call{padding:7px 9px;font-size:10px;white-space:nowrap}
+ .modal{align-items:flex-end}.modalbox{padding:19px 16px}
+ h1{font-size:clamp(25px,7vw,31px);line-height:1.15}
+ .hero p{font-size:13px;line-height:1.6}
+ .hero-logo{width:min(132px,42vw);margin-bottom:14px;border-radius:15px}
+ .sectionhead h2{font-size:23px}
+}
+@media(max-width:380px){
+ .wrap{padding-left:10px;padding-right:10px}.brand{gap:6px}
+ .brandlogo{width:34px;height:34px;flex-basis:34px}
+ .brandname{font-size:9px;letter-spacing:.04em}.brandtag{font-size:6px;letter-spacing:.04em}
+ .call{padding:6px 8px;font-size:9px}
+}
 </style>
 </head>
 <body>
@@ -96,10 +122,27 @@ h1{font-size:clamp(30px,5vw,46px);line-height:1.12;margin-top:12px;max-width:650
    <div class="sectionhead"><div class="kicker">Curated for you</div><h2>Signature packages</h2><p>Complete beauty experiences at special package prices.</p></div>
    <div id="packageCards" class="packages"></div>
   </section>
+  <section id="cartSection" class="section hidden">
+   <div class="sectionhead"><div class="kicker">Your selection</div><h2>Service cart</h2><p>Add services and packages together. Minimum booking value is ₹1,500.</p></div>
+   <div class="cart-summary">
+    <div id="cartItems"></div>
+    <div class="flex items-center justify-between gap-3 pt-3 mt-2 border-t" style="border-color:var(--line)">
+     <div><div class="hint">Cart total</div><div id="cartTotal" class="price" style="font-size:22px;margin-top:4px">₹0</div></div>
+     <button id="checkoutButton" class="goldbtn" type="button" disabled>Continue to booking</button>
+    </div>
+    <p id="cartMinimumMessage" class="hint" style="margin-top:9px">Add items worth ₹1,500 to continue.</p>
+   </div>
+  </section>
   <div class="info"><i class="fa-solid fa-circle-info" style="color:var(--gold)"></i> No advance payment is required. Our team will contact you to confirm service availability and your appointment slot. Payment is after the service.</div>
  </div>
  <footer class="footer">© <span id="year"></span> The Anamika Lux • Patna, Bihar</footer>
 </main>
+<div id="cartDock" class="cart-dock hidden">
+ <div class="cart-dock-inner">
+  <div><div class="hint" id="cartDockCount">0 items in cart</div><div class="cart-dock-total" id="cartDockTotal">₹0</div></div>
+  <button class="goldbtn" type="button" onclick="scrollToCart()">View cart</button>
+ </div>
+</div>
 
 <div id="bookingModal" class="modal hidden">
  <div class="modalbox">
@@ -134,7 +177,8 @@ h1{font-size:clamp(30px,5vw,46px);line-height:1.12;margin-top:12px;max-width:650
 const SUPABASE_URL="https://uwbcgwvrvtvggmaejxfu.supabase.co";
 const SUPABASE_KEY="sb_publishable_CqhbUiMSpMpBSl2X_vKdHg_WimgwESl";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let services=[],packages=[],activeCategory="all",searchText="",selectedItem=null;
+let services=[],packages=[],activeCategory="all",searchText="",cart=[],selectedItems=[];
+const MIN_ORDER_VALUE=1500;
 const byId=id=>document.getElementById(id);
 function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function money(value){return Number(value||0).toLocaleString("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0});}
@@ -160,31 +204,64 @@ function renderMenu(){
  byId("categoryFilters").querySelectorAll("[data-category]").forEach(button=>button.addEventListener("click",()=>{activeCategory=button.dataset.category;renderMenu();}));
  const shown=services.filter(item=>(activeCategory==="all"||item.category_name===activeCategory)&&(!searchText||(item.name+" "+item.category_name).toLowerCase().includes(searchText)));
  byId("serviceCards").innerHTML=shown.map(item=>{
-  const index=services.indexOf(item),label=item.display_price|| (Number(item.cart_price)>0?money(item.cart_price):"Price on enquiry");
-  return '<article class="card"><div class="cardcat">'+escapeHtml(item.category_name)+'</div><h3>'+escapeHtml(item.name)+'</h3><div class="cardfoot"><div><div class="price">'+escapeHtml(label)+'</div><div class="sub">At-home service</div></div><button class="bookbtn" type="button" data-service="'+index+'">Book now</button></div></article>';
+  const index=services.indexOf(item),label=item.display_price||(Number(item.cart_price)>0?money(item.cart_price):"Price on enquiry"),price=Number(item.cart_price)||0;
+  return '<article class="card"><div class="cardcat">'+escapeHtml(item.category_name)+'</div><h3>'+escapeHtml(item.name)+'</h3><div class="cardfoot"><div><div class="price">'+escapeHtml(label)+'</div><div class="sub">At-home service</div></div><button class="bookbtn" type="button" data-service="'+index+'" '+(price>0?'':'disabled')+'>'+(price>0?'+ Add to cart':'Ask price')+'</button></div></article>';
  }).join("")||'<div class="state" style="grid-column:1/-1">No matching services found.</div>';
- byId("serviceCards").querySelectorAll("[data-service]").forEach(button=>button.addEventListener("click",()=>openBooking("service",Number(button.dataset.service))));
+ byId("serviceCards").querySelectorAll("[data-service]").forEach(button=>button.addEventListener("click",()=>addToCart("service",Number(button.dataset.service))));
  byId("packageCards").innerHTML=packages.map((item,index)=>{
-  const inclusions=Array.isArray(item.inclusions)?item.inclusions:[];
-  const price=Number(item.price)||0,original=Number(item.original_price)||0;
-  return '<article class="pkg"><div class="pkgtype">'+escapeHtml(item.package_type||"Salon package")+'</div><h3>'+escapeHtml(item.name)+'</h3><p>'+escapeHtml(item.description||"A curated beauty experience.")+'</p>'+(inclusions.length?'<ul>'+inclusions.slice(0,5).map(value=>"<li>"+escapeHtml(value)+"</li>").join("")+"</ul>":"")+'<div class="pkgfoot"><div class="price">'+(price?money(price):"Price on enquiry")+(original>price&&price?'<div class="sub" style="text-decoration:line-through">'+money(original)+"</div>":"")+'</div><button type="button" class="bookbtn" data-package="'+index+'">Book package</button></div></article>';
+  const inclusions=Array.isArray(item.inclusions)?item.inclusions:[],price=Number(item.price)||0,original=Number(item.original_price)||0;
+  return '<article class="pkg"><div class="pkgtype">'+escapeHtml(item.package_type||"Salon package")+'</div><h3>'+escapeHtml(item.name)+'</h3><p>'+escapeHtml(item.description||"A curated beauty experience.")+'</p>'+(inclusions.length?'<ul>'+inclusions.slice(0,5).map(value=>"<li>"+escapeHtml(value)+"</li>").join("")+"</ul>":"")+'<div class="pkgfoot"><div class="price">'+(price?money(price):"Price on enquiry")+(original>price?'<div class="sub" style="text-decoration:line-through">'+money(original)+"</div>":"")+'</div><button type="button" class="bookbtn" data-package="'+index+'" '+(price>0?'':'disabled')+'>'+(price>0?'+ Add to cart':'Ask price')+'</button></div></article>';
  }).join("")||'<div class="state" style="grid-column:1/-1">No packages available right now.</div>';
- byId("packageCards").querySelectorAll("[data-package]").forEach(button=>button.addEventListener("click",()=>openBooking("package",Number(button.dataset.package))));
+ byId("packageCards").querySelectorAll("[data-package]").forEach(button=>button.addEventListener("click",()=>addToCart("package",Number(button.dataset.package))));
+ renderCart();
 }
 function updateSearch(value){searchText=String(value||"").trim().toLowerCase();renderMenu();}
-function openBooking(type,index){
- const rows=type==="package"?packages:services,item=rows[index];if(!item)return;
+function cartTotal(){return cart.reduce((sum,item)=>sum+item.price*item.qty,0);}
+function addToCart(type,index){
+ const source=type==="package"?packages:services,item=source[index];if(!item)return;
  const price=Number(type==="package"?item.price:item.cart_price)||0;
- selectedItem={name:item.name,type:type,category:type==="package"?"Package":(item.category_name||""),price:price};
- byId("selectedName").textContent=item.name;byId("selectedPrice").textContent=price?money(price):"Price on enquiry";
- byId("formError").classList.add("hidden");byId("bookingFormPanel").classList.remove("hidden");byId("successPanel").classList.add("hidden");
- byId("guestForm").reset();byId("appointmentDate").min=todayLocal();byId("bookingModal").classList.remove("hidden");
- document.body.style.overflow="hidden";
+ if(price<=0){alert("This item needs price confirmation. Please call the salon.");return;}
+ const id=String(type==="package"?(item.package_id||item.name):(item.service_key||item.name));
+ const existing=cart.find(row=>row.id===id&&row.type===type);
+ if(existing){if(existing.qty>=20){alert("Maximum quantity reached.");return;}existing.qty+=1;}
+ else cart.push({id,name:item.name,price,qty:1,category:type==="package"?"Package":(item.category_name||""),type});
+ renderCart();
 }
-function closeBooking(){byId("bookingModal").classList.add("hidden");document.body.style.overflow="";selectedItem=null;}
+function changeCartQty(index,change){
+ const item=cart[index];if(!item)return;item.qty+=change;if(item.qty<=0)cart.splice(index,1);renderCart();
+}
+function removeCartItem(index){cart.splice(index,1);renderCart();}
+function scrollToCart(){byId("cartSection").scrollIntoView({behavior:"smooth",block:"center"});}
+function renderCart(){
+ const total=cartTotal(),quantity=cart.reduce((sum,item)=>sum+item.qty,0);
+ byId("cartSection").classList.toggle("hidden",cart.length===0);byId("cartDock").classList.toggle("hidden",cart.length===0);
+ byId("cartDockCount").textContent=quantity+" item"+(quantity===1?"":"s")+" in cart";
+ byId("cartDockTotal").textContent=money(total);byId("cartTotal").textContent=money(total);
+ const rows=cart.map((item,index)=>'<div class="cart-row"><div style="min-width:0"><strong style="display:block;font-size:13px">'+escapeHtml(item.name)+'</strong><span class="hint">'+money(item.price)+' each • '+money(item.price*item.qty)+'</span></div><div class="qty-controls"><button type="button" aria-label="Decrease" data-minus="'+index+'">−</button><strong>'+item.qty+'</strong><button type="button" aria-label="Increase" data-plus="'+index+'">+</button><button type="button" aria-label="Remove" data-remove="'+index+'" style="width:auto;padding:0 8px;font-size:10px">Remove</button></div></div>').join("");
+ byId("cartItems").innerHTML=rows;
+ byId("cartItems").querySelectorAll("[data-minus]").forEach(button=>button.addEventListener("click",()=>changeCartQty(Number(button.dataset.minus),-1)));
+ byId("cartItems").querySelectorAll("[data-plus]").forEach(button=>button.addEventListener("click",()=>changeCartQty(Number(button.dataset.plus),1)));
+ byId("cartItems").querySelectorAll("[data-remove]").forEach(button=>button.addEventListener("click",()=>removeCartItem(Number(button.dataset.remove))));
+ const remaining=Math.max(MIN_ORDER_VALUE-total,0),ready=total>=MIN_ORDER_VALUE,checkout=byId("checkoutButton");
+ checkout.disabled=!ready;checkout.classList.toggle("opacity-50",!ready);checkout.classList.toggle("cursor-not-allowed",!ready);
+ checkout.textContent=ready?"Continue to booking":"Add "+money(remaining)+" more";
+ byId("cartMinimumMessage").textContent=ready?"Minimum order reached. You can continue.":"Minimum order is "+money(MIN_ORDER_VALUE)+". Add "+money(remaining)+" more to book.";
+}
+function openBooking(){
+ const total=cartTotal();
+ if(!cart.length){alert("Please add services to your cart first.");return;}
+ if(total<MIN_ORDER_VALUE){alert("Minimum order is ₹1,500. Please add ₹"+(MIN_ORDER_VALUE-total).toLocaleString("en-IN")+" more.");return;}
+ selectedItems=cart.map(item=>({...item}));
+ byId("selectedName").textContent=selectedItems.length===1?selectedItems[0].name:selectedItems.length+" selected items";
+ byId("selectedPrice").textContent="Cart total: "+money(total);
+ byId("formError").classList.add("hidden");byId("bookingFormPanel").classList.remove("hidden");byId("successPanel").classList.add("hidden");
+ byId("guestForm").reset();byId("appointmentDate").min=todayLocal();byId("bookingModal").classList.remove("hidden");document.body.style.overflow="hidden";
+}
+function closeBooking(){byId("bookingModal").classList.add("hidden");document.body.style.overflow="";selectedItems=[];}
 byId("bookingModal").addEventListener("click",event=>{if(event.target===byId("bookingModal"))closeBooking();});
+byId("checkoutButton").addEventListener("click",openBooking);
 async function submitBooking(event){
- event.preventDefault();if(!selectedItem)return;
+ event.preventDefault();if(!selectedItems.length)return;
  const name=byId("customerName").value.trim(),phone=byId("customerPhone").value.replace(/\D/g,""),date=byId("appointmentDate").value,slot=byId("appointmentSlot").value,address=byId("customerAddress").value.trim();
  if(byId("companyWebsite").value)return;
  const errorBox=byId("formError");errorBox.classList.add("hidden");
@@ -192,9 +269,10 @@ async function submitBooking(event){
  if(phone.length<10||phone.length>15){errorBox.textContent="Please enter a valid mobile number.";errorBox.classList.remove("hidden");return;}
  if(!date||date<todayLocal()){errorBox.textContent="Please choose today or a future date.";errorBox.classList.remove("hidden");return;}
  if(address.length<5||address.length>1000){errorBox.textContent="Please enter your full address.";errorBox.classList.remove("hidden");return;}
- const price=Number(selectedItem.price)||0;
- const itemList=[{name:selectedItem.name,price:price,qty:1,category:selectedItem.category,type:selectedItem.type}];
- const selectedLabel=selectedItem.name+" ("+(price?"₹"+price.toLocaleString("en-IN"):"Price on enquiry")+")";
+ const itemList=selectedItems.map(item=>({name:item.name,price:item.price,qty:item.qty,category:item.category,type:item.type}));
+ const price=itemList.reduce((sum,item)=>sum+item.price*item.qty,0);
+ if(price<MIN_ORDER_VALUE){errorBox.textContent="Minimum order is ₹1,500. Please add more services to your cart.";errorBox.classList.remove("hidden");return;}
+ const selectedLabel=("Cart: "+selectedItems.map(item=>item.name+" x"+item.qty).join(", ")).slice(0,490);
  const button=byId("submitButton");button.disabled=true;button.textContent="Sending request…";
  try{
   const response=await db.rpc("create_public_booking",{
@@ -205,9 +283,9 @@ async function submitBooking(event){
   const saved=response.data||{};
   byId("successName").textContent="Thank you, "+name;
   byId("bookingCode").textContent=saved.booking_code||"Request received";
-  byId("successDetails").textContent=selectedItem.name+" • "+date+" • "+slot;
+  byId("successDetails").textContent=selectedItems.map(item=>item.name+" x"+item.qty).join(", ")+" • "+money(price)+" • "+date+" • "+slot;
   byId("bookingFormPanel").classList.add("hidden");byId("successPanel").classList.remove("hidden");
-  selectedItem=null;
+  cart=[];renderCart();selectedItems=[];
  }catch(error){
   console.error("Guest booking submit failed:",error);
   errorBox.textContent=error&&error.message?error.message:"Booking could not be saved. Please check your connection and try again.";
