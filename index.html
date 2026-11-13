@@ -135,46 +135,30 @@
             scrollbar-width: none;
         }
     
-        /* Accessibility: larger, easier-to-read text across the public website */
-        body {
-            font-size: 16px;
-        }
-        body [class*="text-[9px]"],
-        body [class*="text-[10px]"],
-        body [class*="text-[11px]"] {
-            font-size: 13px !important;
-            line-height: 1.55 !important;
-        }
-        body [class*="text-[12px]"],
-        body [class*="text-xs"] {
-            font-size: 14px !important;
-            line-height: 1.55 !important;
-        }
-        body [class*="text-[13px]"],
-        body [class*="text-sm"] {
-            font-size: 15px !important;
-            line-height: 1.55 !important;
-        }
-        body input,
-        body select,
-        body textarea,
-        body button {
-            font-size: max(14px, 1em);
-        }
+        /* Keep typography proportional on phones; form fields remain tap-friendly. */
+        body { font-size: 16px; }
+        body input, body select, body textarea { font-size: 16px; }
         @media (max-width: 640px) {
-            body [class*="text-[9px]"],
-            body [class*="text-[10px]"],
-            body [class*="text-[11px]"] {
-                font-size: 14px !important;
-            }
-            body [class*="text-[12px]"],
-            body [class*="text-xs"] {
-                font-size: 15px !important;
-            }
-            body [class*="text-[13px]"],
-            body [class*="text-sm"] {
-                font-size: 16px !important;
-            }
+            nav.sticky { padding: 7px 10px !important; }
+            nav.sticky > div { gap: 8px; min-width: 0; }
+            nav.sticky a.flex.items-center { gap: 7px !important; min-width: 0; }
+            nav.sticky a.flex.items-center img { width: 38px !important; height: 38px !important; flex: 0 0 38px; border-radius: 9px !important; }
+            nav.sticky a.flex.items-center > div { min-width: 0; }
+            nav.sticky a.flex.items-center span:first-child { font-size: 10px !important; letter-spacing: .07em !important; white-space: nowrap; line-height: 1.2 !important; }
+            nav.sticky a.flex.items-center span:last-child { font-size: 7px !important; letter-spacing: .08em !important; white-space: nowrap; line-height: 1.2 !important; }
+            nav.sticky > div > div:last-child { gap: 6px !important; flex: 0 0 auto; }
+            nav.sticky a[href^="tel:"] { width: 30px !important; height: 30px !important; }
+            nav.sticky a[href="/booking.html"] { padding: 7px 10px !important; font-size: 9px !important; letter-spacing: .06em !important; min-height: 32px; }
+            nav.sticky a[href="/booking.html"] i { font-size: 9px !important; }
+            .glass-card.rounded-3xl { padding: 20px 15px !important; }
+            .glass-card.rounded-3xl img[alt*="official"] { width: 118px !important; height: 118px !important; }
+        }
+        @media (max-width: 380px) {
+            nav.sticky { padding-left: 8px !important; padding-right: 8px !important; }
+            nav.sticky a.flex.items-center img { width: 34px !important; height: 34px !important; flex-basis: 34px; }
+            nav.sticky a.flex.items-center span:first-child { font-size: 9px !important; letter-spacing: .04em !important; }
+            nav.sticky a.flex.items-center span:last-child { font-size: 6.5px !important; letter-spacing: .04em !important; }
+            nav.sticky a[href="/booking.html"] { padding: 6px 8px !important; }
         }
 
     
@@ -1249,6 +1233,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
         var quantity = getCartQuantity();
         var total = getCartTotal();
+        var minimumOrder = 1500;
+        var remaining = Math.max(minimumOrder - total, 0);
+        var canBook = total >= minimumOrder;
         var label = document.getElementById("mobileCartLabel");
         if (label) label.textContent = "View Cart (" + quantity + ")";
 
@@ -1278,8 +1265,9 @@ window.addEventListener('DOMContentLoaded', () => {
             + rows
             + '<div class="flex items-center justify-between gap-3 pt-3 mt-2 border-t border-gold-500/20"><div><span class="text-[10px] text-neutral-400 uppercase">Estimated Total</span>'
             + '<p class="text-2xl font-cinzel font-black text-gold-300">' + formatINR(total) + '</p></div>'
-            + '<button type="button" id="bookServiceCartBtn" class="btn-gold-solid px-4 sm:px-5 py-3 rounded-xl text-[11px] uppercase tracking-wider font-extrabold"><i class="fa-regular fa-calendar-check mr-1"></i> Book Selected Services</button></div>'
-            + '<p class="text-[10px] text-neutral-400 mt-2">Final service details and any starting-rate variation will be confirmed by the salon.</p></div>';
+            + '<button type="button" id="bookServiceCartBtn" '+(canBook?'':'disabled')+' class="btn-gold-solid px-4 sm:px-5 py-3 rounded-xl text-[11px] uppercase tracking-wider font-extrabold '+(canBook?'':'opacity-45 cursor-not-allowed')+'"><i class="fa-regular fa-calendar-check mr-1"></i> '+(canBook?'Book Selected Services':'Add '+formatINR(remaining)+' More')+'</button></div>'
+            + '<p class="text-[10px] '+(canBook?'text-emerald-300':'text-amber-300')+' mt-2">'+(canBook?'Minimum order reached. You can continue to booking.':'Minimum order is '+formatINR(minimumOrder)+'. Add '+formatINR(remaining)+' more to book.')+'</p>'
+            + '<p class="text-[10px] text-neutral-400 mt-1">Final service details and any starting-rate variation will be confirmed by the salon.</p></div>';
 
         panel.querySelectorAll("[data-cart-minus]").forEach(function (button) {
             button.addEventListener("click", function () { window.changeServiceCartQty(Number(button.dataset.cartMinus), -1); });
@@ -1308,6 +1296,10 @@ window.addEventListener('DOMContentLoaded', () => {
             return;
         }
         var total = getCartTotal();
+        if (total < 1500) {
+            showCartNotice("Minimum order is ₹1,500. Please add ₹" + (1500 - total).toLocaleString("en-IN") + " more to your cart.");
+            return;
+        }
         var details = window.serviceCart.map(function (item) {
             return item.name + " x" + item.qty + " @ " + formatINR(item.price);
         }).join("; ");
@@ -1316,7 +1308,7 @@ window.addEventListener('DOMContentLoaded', () => {
         window.__bookingUsesCart = true;
     };
 
-    // Keep the original booking modal and WhatsApp request flow, but clear the cart after a submitted cart booking.
+    // Keep single-package flow; guard the cart total before checkout.
     var originalOpenBookingSheet = window.openBookingSheet;
     window.openBookingSheet = function (packageName) {
         window.__bookingUsesCart = false;
@@ -1325,13 +1317,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
     var originalBookingSubmit = window.handleSheetFormSubmit;
     window.handleSheetFormSubmit = function (event) {
-        var wasCartBooking = window.__bookingUsesCart;
-        originalBookingSubmit(event);
-        if (wasCartBooking) {
-            window.serviceCart = [];
-            window.__bookingUsesCart = false;
-            window.renderServiceCartSummary();
+        var isCartBooking = !!window.__bookingUsesCart;
+        var total = isCartBooking ? getCartTotal() : 0;
+        if (isCartBooking && total < 1500) {
+            if (event && typeof event.preventDefault === "function") event.preventDefault();
+            showCartNotice("Minimum order is ₹1,500. Please add ₹" + (1500 - total).toLocaleString("en-IN") + " more.");
+            return;
         }
+        return originalBookingSubmit(event);
     };
 
     // Add the two printed signature packages directly below the other five combos.
