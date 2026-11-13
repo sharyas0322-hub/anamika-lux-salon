@@ -63,6 +63,20 @@ h1,h2,h3,.serif{font-family:'Playfair Display',serif}
 #roleChooser button.border-2{border-color:transparent}
 @media(min-width:900px){.desktop-side{display:flex}.bottom-nav{display:none}.app-content{margin-left:230px}.topbar-inner{max-width:1240px}.main-wrap{max-width:1240px;margin:auto;padding:26px}}
 @media(max-width:899px){.main-wrap{padding:16px 14px 100px}.topbar-inner{padding:0 15px}.auth-wrap{padding:20px 15px}}
+@media(max-width:520px){
+ #appScreen .topbar-inner{height:56px!important;padding:0 10px!important;gap:8px}
+ #appScreen .topbar-inner>a{gap:7px!important;min-width:0}
+ #appScreen .brand-logo-small{width:34px;height:34px;flex:0 0 34px;border-radius:8px}
+ #appScreen .topbar-inner .brand-wordmark{font-size:10px!important;letter-spacing:.055em!important;line-height:1.15;white-space:nowrap}
+ #appScreen #topAudience{font-size:7px!important;letter-spacing:.065em!important;white-space:nowrap;line-height:1.15}
+ #appScreen .topbar-inner>div{gap:7px!important;flex:0 0 auto}
+ #appScreen .topbar-inner button{width:32px;height:32px}
+}
+@media(max-width:380px){
+ #appScreen .brand-logo-small{width:31px;height:31px;flex-basis:31px}
+ #appScreen .topbar-inner .brand-wordmark{font-size:9px!important;letter-spacing:.03em!important}
+ #appScreen #topAudience{font-size:6px!important}
+}
 </style>
 </head>
 <body class="app-bg min-h-screen">

@@ -134,6 +134,15 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        @media(max-width:520px){
+            .admin-mobile-header{padding:8px 10px!important;gap:8px}
+            .admin-mobile-header>div:first-child{gap:8px!important;min-width:0}
+            .admin-mobile-header>div:first-child>img{width:36px!important;height:36px!important;flex:0 0 36px}
+            .admin-mobile-header h1{font-size:10px!important;letter-spacing:.045em!important;white-space:nowrap}
+            .admin-mobile-header span{display:none!important}
+            .admin-mobile-header p{display:none!important}
+            .admin-mobile-header button{padding:7px 9px!important;font-size:10px!important;white-space:nowrap}
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -182,7 +191,7 @@
     <div id="adminPortalBackdrop" style="display:none; position:fixed; inset:0; z-index:99999999; background:#07070a; overflow-y:auto;" class="flex flex-col antialiased">
         
         <!-- Top App Bar of Admin Suite -->
-        <header class="bg-obsidian-900 border-b border-gold-500/20 px-4 py-3 flex items-center justify-between shrink-0">
+        <header class="admin-mobile-header bg-obsidian-900 border-b border-gold-500/20 px-4 py-3 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-3">
                 <img src="/the-anamika-lux-logo.png" alt="The Anamika official gold TA crown logo" class="w-12 h-12 rounded-xl object-contain bg-[#050507] border border-gold-500/40 shadow-md">
                 <div>

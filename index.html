@@ -220,6 +220,45 @@
         }
 
     
+        /* Phone layout: compact brand bar, balanced headings and readable body copy. */
+        @media (max-width: 640px) {
+            nav.sticky { padding: 7px 10px !important; }
+            nav.sticky > div { gap: 7px !important; min-width: 0; }
+            nav.sticky a[href="#"] { gap: 7px !important; min-width: 0; }
+            nav.sticky a[href="#"] img {
+                width: 36px !important; height: 36px !important; flex: 0 0 36px;
+                border-radius: 8px !important;
+            }
+            nav.sticky a[href="#"] > div { min-width: 0; }
+            nav.sticky a[href="#"] span:first-child {
+                font-size: 10px !important; letter-spacing: .055em !important;
+                line-height: 1.2 !important; white-space: nowrap;
+            }
+            nav.sticky a[href="#"] span:last-child {
+                font-size: 7px !important; letter-spacing: .07em !important;
+                line-height: 1.2 !important; white-space: nowrap;
+            }
+            nav.sticky > div > div:last-child { gap: 6px !important; flex: 0 0 auto; }
+            nav.sticky a[href^="tel:"] { width: 30px !important; height: 30px !important; }
+            nav.sticky a[href="/booking.html"] {
+                padding: 7px 10px !important; font-size: 9px !important;
+                letter-spacing: .05em !important; min-height: 32px;
+            }
+            nav.sticky a[href="/booking.html"] i { font-size: 9px !important; }
+            main section h1 { font-size: clamp(26px, 7vw, 32px) !important; line-height: 1.15 !important; }
+            main section h2 { font-size: 23px !important; line-height: 1.22 !important; }
+            main section > p, main section p { line-height: 1.55; }
+            .glass-card.rounded-3xl { padding: 20px 15px !important; }
+            .glass-card.rounded-3xl img[alt*="official"] { width: 116px !important; height: 116px !important; }
+        }
+        @media (max-width: 380px) {
+            nav.sticky { padding-left: 8px !important; padding-right: 8px !important; }
+            nav.sticky a[href="#"] img { width: 32px !important; height: 32px !important; flex-basis: 32px; }
+            nav.sticky a[href="#"] span:first-child { font-size: 9px !important; letter-spacing: .035em !important; }
+            nav.sticky a[href="#"] span:last-child { font-size: 6px !important; letter-spacing: .035em !important; }
+            nav.sticky a[href="/booking.html"] { padding: 6px 8px !important; }
+        }
+
         /* Creator credit: discreet premium signature at the very bottom */
         .creator-credit {
             display: flex;
