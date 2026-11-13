@@ -1,18 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#050507"/>
-      <stop offset="1" stop-color="#171720"/>
-    </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#FFF6DC"/>
-      <stop offset=".45" stop-color="#D4AF37"/>
-      <stop offset="1" stop-color="#9F7612"/>
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <circle cx="256" cy="248" r="164" fill="none" stroke="url(#gold)" stroke-width="9" opacity=".85"/>
-  <path d="M142 220l36-75 78 60 78-60 36 75-22 122H164z" fill="url(#gold)" stroke="#FFF6DC" stroke-width="8" stroke-linejoin="round"/>
-  <path d="M166 342h180" stroke="#FFF6DC" stroke-width="13" stroke-linecap="round"/>
-  <text x="256" y="404" fill="#FFF6DC" font-family="Cinzel,Georgia,serif" font-size="48" font-weight="bold" text-anchor="middle">AL</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+<title id="title">The Anamika gold TA crown logo</title><desc id="desc">Gold TA monogram beneath a crown, with The Anamika wordmark and lotus detail on a black background.</desc>
+<defs>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4C8"/><stop offset=".24" stop-color="#F2D36D"/><stop offset=".52" stop-color="#D4AF37"/><stop offset=".78" stop-color="#B98219"/><stop offset="1" stop-color="#F9E7A0"/></linearGradient>
+<linearGradient id="shine" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF8DE"/><stop offset=".5" stop-color="#E7BD48"/><stop offset="1" stop-color="#98650D"/></linearGradient>
+<filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="512" height="512" fill="#050507"/>
+<g fill="url(#gold)" stroke="#FBE8A0" stroke-width="2" stroke-linejoin="round" filter="url(#glow)">
+<path d="M135 118 L157 58 Q178 100 209 91 L255 25 L302 91 Q333 100 355 58 L377 118 Q256 161 135 118Z"/>
+<path d="M151 126 Q256 159 361 126 L356 141 Q256 174 156 141Z" fill="url(#shine)"/>
+<circle cx="157" cy="58" r="7"/><circle cx="209" cy="91" r="7"/><circle cx="255" cy="25" r="8"/><circle cx="302" cy="91" r="7"/><circle cx="355" cy="58" r="7"/>
+</g>
+<text x="255" y="337" text-anchor="middle" fill="url(#gold)" stroke="#FBE8A0" stroke-width="1.5" paint-order="stroke fill" font-family="Georgia, 'Times New Roman', serif" font-size="260" font-weight="700" letter-spacing="-34">TA</text>
+<path d="M118 345 C197 289 313 327 407 269 C430 255 448 234 458 211" fill="none" stroke="url(#gold)" stroke-width="13" stroke-linecap="round" filter="url(#glow)"/>
+<path d="M119 345 C204 296 313 330 407 272" fill="none" stroke="#FFF2BE" stroke-width="1.8" opacity=".9"/>
+<text x="256" y="412" text-anchor="middle" fill="url(#gold)" stroke="#FBE8A0" stroke-width=".7" paint-order="stroke fill" font-family="Georgia, 'Times New Roman', serif" font-size="42" letter-spacing="7">THE ANAMIKA</text>
+<g fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"><path d="M68 451 H198"/><path d="M314 451 H444"/></g>
+<g fill="url(#gold)" stroke="#FBE8A0" stroke-width="1.2" stroke-linejoin="round">
+<path d="M256 478 C236 456 235 439 256 425 C277 439 276 456 256 478Z"/><path d="M249 476 C220 466 211 449 224 438 C244 442 252 457 249 476Z"/><path d="M263 476 C292 466 301 449 288 438 C268 442 260 457 263 476Z"/><path d="M247 478 C223 483 211 476 204 467 C223 462 238 467 247 478Z"/><path d="M265 478 C289 483 301 476 308 467 C289 462 274 467 265 478Z"/>
+</g></svg>
