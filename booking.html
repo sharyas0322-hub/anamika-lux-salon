@@ -90,6 +90,40 @@ h1{font-size:clamp(30px,5vw,46px);line-height:1.12;margin-top:12px;max-width:650
  .brandname{font-size:9px;letter-spacing:.04em}.brandtag{font-size:6px;letter-spacing:.04em}
  .call{padding:6px 8px;font-size:9px}
 }
+
+/* Dedicated ecommerce-style cart screen */
+body.cart-page-open{overflow:hidden!important}
+body.cart-page-open #cartSection{position:fixed;inset:0;z-index:40;display:block!important;overflow-y:auto;margin:0;padding:12px 18px 30px;background:radial-gradient(900px 450px at 95% -10%,rgba(212,175,55,.14),transparent 60%),#050507}
+.cart-page-shell{max-width:1120px;margin:0 auto}
+.cart-page-header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:9px 0 17px;border-bottom:1px solid var(--line)}
+.cart-page-brand{display:flex;align-items:center;gap:10px}.cart-page-brand img{width:42px;height:42px;object-fit:contain;border:1px solid var(--line);border-radius:10px}
+.cart-page-brand strong{display:block;font:800 12px Cinzel,serif;letter-spacing:.12em}.cart-page-brand span{display:block;margin-top:3px;color:var(--gold2);font-size:9px;letter-spacing:.12em;text-transform:uppercase}
+.cart-back{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px 13px;background:#101017;color:var(--gold2);font-size:11px;font-weight:800}
+.cart-page-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding:25px 0 18px}
+.cart-page-intro h2{font-size:32px;margin:7px 0 5px}.cart-page-intro p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}
+.cart-count-pill{padding:9px 12px;border:1px solid var(--line);border-radius:999px;color:var(--gold2);font-size:10px;font-weight:900;white-space:nowrap}
+.cart-page-content{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+.cart-items-panel,.cart-summary{border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,#171720,#09090d);box-shadow:0 16px 40px rgba(0,0,0,.2)}
+.cart-items-panel{padding:19px}.cart-items-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.07)}
+.cart-items-heading h3,.cart-summary h3{font:700 18px 'Playfair Display',serif;margin:0}
+.cart-items-heading button{border:0;background:transparent;color:#c7bda4;font-size:10px;text-decoration:underline}
+.cart-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.cart-row:last-child{border-bottom:0}
+.cart-row strong{color:var(--text)}.cart-row .hint{display:block;margin-top:5px;color:var(--gold2)}
+.qty-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}.qty-controls button{width:29px;height:29px;border:1px solid var(--line);border-radius:8px;background:#171720;color:var(--gold2);font-weight:900}
+.qty-controls strong{min-width:12px;text-align:center;font-size:11px}.qty-controls [data-remove]{width:auto;padding:0 8px;color:#e89aa2;font-size:10px}
+.cart-items-footer{padding-top:15px;border-top:1px solid rgba(255,255,255,.07)}.cart-continue{border:1px solid var(--line);border-radius:12px;padding:11px 14px;background:rgba(212,175,55,.06);color:var(--gold2);font-size:11px;font-weight:800}
+.cart-summary{position:sticky;top:18px;padding:20px}.cart-summary h3{margin-bottom:17px}
+.cart-summary-line{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;color:#b8b4aa;font-size:11px}.cart-summary-line strong{color:var(--text);font-size:12px}
+.cart-summary-line .free-label{color:#86d4a3}.cart-grand-total{margin-top:7px;padding-top:15px;border-top:1px solid var(--line)}.cart-grand-total span{color:var(--gold2);font-weight:900}.cart-grand-total strong{color:var(--gold2);font:900 23px Cinzel,serif}
+.cart-progress-wrap{margin:15px 0 13px;padding:12px;border:1px solid rgba(212,175,55,.18);border-radius:13px;background:rgba(212,175,55,.05)}
+.cart-progress-copy{display:flex;justify-content:space-between;gap:8px;color:#e6d9b1;font-size:10px;font-weight:800}
+.cart-progress-track{height:6px;margin-top:9px;overflow:hidden;border-radius:99px;background:#292630}.cart-progress-fill{display:block;width:0;height:100%;border-radius:99px;background:linear-gradient(90deg,#9f7612,#f3e5ab);transition:width .2s ease}
+.cart-checkout{width:100%;border-radius:13px;padding:14px 13px;font-size:11px;font-weight:900}.cart-checkout:disabled{opacity:.45;cursor:not-allowed}
+.cart-payment-note{margin:12px 0 0;color:#a8a294;font-size:10px;line-height:1.6;text-align:center}.cart-payment-note i{color:var(--gold2);margin-right:4px}
+@media(max-width:760px){body.cart-page-open #cartSection{padding:10px 13px calc(25px + env(safe-area-inset-bottom))}.cart-page-content{grid-template-columns:1fr;gap:13px}.cart-summary{position:static;padding:17px}.cart-items-panel{padding:14px}.cart-page-intro{padding:20px 0 15px}.cart-page-intro h2{font-size:26px}.cart-row{grid-template-columns:minmax(0,1fr);gap:10px}.qty-controls{justify-content:flex-start}}
+@media(max-width:420px){.cart-page-brand strong{font-size:10px}.cart-page-brand span{font-size:8px}.cart-back{padding:9px 10px;font-size:10px}.cart-page-intro h2{font-size:24px}}
+
 </style>
 </head>
 <body>
@@ -122,15 +156,37 @@ h1{font-size:clamp(30px,5vw,46px);line-height:1.12;margin-top:12px;max-width:650
    <div class="sectionhead"><div class="kicker">Curated for you</div><h2>Signature packages</h2><p>Complete beauty experiences at special package prices.</p></div>
    <div id="packageCards" class="packages"></div>
   </section>
-  <section id="cartSection" class="section hidden">
-   <div class="sectionhead"><div class="kicker">Your selection</div><h2>Service cart</h2><p>Add services and packages together. Minimum booking value is ₹1,500.</p></div>
-   <div class="cart-summary">
-    <div id="cartItems"></div>
-    <div class="flex items-center justify-between gap-3 pt-3 mt-2 border-t" style="border-color:var(--line)">
-     <div><div class="hint">Cart total</div><div id="cartTotal" class="price" style="font-size:22px;margin-top:4px">₹0</div></div>
-     <button id="checkoutButton" class="goldbtn" type="button" disabled>Continue to booking</button>
+  <section id="cartSection" class="section hidden" aria-label="Shopping cart">
+   <div class="cart-page-shell">
+    <header class="cart-page-header">
+     <div class="cart-page-brand"><img src="/the-anamika-lux-logo.png" alt="The Anamika Lux logo"><div><strong>THE ANAMIKA LUX</strong><span>Doorstep Beauty • Patna</span></div></div>
+     <button class="cart-back" type="button" onclick="closeCartPage()"><i class="fa-solid fa-arrow-left"></i> Continue shopping</button>
+    </header>
+    <div class="cart-page-intro">
+     <div><div class="kicker">Your shopping bag</div><h2>Shopping Cart</h2><p>Review your selected services and packages before checkout.</p></div>
+     <span id="cartPageCount" class="cart-count-pill">0 ITEMS</span>
     </div>
-    <p id="cartMinimumMessage" class="hint" style="margin-top:9px">Add items worth ₹1,500 to continue.</p>
+    <div class="cart-page-content">
+     <div class="cart-items-panel">
+      <div class="cart-items-heading"><h3>Your items</h3><button id="clearCartButton" type="button" onclick="clearCart()">Clear cart</button></div>
+      <div id="cartItems"></div>
+      <div class="cart-items-footer"><button class="cart-continue" type="button" onclick="closeCartPage()"><i class="fa-solid fa-arrow-left"></i> Continue shopping</button></div>
+     </div>
+     <aside class="cart-summary">
+      <h3>Order Summary</h3>
+      <div class="cart-summary-line"><span>Subtotal</span><strong id="cartTotal">₹0</strong></div>
+      <div class="cart-summary-line"><span>Doorstep fee</span><strong class="free-label">FREE</strong></div>
+      <div class="cart-summary-line"><span>Booking fee</span><strong>₹0</strong></div>
+      <div class="cart-summary-line cart-grand-total"><span>Estimated total</span><strong id="cartGrandTotal">₹0</strong></div>
+      <div class="cart-progress-wrap">
+       <div class="cart-progress-copy"><span>Minimum booking ₹1,500</span><span id="cartProgressText">0%</span></div>
+       <div class="cart-progress-track"><span id="cartProgressBar" class="cart-progress-fill"></span></div>
+       <p id="cartMinimumMessage" class="hint">Add items worth ₹1,500 to continue.</p>
+      </div>
+      <button id="checkoutButton" class="goldbtn cart-checkout" type="button" disabled>Continue to booking <i class="fa-solid fa-arrow-right"></i></button>
+      <p class="cart-payment-note"><i class="fa-solid fa-shield-halved"></i> No advance payment. Our team confirms your slot by phone; pay after service.</p>
+     </aside>
+    </div>
    </div>
   </section>
   <div class="info"><i class="fa-solid fa-circle-info" style="color:var(--gold)"></i> No advance payment is required. Our team will contact you to confirm service availability and your appointment slot. Payment is after the service.</div>
@@ -231,9 +287,21 @@ function changeCartQty(index,change){
  const item=cart[index];if(!item)return;item.qty+=change;if(item.qty<=0)cart.splice(index,1);renderCart();
 }
 function removeCartItem(index){cart.splice(index,1);renderCart();}
-function scrollToCart(){byId("cartSection").scrollIntoView({behavior:"smooth",block:"center"});}
+function scrollToCart(){
+ if(!cart.length)return;
+ byId("cartSection").classList.remove("hidden");
+ document.body.classList.add("cart-page-open");
+ byId("cartSection").scrollTop=0;
+}
+function closeCartPage(){document.body.classList.remove("cart-page-open");}
+function clearCart(){cart=[];renderCart();closeCartPage();}
 function renderCart(){
  const total=cartTotal(),quantity=cart.reduce((sum,item)=>sum+item.qty,0);
+ if(!cart.length)document.body.classList.remove("cart-page-open");
+ if(byId("cartPageCount"))byId("cartPageCount").textContent=quantity+" ITEM"+(quantity===1?"":"S");
+ if(byId("cartGrandTotal"))byId("cartGrandTotal").textContent=money(total);
+ if(byId("cartProgressBar"))byId("cartProgressBar").style.width=Math.min(total/MIN_ORDER_VALUE*100,100)+"%";
+ if(byId("cartProgressText"))byId("cartProgressText").textContent=Math.min(Math.round(total/MIN_ORDER_VALUE*100),100)+"%";
  byId("cartSection").classList.toggle("hidden",cart.length===0);byId("cartDock").classList.toggle("hidden",cart.length===0);
  byId("cartDockCount").textContent=quantity+" item"+(quantity===1?"":"s")+" in cart";
  byId("cartDockTotal").textContent=money(total);byId("cartTotal").textContent=money(total);
@@ -244,7 +312,7 @@ function renderCart(){
  byId("cartItems").querySelectorAll("[data-remove]").forEach(button=>button.addEventListener("click",()=>removeCartItem(Number(button.dataset.remove))));
  const remaining=Math.max(MIN_ORDER_VALUE-total,0),ready=total>=MIN_ORDER_VALUE,checkout=byId("checkoutButton");
  checkout.disabled=!ready;checkout.classList.toggle("opacity-50",!ready);checkout.classList.toggle("cursor-not-allowed",!ready);
- checkout.textContent=ready?"Continue to booking":"Add "+money(remaining)+" more";
+ checkout.innerHTML=ready?'Continue to booking <i class="fa-solid fa-arrow-right"></i>':"Add "+money(remaining)+" more";
  byId("cartMinimumMessage").textContent=ready?"Minimum order reached. You can continue.":"Minimum order is "+money(MIN_ORDER_VALUE)+". Add "+money(remaining)+" more to book.";
 }
 function openBooking(){
