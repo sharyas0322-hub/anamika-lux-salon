@@ -1,0 +1,17 @@
+{
+  "name": "the-anamika-lux-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Android app wrapper for The Anamika Lux",
+  "scripts": {
+    "prepare:web": "node scripts/prepare-web.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.2",
+    "@capacitor/core": "8.6.2"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "8.6.2"
+  }
+}

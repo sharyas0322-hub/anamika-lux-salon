@@ -1,0 +1,111 @@
+name: Build THE ANAMIKA LUX Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "index.html"
+      - "booking.html"
+      - "app.html"
+      - "admin.html"
+      - "sw.js"
+      - "app-icon.svg"
+      - "the-anamika-lux-logo.png"
+      - "package.json"
+      - "capacitor.config.json"
+      - "scripts/**"
+      - ".github/workflows/android-apk.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build installable Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out website
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Install Capacitor dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Prepare website files
+        run: npm run prepare:web
+
+      - name: Create Android project
+        run: npx cap add android
+
+      - name: Generate Android icons from the exact website favicon
+        run: |
+          mkdir -p assets
+          convert the-anamika-lux-logo.png \
+            -resize 1024x1024 \
+            -background "#050507" \
+            -gravity center \
+            -extent 1024x1024 \
+            -alpha remove -alpha off \
+            assets/icon.png
+          npx capacitor-assets generate --android \
+            --iconBackgroundColor "#050507" \
+            --iconBackgroundColorDark "#050507" \
+            --splashBackgroundColor "#050507" \
+            --splashBackgroundColorDark "#050507"
+
+      - name: Sync web app and native assets
+        run: npx cap sync android
+
+      - name: Build APK
+        run: |
+          cd android
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Prepare APK artifact
+        run: |
+          mkdir -p artifacts
+          cp android/app/build/outputs/apk/debug/app-debug.apk artifacts/THE-ANAMIKA-LUX.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: THE-ANAMIKA-LUX-Android-APK
+          path: artifacts/THE-ANAMIKA-LUX.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish latest APK download
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-apk
+          target_commitish: main
+          name: THE ANAMIKA LUX - Android APK
+          body: |
+            Installable Android build of THE ANAMIKA LUX.
+
+            The launcher icon is generated from the same website favicon file: the-anamika-lux-logo.png.
+            This is a debug-signed APK for direct Android installation, not a Play Store release.
+          files: artifacts/THE-ANAMIKA-LUX.apk
+          overwrite_files: true
+          fail_on_unmatched_files: true
+          make_latest: true
