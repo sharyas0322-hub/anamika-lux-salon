@@ -60,6 +60,11 @@ jobs:
       - name: Create Android project
         run: npx cap add android
 
+      - name: Install image conversion utility
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y imagemagick
+
       - name: Generate Android icons from the exact website favicon
         run: |
           mkdir -p assets
