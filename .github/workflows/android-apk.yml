@@ -25,6 +25,7 @@ jobs:
   build:
     name: Build installable Android APK
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
       - name: Check out website
         uses: actions/checkout@v4
