@@ -299,7 +299,65 @@
             .creator-credit-role { font-size: 12px; }
         }
 
-    </style>
+    
+        /* Dedicated ecommerce-style cart page */
+        .cart-page{position:fixed;inset:0;z-index:60;overflow-y:auto;background:radial-gradient(900px 480px at 95% -10%,rgba(212,175,55,.14),transparent 60%),#050507;color:#f7f3e8}
+        .cart-page-inner{max-width:1120px;margin:0 auto;padding:16px 20px 40px}
+        .cart-page-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:9px 0 17px;border-bottom:1px solid rgba(212,175,55,.2)}
+        .cart-back{display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(212,175,55,.35);border-radius:12px;padding:10px 13px;background:#101017;color:#f3e5ab;font-size:12px;font-weight:800}
+        .cart-page-brand{display:flex;align-items:center;gap:10px}
+        .cart-page-brand img{width:42px;height:42px;object-fit:contain;border:1px solid rgba(212,175,55,.28);border-radius:10px}
+        .cart-page-brand strong{display:block;font:800 12px Cinzel,serif;letter-spacing:.12em}
+        .cart-page-brand span{display:block;margin-top:3px;color:#bcae82;font-size:9px;letter-spacing:.12em;text-transform:uppercase}
+        .cart-page-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:27px 0 20px}
+        .cart-page-eyebrow{color:#e7ce75;font-size:10px;font-weight:900;letter-spacing:.2em;text-transform:uppercase}
+        .cart-page-intro h1{margin:7px 0 5px;font:700 clamp(27px,4vw,38px) 'Playfair Display',serif;line-height:1.12}
+        .cart-page-intro p{margin:0;color:#aaa69a;font-size:12px;line-height:1.6}
+        .cart-count-pill{padding:9px 12px;border:1px solid rgba(212,175,55,.3);border-radius:999px;color:#f3e5ab;font-size:10px;font-weight:900;white-space:nowrap}
+        .cart-page-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+        .cart-items-panel,.cart-summary-panel{border:1px solid rgba(212,175,55,.24);border-radius:20px;background:linear-gradient(145deg,rgba(23,23,32,.98),rgba(9,9,13,.98));box-shadow:0 16px 40px rgba(0,0,0,.2)}
+        .cart-items-panel{padding:19px}
+        .cart-panel-title{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.07)}
+        .cart-panel-title h2,.cart-summary-panel h2{margin:0;font:700 18px 'Playfair Display',serif}
+        .cart-clear{border:0;background:transparent;color:#c7bda4;font-size:10px;text-decoration:underline;text-underline-offset:3px}
+        .cart-page-item{display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:13px;padding:17px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+        .cart-page-item:last-child{border-bottom:0}
+        .cart-item-icon{width:50px;height:50px;display:grid;place-items:center;border:1px solid rgba(212,175,55,.27);border-radius:14px;background:rgba(212,175,55,.08);color:#e7ce75;font-size:17px}
+        .cart-item-info{min-width:0}
+        .cart-item-category{display:block;margin-bottom:5px;color:#c6a94c;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+        .cart-item-info strong{display:block;color:#f5f1e7;font-size:13px;line-height:1.4}
+        .cart-item-info small{display:block;margin-top:5px;color:#aaa69a;font-size:10px}
+        .cart-item-side{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+        .cart-item-line-total{color:#f3e5ab;font-size:13px;font-weight:900;white-space:nowrap}
+        .cart-item-qty{display:flex;align-items:center;gap:9px}
+        .cart-item-qty button{width:27px;height:27px;border:1px solid rgba(212,175,55,.3);border-radius:8px;background:#101017;color:#f3e5ab;font-weight:900}
+        .cart-item-qty span{min-width:12px;text-align:center;color:#fff;font-size:11px;font-weight:800}
+        .cart-item-remove{border:0;background:transparent;color:#e89aa2;font-size:10px;text-decoration:underline;text-underline-offset:3px}
+        .cart-items-footer{padding-top:15px;border-top:1px solid rgba(255,255,255,.07)}
+        .cart-continue{border:1px solid rgba(212,175,55,.34);border-radius:12px;padding:11px 14px;background:rgba(212,175,55,.06);color:#f3e5ab;font-size:11px;font-weight:800}
+        .cart-summary-panel{position:sticky;top:18px;padding:20px}
+        .cart-summary-panel h2{margin-bottom:17px}
+        .cart-summary-line{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;color:#b8b4aa;font-size:11px}
+        .cart-summary-line strong{color:#f3eee3;font-size:12px}
+        .cart-summary-total{margin-top:7px;padding-top:15px;border-top:1px solid rgba(212,175,55,.23)}
+        .cart-summary-total span{color:#f3e5ab;font-weight:900}
+        .cart-summary-total strong{color:#f3e5ab;font:900 23px Cinzel,serif}
+        .cart-progress-wrap{margin:15px 0 13px;padding:12px;border:1px solid rgba(212,175,55,.18);border-radius:13px;background:rgba(212,175,55,.05)}
+        .cart-progress-copy{display:flex;justify-content:space-between;gap:8px;color:#e6d9b1;font-size:10px;font-weight:800}
+        .cart-progress-track{height:6px;margin-top:9px;overflow:hidden;border-radius:99px;background:#292630}
+        .cart-progress-fill{display:block;width:0;height:100%;border-radius:99px;background:linear-gradient(90deg,#9f7612,#f3e5ab);transition:width .2s ease}
+        .cart-minimum-message{margin:8px 0 0;color:#b7b0a0;font-size:10px;line-height:1.5}
+        .cart-checkout-button{width:100%;border:0;border-radius:13px;padding:14px 13px;background:linear-gradient(120deg,#f3e5ab,#d4af37,#9f7612);color:#090909;font-size:11px;font-weight:900;letter-spacing:.04em}
+        .cart-checkout-button:disabled{opacity:.45;cursor:not-allowed}
+        .cart-payment-note{margin:12px 0 0;color:#a8a294;font-size:10px;line-height:1.6;text-align:center}
+        .cart-empty-state{max-width:520px;margin:54px auto;padding:32px 22px;border:1px solid rgba(212,175,55,.25);border-radius:22px;background:#101017;text-align:center}
+        .cart-empty-icon{width:64px;height:64px;margin:0 auto 15px;display:grid;place-items:center;border:1px solid rgba(212,175,55,.28);border-radius:20px;background:rgba(212,175,55,.08);color:#e7ce75;font-size:24px}
+        .cart-empty-state h2{margin:0;font:700 24px 'Playfair Display',serif}
+        .cart-empty-state p{margin:9px 0 18px;color:#aaa69a;font-size:12px;line-height:1.6}
+        @media(max-width:760px){.cart-page-inner{padding:10px 13px calc(26px + env(safe-area-inset-bottom))}.cart-page-layout{grid-template-columns:1fr;gap:13px}.cart-summary-panel{position:static}.cart-page-intro{padding:21px 0 16px}.cart-page-item{grid-template-columns:44px minmax(0,1fr) auto;gap:10px;padding:14px 0}.cart-item-icon{width:42px;height:42px;border-radius:12px}.cart-item-info strong{font-size:12px}.cart-item-side{gap:7px}.cart-items-panel{padding:14px}.cart-summary-panel{padding:17px}}
+        @media(max-width:380px){.cart-page-brand strong{font-size:10px}.cart-page-brand span{font-size:8px}.cart-back{padding:9px 10px;font-size:10px}.cart-item-qty{gap:6px}.cart-item-line-total{font-size:11px}}
+
+</style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="text-neutral-200 font-sans min-h-screen relative overflow-x-hidden antialiased">
@@ -549,6 +607,51 @@
             </div>
         </footer>
     </main>
+
+
+    <!-- Dedicated cart page, opened from the View Cart action -->
+    <section id="cartPageView" class="cart-page hidden" role="dialog" aria-modal="true" aria-label="Your shopping cart">
+        <div class="cart-page-inner">
+            <header class="cart-page-header">
+                <button type="button" class="cart-back" onclick="closeCartPage()"><i class="fa-solid fa-arrow-left"></i><span>Continue shopping</span></button>
+                <div class="cart-page-brand">
+                    <img src="/the-anamika-lux-logo.png" alt="The Anamika Lux logo">
+                    <div><strong>THE ANAMIKA LUX</strong><span>Doorstep Beauty • Patna</span></div>
+                </div>
+            </header>
+            <div class="cart-page-intro">
+                <div><span class="cart-page-eyebrow">Your shopping bag</span><h1>Shopping Cart</h1><p>Review your selected services and packages before checkout.</p></div>
+                <span id="cartPageCount" class="cart-count-pill">0 ITEMS</span>
+            </div>
+            <div id="cartPageEmpty" class="cart-empty-state hidden">
+                <div class="cart-empty-icon"><i class="fa-solid fa-basket-shopping"></i></div>
+                <h2>Your cart is empty</h2>
+                <p>Explore our salon menu and add the services or packages you would love to book.</p>
+                <button type="button" class="cart-checkout-button" onclick="closeCartPage()">Browse services</button>
+            </div>
+            <div id="cartPageLayout" class="cart-page-layout">
+                <div class="cart-items-panel">
+                    <div class="cart-panel-title"><h2>Your items</h2><button id="cartPageClear" type="button" class="cart-clear">Clear cart</button></div>
+                    <div id="cartPageItems"></div>
+                    <div class="cart-items-footer"><button type="button" class="cart-continue" onclick="closeCartPage()"><i class="fa-solid fa-arrow-left mr-2"></i> Continue shopping</button></div>
+                </div>
+                <aside class="cart-summary-panel">
+                    <h2>Order Summary</h2>
+                    <div class="cart-summary-line"><span>Subtotal</span><strong id="cartPageSubtotal">₹0</strong></div>
+                    <div class="cart-summary-line"><span>Doorstep fee</span><strong class="text-emerald-300">FREE</strong></div>
+                    <div class="cart-summary-line"><span>Booking fee</span><strong>₹0</strong></div>
+                    <div class="cart-summary-line cart-summary-total"><span>Estimated total</span><strong id="cartPageTotal">₹0</strong></div>
+                    <div class="cart-progress-wrap">
+                        <div class="cart-progress-copy"><span>Minimum booking ₹1,500</span><span id="cartPageProgressText">0%</span></div>
+                        <div class="cart-progress-track"><span id="cartPageProgress" class="cart-progress-fill"></span></div>
+                        <p id="cartPageMinimumText" class="cart-minimum-message">Add services worth ₹1,500 to continue.</p>
+                    </div>
+                    <button id="cartPageCheckout" type="button" class="cart-checkout-button" disabled onclick="bookServiceCart()">Continue to booking <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                    <p class="cart-payment-note"><i class="fa-solid fa-shield-halved mr-1"></i> No online payment required. Our team confirms your slot by phone; pay after service.</p>
+                </aside>
+            </div>
+        </div>
+    </section>
 
     <!-- Native App Bottom Navigation Dock (Sticky on Mobile) -->
     <div class="fixed bottom-0 left-0 right-0 z-40 bg-obsidian-950/95 backdrop-blur-xl border-t border-gold-500/25 px-4 py-2.5 sm:hidden flex items-center justify-between gap-3 shadow-[0_-10px_25px_rgba(0,0,0,0.8)]">
@@ -1266,8 +1369,77 @@ window.addEventListener('DOMContentLoaded', () => {
         window.renderServiceCartSummary();
     };
 
+    function renderFullCartPage() {
+        var cart = Array.isArray(window.serviceCart) ? window.serviceCart : [];
+        var quantity = cart.reduce(function (sum, item) { return sum + Number(item.qty || 0); }, 0);
+        var total = cart.reduce(function (sum, item) { return sum + Number(item.price || 0) * Number(item.qty || 0); }, 0);
+        var count = document.getElementById("cartPageCount");
+        var empty = document.getElementById("cartPageEmpty");
+        var layout = document.getElementById("cartPageLayout");
+        var items = document.getElementById("cartPageItems");
+        if (!count || !empty || !layout || !items) return;
+        count.textContent = quantity + " ITEM" + (quantity === 1 ? "" : "S");
+        empty.classList.toggle("hidden", cart.length > 0);
+        layout.classList.toggle("hidden", cart.length === 0);
+
+        items.innerHTML = cart.map(function (item, index) {
+            var icon = item.type === "package" ? "fa-gift" : "fa-spa";
+            return '<article class="cart-page-item">'
+                + '<div class="cart-item-icon"><i class="fa-solid ' + icon + '"></i></div>'
+                + '<div class="cart-item-info"><span class="cart-item-category">' + escapeMenuText(item.category || (item.type === "package" ? "Package" : "Salon service")) + '</span>'
+                + '<strong>' + escapeMenuText(item.name) + '</strong><small>' + formatINR(item.price) + ' each</small></div>'
+                + '<div class="cart-item-side"><strong class="cart-item-line-total">' + formatINR(item.price * item.qty) + '</strong>'
+                + '<div class="cart-item-qty"><button type="button" aria-label="Decrease quantity" data-page-minus="' + index + '">−</button><span>' + item.qty + '</span><button type="button" aria-label="Increase quantity" data-page-plus="' + index + '">+</button></div>'
+                + '<button type="button" class="cart-item-remove" data-page-remove="' + index + '">Remove</button></div></article>';
+        }).join("");
+
+        var subtotal = document.getElementById("cartPageSubtotal");
+        var grandTotal = document.getElementById("cartPageTotal");
+        var progress = document.getElementById("cartPageProgress");
+        var progressText = document.getElementById("cartPageProgressText");
+        var minimumText = document.getElementById("cartPageMinimumText");
+        var checkout = document.getElementById("cartPageCheckout");
+        var clear = document.getElementById("cartPageClear");
+        var remaining = Math.max(1500 - total, 0);
+        var ready = cart.length > 0 && total >= 1500;
+        if (subtotal) subtotal.textContent = formatINR(total);
+        if (grandTotal) grandTotal.textContent = formatINR(total);
+        if (progress) progress.style.width = Math.min(total / 1500 * 100, 100) + "%";
+        if (progressText) progressText.textContent = Math.min(Math.round(total / 1500 * 100), 100) + "%";
+        if (minimumText) minimumText.textContent = ready ? "Minimum order reached. You can continue to booking." : "Add " + formatINR(remaining) + " more to reach the ₹1,500 minimum.";
+        if (checkout) checkout.disabled = !ready;
+        if (clear) clear.disabled = cart.length === 0;
+
+        items.querySelectorAll("[data-page-minus]").forEach(function (button) {
+            button.addEventListener("click", function () { window.changeServiceCartQty(Number(button.dataset.pageMinus), -1); });
+        });
+        items.querySelectorAll("[data-page-plus]").forEach(function (button) {
+            button.addEventListener("click", function () { window.changeServiceCartQty(Number(button.dataset.pagePlus), 1); });
+        });
+        items.querySelectorAll("[data-page-remove]").forEach(function (button) {
+            button.addEventListener("click", function () { window.removeServiceFromCart(Number(button.dataset.pageRemove)); });
+        });
+        if (clear) clear.onclick = function () { window.clearServiceCart(); };
+    }
+
+    window.openCartPage = function () {
+        renderFullCartPage();
+        var page = document.getElementById("cartPageView");
+        if (!page) return;
+        page.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+        page.scrollTop = 0;
+    };
+
+    window.closeCartPage = function () {
+        var page = document.getElementById("cartPageView");
+        if (page) page.classList.add("hidden");
+        document.body.style.overflow = "";
+    };
+
     window.renderServiceCartSummary = function () {
         var panel = document.getElementById("serviceCartSummary");
+        renderFullCartPage();
         if (!panel) return;
 
         var quantity = getCartQuantity();
@@ -1300,7 +1472,8 @@ window.addEventListener('DOMContentLoaded', () => {
         panel.innerHTML = '<div class="glass-card-featured rounded-2xl p-4 sm:p-5">'
             + '<div class="flex items-center justify-between gap-3 mb-2"><div><span class="text-[10px] uppercase tracking-wider text-gold-300">Your Selection</span>'
             + '<h3 class="font-cinzel text-base font-bold text-white">Service Cart (' + quantity + ')</h3></div>'
-            + '<button type="button" id="clearServiceCart" class="text-[10px] text-neutral-400 underline">Clear cart</button></div>'
+            + '<div class="flex items-center gap-3"><button type="button" id="openFullCartButton" class="text-[10px] text-gold-300 underline">View full cart</button>'
+            + '<button type="button" id="clearServiceCart" class="text-[10px] text-neutral-400 underline">Clear cart</button></div></div>'
             + rows
             + '<div class="flex items-center justify-between gap-3 pt-3 mt-2 border-t border-gold-500/20"><div><span class="text-[10px] text-neutral-400 uppercase">Estimated Total</span>'
             + '<p class="text-2xl font-cinzel font-black text-gold-300">' + formatINR(total) + '</p></div>'
@@ -1318,6 +1491,8 @@ window.addEventListener('DOMContentLoaded', () => {
             button.addEventListener("click", function () { window.removeServiceFromCart(Number(button.dataset.cartRemove)); });
         });
 
+        var openFullCartButton = document.getElementById("openFullCartButton");
+        if (openFullCartButton) openFullCartButton.addEventListener("click", window.openCartPage);
         var clearButton = document.getElementById("clearServiceCart");
         if (clearButton) clearButton.addEventListener("click", window.clearServiceCart);
         var bookButton = document.getElementById("bookServiceCartBtn");
@@ -1325,8 +1500,7 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     window.scrollToServiceCart = function () {
-        var target = document.getElementById("serviceCartSummary") || document.getElementById("serviceMenu");
-        if (target) target.scrollIntoView({behavior:"smooth", block:"center"});
+        window.openCartPage();
     };
 
     window.bookServiceCart = function () {
