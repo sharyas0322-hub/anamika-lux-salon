@@ -653,7 +653,7 @@ async function checkForAppUpdate(){
     const response=await fetch("/app-version.json?ts="+Date.now(),{cache:"no-store"});
     if(!response.ok)return;
     const latest=await response.json();
-    const currentVersion="1.0.0";
+    const currentVersion="1.0.1";
     if(!latest.version||latest.version===currentVersion)return;
     const key="anamika-lux-dismissed-update-"+latest.version;
     if(sessionStorage.getItem(key))return;
