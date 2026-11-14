@@ -646,6 +646,25 @@ function startRealtime(){
 window.addEventListener("online",()=>toast("You are back online."));
 
 
+
+// In-app update check: reads the latest release metadata without changing the app's normal flow.
+async function checkForAppUpdate(){
+  try{
+    const response=await fetch("/app-version.json?ts="+Date.now(),{cache:"no-store"});
+    if(!response.ok)return;
+    const latest=await response.json();
+    const currentVersion="1.0.0";
+    if(!latest.version||latest.version===currentVersion)return;
+    const key="anamika-lux-dismissed-update-"+latest.version;
+    if(sessionStorage.getItem(key))return;
+    const root=document.createElement("div");
+    root.id="appUpdatePrompt";
+    root.className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/70 p-4";
+    root.innerHTML='<div class="glass w-full max-w-md rounded-[28px] p-6 text-center"><div class="mx-auto mb-4 w-14 h-14 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] text-2xl"><i class="fa-solid fa-arrow-up-right-dots"></i></div><p class="text-[11px] uppercase tracking-[.2em] text-[#D4AF37] font-bold">New version available</p><h2 class="serif text-2xl mt-2">A better Anamika Lux is ready</h2><p class="text-sm text-[#A3A3A3] mt-3">'+(latest.message||"Update for the latest improvements and a smoother experience.")+'</p><div class="mt-6 grid gap-2"><a class="btn-main block text-center" href="'+latest.apkUrl+'">Update now</a><button class="btn-soft" onclick="sessionStorage.setItem(\''+key+'\',\'1\');document.getElementById(\'appUpdatePrompt\').remove()">Not now</button></div></div>';
+    document.body.appendChild(root);
+  }catch(error){console.warn("Update check skipped",error);}
+}
+checkForAppUpdate();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
 })();
 </script>
