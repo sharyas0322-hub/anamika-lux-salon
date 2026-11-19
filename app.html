@@ -320,6 +320,7 @@ async function loadWorkspace(){
   if(p.error)throw p.error;if(a.error)throw a.error;if(bp.error)throw bp.error;
   if(!p.data)throw new Error("Profile is not ready. Please use Forgot password or contact support.");
   profile=p.data;isAdmin=!!a.data;beauticianProfile=bp.data||null;
+  if(isAdmin){await db.auth.signOut();currentUser=null;profile=null;isAdmin=false;authMessage("Owner dashboard is available only through the private website admin portal.",true);return;}
   $("authScreen").classList.add("hide");$("appScreen").classList.remove("hide");
   $("headerGreeting").textContent="Hello, "+(profile.full_name||"Welcome");
   if(isAdmin){activeTab="admin";await loadAdminData();}
