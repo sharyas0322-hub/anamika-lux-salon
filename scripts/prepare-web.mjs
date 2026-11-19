@@ -11,7 +11,6 @@ const siteFiles = [
   "index.html",
   "booking.html",
   "app.html",
-  "admin.html",
   "sw.js",
   "brand-settings.js",
   "app-version.json",
