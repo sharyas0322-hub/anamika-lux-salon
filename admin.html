@@ -478,7 +478,7 @@
                     </div>
                     <section class="glass-card rounded-2xl p-4 sm:p-5 border-gold-500/30 space-y-3">
                         <div class="flex flex-wrap items-center justify-between gap-2">
-                            <div><h3 class="font-cinzel text-sm font-bold text-gold-200">Combo Packages</h3><p class="text-[10px] text-neutral-400">5 regular combos plus 2 printed signature packages.</p></div>
+                            <div><h3 class="font-cinzel text-sm font-bold text-gold-200">Combo Packages</h3><p class="text-[10px] text-neutral-400">All active combo packages plus 2 printed signature packages.</p></div>
                             <button type="button" onclick="resetPackagesToDefault()" class="text-[10px] text-neutral-400 underline">Reset regular combos</button>
                         </div>
                         <div class="rounded-2xl border border-gold-500/20 bg-obsidian-900 p-4 space-y-3">
@@ -1863,7 +1863,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const bookings = results[3].data || [];
     window.ANAMIKA_PACKAGES = packages.filter(function (p) { return p.package_type === "combo"; }).map(function (p) {
       return {id:p.package_id, name:p.name, price:Number(p.price), originalPrice:Number(p.original_price),
-        category:p.category, badge:p.badge, desc:p.description, imageUrl:p.image_url || "",
+        category:p.category, badge:p.badge, desc:p.description, imageUrl:p.image_url || "", sortOrder:p.sort_order || 0,
         inclusions:Array.isArray(p.inclusions)?p.inclusions:[]};
     });
     const signature = packages.find(function (p) { return p.package_type === "signature"; });
