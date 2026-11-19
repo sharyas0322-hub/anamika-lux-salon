@@ -12,7 +12,9 @@ const siteFiles = [
   "booking.html",
   "app.html",
   "admin.html",
-  "sw.js",\n  "brand-settings.js",\n  "app-version.json",
+  "sw.js",
+  "brand-settings.js",
+  "app-version.json",
   "app-icon.svg",
   "the-anamika-lux-logo.png"
 ];
