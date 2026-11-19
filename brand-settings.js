@@ -152,12 +152,12 @@
         <div class="flex-1 min-w-0"><label class="field-label">Upload new logo</label>
         <input id="brandLogoFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="w-full text-xs text-neutral-300"></div>
       </div>
-      <div><label class="field-label">Primary brand colour</label><div class="flex items-center gap-3">
+      <div><label class="block text-[10px] text-neutral-400 uppercase font-semibold mb-1">Primary brand colour</label><div class="flex items-center gap-3">
         <input id="brandColorInput" type="color" value="#D4AF37" class="w-12 h-11 rounded-lg border-0 bg-transparent">
         <span id="brandColorValue" class="text-xs font-mono text-neutral-300">#D4AF37</span></div></div>
-      <div><label class="field-label">Latest APK version</label><input id="brandAppVersion" type="text" value="1.0.1" placeholder="e.g. 1.0.2" class="w-full field"></div>
-      <div><label class="field-label">APK download URL</label><input id="brandApkUrl" type="url" class="w-full field" placeholder="https://.../THE-ANAMIKA-LUX.apk"></div>
-      <div><label class="field-label">Update notification message</label><textarea id="brandUpdateMessage" rows="2" class="w-full field" placeholder="What's new in this update?"></textarea></div>
+      <div><label class="block text-[10px] text-neutral-400 uppercase font-semibold mb-1">Latest APK version</label><input id="brandAppVersion" type="text" value="1.0.2" placeholder="e.g. 1.0.3" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold-400"></div>
+      <div><label class="block text-[10px] text-neutral-400 uppercase font-semibold mb-1">APK download URL</label><input id="brandApkUrl" type="url" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold-400" placeholder="https://.../THE-ANAMIKA-LUX.apk"></div>
+      <div><label class="block text-[10px] text-neutral-400 uppercase font-semibold mb-1">Update notification message</label><textarea id="brandUpdateMessage" rows="2" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold-400" placeholder="What's new in this update?"></textarea></div>
       <button id="saveBrandSettingsBtn" type="button" class="btn-gold-solid w-full rounded-xl py-3 font-extrabold">Save & publish settings</button>
       <p class="text-[10px] text-neutral-500">APK updates download a new installer. Android may ask the user to confirm installation.</p>`;
     settingsTab.appendChild(panel);
