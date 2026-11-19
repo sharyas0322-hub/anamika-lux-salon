@@ -865,8 +865,12 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
 
             container.innerHTML = filtered.map(pkg => {
                 const isFeatured = pkg.id === 'pkg5' || pkg.badge.includes('Royal');
+                const rawImageUrl = String(pkg.imageUrl || "").trim();
+                const safeImageUrl = (rawImageUrl.startsWith("https://") || rawImageUrl.startsWith("http://") || rawImageUrl.startsWith("/")) ? rawImageUrl.replace(/["'<>]/g, "") : "";
+                const imageBlock = safeImageUrl ? `<img src="${safeImageUrl}" alt="Package photo" loading="lazy" class="w-full h-44 sm:h-52 object-cover rounded-2xl mb-4 border border-gold-500/20">` : "";
                 return `
                     <div class="${isFeatured ? 'glass-card-featured' : 'glass-card'} rounded-3xl p-5 sm:p-7 relative overflow-hidden transition-all">
+                        ${imageBlock}
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                             <div>
                                 <span class="inline-block text-[10px] uppercase font-cinzel font-bold text-gold-400 tracking-wider bg-gold-500/10 border border-gold-500/30 px-3 py-1 rounded-full mb-1">
@@ -1633,7 +1637,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }).map(function (p) {
       return {
         id: p.package_id, name: p.name, price: Number(p.price), originalPrice: Number(p.original_price),
-        category: p.category, badge: p.badge, desc: p.description,
+        category: p.category, badge: p.badge, desc: p.description, imageUrl: p.image_url || "",
         inclusions: Array.isArray(p.inclusions) ? p.inclusions : []
       };
     })));
