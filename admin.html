@@ -231,6 +231,10 @@
                     </div>
                     <span id="badgeLeadCount" class="text-[10px] font-mono bg-obsidian-800 text-gold-400 px-2 py-0.5 rounded-full border border-white/10">0</span>
                 </button>
+                <button onclick="switchAdminTab('people')" id="adminTabBtn-people" class="admin-nav-btn flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-medium text-neutral-400 hover:text-white hover:bg-obsidian-800 whitespace-nowrap transition-all w-full text-left">
+                    <i class="fa-solid fa-users w-4 text-center"></i>
+                    <span>Customers & Staff</span>
+                </button>
                 <button onclick="switchAdminTab('campaign')" id="adminTabBtn-campaign" class="admin-nav-btn flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-medium text-neutral-400 hover:text-white hover:bg-obsidian-800 whitespace-nowrap transition-all w-full text-left">
                     <i class="fa-solid fa-bullhorn w-4 text-center"></i>
                     <span>Festive Campaign</span>
@@ -414,6 +418,21 @@
                 </div>
 
                 <!-- VIEW 3: FESTIVE CAMPAIGN MANAGER -->
+                <div id="adminTab-people" class="hidden space-y-5">
+                    <div class="border-b border-white/5 pb-3">
+                        <h2 class="text-base font-cinzel font-bold text-white">Customers & Beautician Team</h2>
+                        <p class="text-xs text-neutral-400">Review customer profiles and approve, reject or manage beautician availability.</p>
+                    </div>
+                    <section class="glass-card rounded-2xl p-4 sm:p-5 border-gold-500/30 space-y-3">
+                        <div class="flex items-center justify-between gap-2"><h3 class="font-cinzel text-sm font-bold text-gold-200">Beautician Applications & Team</h3><button type="button" onclick="window.loadAdminPeople()" class="text-[10px] text-gold-300 underline">Refresh</button></div>
+                        <div id="adminBeauticianList" class="space-y-3"><p class="text-xs text-neutral-500">Loading team...</p></div>
+                    </section>
+                    <section class="glass-card rounded-2xl p-4 sm:p-5 border-gold-500/30 space-y-3">
+                        <div class="flex items-center justify-between gap-2"><h3 class="font-cinzel text-sm font-bold text-gold-200">Registered Customers</h3><span id="adminCustomerCount" class="text-[10px] text-neutral-400">0 customers</span></div>
+                        <div id="adminCustomerList" class="space-y-2"><p class="text-xs text-neutral-500">Loading customers...</p></div>
+                    </section>
+                </div>
+
                 <div id="adminTab-campaign" class="hidden space-y-4 max-w-2xl">
                     <div class="border-b border-white/5 pb-3">
                         <h2 class="text-base font-cinzel font-bold text-white">Festive Campaign & Banner Manager</h2>
@@ -1265,7 +1284,7 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
         }
 
         function switchAdminTab(tabName) {
-            ['overview', 'leads', 'campaign', 'packages', 'settings'].forEach(t => {
+            ['overview', 'leads', 'people', 'campaign', 'packages', 'settings'].forEach(t => {
                 const tabEl = document.getElementById(`adminTab-${t}`);
                 const btnEl = document.getElementById(`adminTabBtn-${t}`);
                 if (!tabEl || !btnEl) return;
@@ -1283,6 +1302,7 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
 
             if (tabName === 'overview') loadDashboardMetrics();
             if (tabName === 'leads') loadAdminBookings();
+            if (tabName === 'people' && window.loadAdminPeople) window.loadAdminPeople();
             if (tabName === 'packages') {
                 loadAdminPackages();
                 loadAdminServicePrices();
@@ -2132,6 +2152,78 @@ window.addEventListener('DOMContentLoaded', () => {
     window.loadDashboardMetrics();
     window.filterBookingsDisplay();
     window.showToast("Completed and cancelled history cleared. Active client details are safe.");
+  };
+
+  function escapePeopleText(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];
+    });
+  }
+
+  window.loadAdminPeople = async function () {
+    const staffList = document.getElementById("adminBeauticianList");
+    const customerList = document.getElementById("adminCustomerList");
+    if (!staffList || !customerList) return;
+    staffList.innerHTML = '<p class="text-xs text-neutral-500">Loading team...</p>';
+    customerList.innerHTML = '<p class="text-xs text-neutral-500">Loading customers...</p>';
+    try {
+      const results = await Promise.all([
+        db.from("beautician_profiles").select("*").order("created_at", {ascending:false}),
+        db.from("app_profiles").select("user_id,full_name,phone,account_type,city,created_at").eq("account_type","customer").order("created_at", {ascending:false})
+      ]);
+      results.forEach(function (result) { if (result.error) throw result.error; });
+      const staff = results[0].data || [];
+      const customers = results[1].data || [];
+      if (!staff.length) {
+        staffList.innerHTML = '<p class="text-xs text-neutral-500 py-3">No beautician applications yet.</p>';
+      } else {
+        staffList.innerHTML = staff.map(function (person) {
+          const skills = Array.isArray(person.skills) ? person.skills.join(", ") : "";
+          return '<article class="rounded-xl border border-white/10 bg-obsidian-900 p-3 space-y-2">' +
+            '<div class="flex flex-wrap items-start justify-between gap-2"><div><p class="text-sm font-bold text-white">' + escapePeopleText(person.display_name || "Beautician") + '</p>' +
+            '<p class="text-[10px] text-neutral-400">' + escapePeopleText(person.phone || "") + ' · ' + escapePeopleText(person.city || "") + '</p></div>' +
+            '<span class="text-[10px] font-bold text-gold-300">' + escapePeopleText(person.approval_status || "Pending") + '</span></div>' +
+            '<p class="text-[10px] text-neutral-400">' + escapePeopleText(person.experience_years || 0) + ' years experience · ' + escapePeopleText(skills) + '</p>' +
+            '<div class="flex flex-wrap gap-2">' +
+            '<button type="button" data-staff-id="' + escapePeopleText(person.user_id) + '" data-staff-status="Approved" class="px-3 py-2 rounded-lg bg-emerald-500/15 text-emerald-300 text-[10px] font-bold">Approve</button>' +
+            '<button type="button" data-staff-id="' + escapePeopleText(person.user_id) + '" data-staff-status="Rejected" class="px-3 py-2 rounded-lg bg-rose-500/15 text-rose-300 text-[10px] font-bold">Reject</button>' +
+            '<button type="button" data-staff-id="' + escapePeopleText(person.user_id) + '" data-staff-availability="' + String(!person.is_available) + '" class="px-3 py-2 rounded-lg bg-gold-500/10 text-gold-300 text-[10px] font-bold">' + (person.is_available ? "Mark unavailable" : "Mark available") + '</button>' +
+            '</div></article>';
+        }).join("");
+        staffList.querySelectorAll("[data-staff-status]").forEach(function (button) {
+          button.addEventListener("click", function () { window.updateBeauticianStatus(button.dataset.staffId, button.dataset.staffStatus); });
+        });
+        staffList.querySelectorAll("[data-staff-availability]").forEach(function (button) {
+          button.addEventListener("click", function () { window.updateBeauticianAvailability(button.dataset.staffId, button.dataset.staffAvailability === "true"); });
+        });
+      }
+      const count = document.getElementById("adminCustomerCount");
+      if (count) count.textContent = customers.length + " customers";
+      customerList.innerHTML = customers.length ? customers.map(function (customer) {
+        return '<div class="flex items-center justify-between gap-3 border-b border-white/5 py-2 last:border-0">' +
+          '<div><p class="text-xs font-bold text-white">' + escapePeopleText(customer.full_name || "Customer") + '</p>' +
+          '<p class="text-[10px] text-neutral-400">' + escapePeopleText(customer.phone || "No phone") + ' · ' + escapePeopleText(customer.city || "") + '</p></div>' +
+          '<span class="text-[9px] text-neutral-500">' + (customer.created_at ? new Date(customer.created_at).toLocaleDateString("en-IN") : "") + '</span></div>';
+      }).join("") : '<p class="text-xs text-neutral-500 py-3">No registered customers yet.</p>';
+    } catch (error) {
+      staffList.innerHTML = '<p class="text-xs text-rose-300">Could not load team: ' + escapePeopleText(error.message) + '</p>';
+      customerList.innerHTML = '<p class="text-xs text-rose-300">Could not load customers.</p>';
+    }
+  };
+
+  window.updateBeauticianStatus = async function (userId, status) {
+    if (!["Approved", "Rejected", "Pending"].includes(status)) return;
+    const result = await db.from("beautician_profiles").update({approval_status:status,updated_at:new Date().toISOString()}).eq("user_id",userId);
+    if (result.error) { window.showToast("Team update failed: " + result.error.message); return; }
+    await window.loadAdminPeople();
+    window.showToast("Beautician application marked " + status + ".");
+  };
+
+  window.updateBeauticianAvailability = async function (userId, available) {
+    const result = await db.from("beautician_profiles").update({is_available:available,updated_at:new Date().toISOString()}).eq("user_id",userId);
+    if (result.error) { window.showToast("Availability update failed: " + result.error.message); return; }
+    await window.loadAdminPeople();
+    window.showToast(available ? "Beautician marked available." : "Beautician marked unavailable.");
   };
 
   window.changeAdminPin = function (event) {
