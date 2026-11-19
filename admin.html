@@ -481,6 +481,20 @@
                             <div><h3 class="font-cinzel text-sm font-bold text-gold-200">Combo Packages</h3><p class="text-[10px] text-neutral-400">5 regular combos plus 2 printed signature packages.</p></div>
                             <button type="button" onclick="resetPackagesToDefault()" class="text-[10px] text-neutral-400 underline">Reset regular combos</button>
                         </div>
+                        <div class="rounded-2xl border border-gold-500/20 bg-obsidian-900 p-4 space-y-3">
+                            <h4 class="text-xs font-bold text-gold-300 uppercase tracking-wider">Add a new combo package</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <input id="newComboName" type="text" maxlength="100" placeholder="Combo name" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-xs text-white">
+                                <input id="newComboCategory" type="text" maxlength="40" placeholder="Category (e.g. bridal)" value="value" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-xs text-white">
+                                <input id="newComboPrice" type="number" min="0" placeholder="Offer price (₹)" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-xs text-white">
+                                <input id="newComboOriginal" type="number" min="0" placeholder="Original price (₹)" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-xs text-white">
+                                <input id="newComboBadge" type="text" maxlength="40" placeholder="Badge (e.g. Best Seller)" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-xs text-white">
+                                <input id="newComboInclusions" type="text" placeholder="Inclusions, comma separated" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-xs text-white">
+                            </div>
+                            <textarea id="newComboDescription" rows="2" maxlength="500" placeholder="Short package description" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-xs text-white"></textarea>
+                            <input id="newComboPhoto" type="file" accept="image/png,image/jpeg,image/webp" class="w-full text-[10px] text-neutral-300">
+                            <button type="button" onclick="window.addNewSalonCombo()" class="btn-gold-solid w-full rounded-xl py-3 text-xs font-extrabold">Add & publish combo</button>
+                        </div>
                         <div id="adminPackagesEditor" class="space-y-3"></div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-white/10 pt-3">
                             <label class="text-[10px] text-neutral-300">Signature Beauty Package (₹5,000 default)
@@ -1998,6 +2012,53 @@ window.addEventListener('DOMContentLoaded', () => {
     if (baseCloseAdminPortal) baseCloseAdminPortal();
     await db.auth.signOut();
     window.ANAMIKA_BOOKINGS = [];
+  };
+
+  window.addNewSalonCombo = async function () {
+    const name = document.getElementById("newComboName").value.trim();
+    const price = Number(document.getElementById("newComboPrice").value);
+    const originalPrice = Number(document.getElementById("newComboOriginal").value) || 0;
+    const category = document.getElementById("newComboCategory").value.trim() || "value";
+    const badge = document.getElementById("newComboBadge").value.trim();
+    const description = document.getElementById("newComboDescription").value.trim();
+    const inclusions = document.getElementById("newComboInclusions").value.split(",").map(function (x) { return x.trim(); }).filter(Boolean);
+    const file = document.getElementById("newComboPhoto").files[0];
+    if (name.length < 3) { window.showToast("Enter a combo name with at least 3 characters."); return; }
+    if (!Number.isFinite(price) || price < 0) { window.showToast("Enter a valid offer price."); return; }
+    let imageUrl = null;
+    try {
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) throw new Error("Combo photo must be 5 MB or smaller.");
+        if (!/^image\/(png|jpeg|webp)$/.test(file.type)) throw new Error("Use PNG, JPG or WEBP photos.");
+        const ext = file.type === "image/jpeg" ? "jpg" : file.type.split("/")[1];
+        const path = "packages/new-" + Date.now() + "." + ext;
+        const upload = await db.storage.from("brand-assets").upload(path, file, {upsert:true,contentType:file.type});
+        if (upload.error) throw upload.error;
+        imageUrl = db.storage.from("brand-assets").getPublicUrl(path).data.publicUrl;
+      }
+      const packageId = "combo-" + name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") + "-" + Date.now();
+      const sortOrder = Math.max(0, ...window.getPackages().map(function (p) { return Number(p.sortOrder) || 0; })) + 1;
+      const result = await db.from("salon_packages").insert({
+        package_id:packageId, package_type:"combo", name:name, price:price,
+        original_price:Math.max(price, originalPrice), category:category,
+        badge:badge, description:description, inclusions:inclusions,
+        image_url:imageUrl, is_active:true, sort_order:sortOrder
+      });
+      if (result.error) throw result.error;
+      document.getElementById("newComboName").value = "";
+      document.getElementById("newComboPrice").value = "";
+      document.getElementById("newComboOriginal").value = "";
+      document.getElementById("newComboBadge").value = "";
+      document.getElementById("newComboInclusions").value = "";
+      document.getElementById("newComboDescription").value = "";
+      document.getElementById("newComboPhoto").value = "";
+      await refreshAdminCloudData();
+      window.loadAdminPackages();
+      window.renderPackages("all");
+      window.showToast("New combo published to the website.");
+    } catch (error) {
+      window.showToast("Could not add combo: " + (error.message || "Please retry."));
+    }
   };
 
   window.saveAllPackageChanges = async function () {
