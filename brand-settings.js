@@ -200,14 +200,14 @@
     const message = panel.querySelector("#brandUpdateMessage").value.trim();
     const file = panel.querySelector("#brandLogoFile").files[0];
     if (!/^#[0-9a-f]{6}$/i.test(color)) { adminToast("Choose a valid brand colour."); return; }
-    if (!/^\\d+\\.\\d+\\.\\d+$/.test(version)) { adminToast("Enter app version like 1.0.2."); return; }
-    if (!/^https:\\/\\//i.test(apkUrl)) { adminToast("Enter a valid HTTPS APK download link."); return; }
+    if (!/^\d+\.\d+\.\d+$/.test(version)) { adminToast("Enter app version like 1.0.2."); return; }
+    if (!/^https:\/\/.+/i.test(apkUrl)) { adminToast("Enter a valid HTTPS APK download link."); return; }
     button.disabled = true; button.textContent = "Publishing...";
     try {
       let logoUrl = (window.ANAMIKA_BRAND_SETTINGS || DEFAULTS).logo_url;
       if (file) {
         if (file.size > 5 * 1024 * 1024) throw new Error("Logo must be 5 MB or smaller.");
-        if (!/^image\\/(png|jpeg|webp|svg\\+xml)$/.test(file.type)) throw new Error("Use PNG, JPG, WEBP or SVG for the logo.");
+        if (!/^image\/(png|jpeg|webp|svg\+xml)$/.test(file.type)) throw new Error("Use PNG, JPG, WEBP or SVG for the logo.");
         const ext = file.type === "image/svg+xml" ? "svg" : (file.type === "image/jpeg" ? "jpg" : file.type.split("/")[1]);
         const path = "brand-logo-" + Date.now() + "." + ext;
         const upload = await db.storage.from("brand-assets").upload(path, file, { upsert: true, contentType: file.type });
