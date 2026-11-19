@@ -91,7 +91,7 @@
   }
 
   async function checkAndroidUpdate() {
-    if (!isNativeApp() || document.getElementById("anamikaUpdatePrompt")) return;
+    if (!isNativeApp() || document.getElementById("anamikaUpdatePrompt") || document.getElementById("appUpdatePrompt")) return;
     try {
       const settings = await getSettings();
       const currentMeta = document.querySelector('meta[name="app-version"]');
