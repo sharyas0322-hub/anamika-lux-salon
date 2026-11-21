@@ -1,4 +1,4 @@
-/* Shared Anamika Lux brand settings, admin editor and Android update prompt. */
+/* Shared Anamika Lux brand settings and website admin editor. */
 (function () {
   "use strict";
   const SUPABASE_URL = "https://uwbcgwvrvtvggmaejxfu.supabase.co";
@@ -11,9 +11,6 @@
     id: true,
     brand_color: "#D4AF37",
     logo_url: "/the-anamika-lux-logo.png",
-    app_version: "1.0.1",
-    apk_url: "https://github.com/sharyas0322-hub/anamika-lux-salon/releases/download/android-apk/THE-ANAMIKA-LUX.apk",
-    update_message: "A new Anamika Lux update is ready."
   };
 
   function rgb(hex) {
@@ -72,66 +69,6 @@
     .on("postgres_changes", { event: "*", schema: "public", table: "app_settings" }, refreshPublicSettings)
     .subscribe();
 
-  function compareVersions(a, b) {
-    const aa = String(a || "0").split(".").map(Number);
-    const bb = String(b || "0").split(".").map(Number);
-    for (let i = 0; i < Math.max(aa.length, bb.length); i++) {
-      const x = aa[i] || 0, y = bb[i] || 0;
-      if (x > y) return 1;
-      if (x < y) return -1;
-    }
-    return 0;
-  }
-
-  function isNativeApp() {
-    try {
-      return !!((window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform()) ||
-        window.location.protocol === "capacitor:" || window.location.protocol === "file:");
-    } catch (_) { return false; }
-  }
-
-  async function checkAndroidUpdate() {
-    if (!isNativeApp() || document.getElementById("anamikaUpdatePrompt") || document.getElementById("appUpdatePrompt")) return;
-    try {
-      const settings = await getSettings();
-      const currentMeta = document.querySelector('meta[name="app-version"]');
-      const current = currentMeta ? currentMeta.content : "1.0.1";
-      if (!settings.app_version || compareVersions(settings.app_version, current) <= 0 || !settings.apk_url) return;
-      const dismissedKey = "anamika-update-dismissed-" + settings.app_version;
-      if (sessionStorage.getItem(dismissedKey)) return;
-
-      const overlay = document.createElement("div");
-      overlay.id = "anamikaUpdatePrompt";
-      overlay.style.cssText = "position:fixed;inset:0;z-index:1000000;background:rgba(0,0,0,.78);display:flex;align-items:flex-end;justify-content:center;padding:16px;";
-      const card = document.createElement("section");
-      card.style.cssText = "width:100%;max-width:440px;background:#101017;color:#f3f3f3;border:1px solid rgba(212,175,55,.45);border-radius:26px;padding:24px;box-shadow:0 20px 70px #000;";
-      const heading = document.createElement("h2");
-      heading.textContent = "Anamika Lux update available";
-      heading.style.cssText = "font-size:22px;font-weight:800;margin:0 0 10px;";
-      const message = document.createElement("p");
-      message.textContent = settings.update_message || "Install the latest version for improvements.";
-      message.style.cssText = "font-size:14px;color:#b8b8c0;line-height:1.5;margin-bottom:20px;";
-      const update = document.createElement("a");
-      update.href = settings.apk_url;
-      update.target = "_blank";
-      update.rel = "noopener";
-      update.textContent = "Download update";
-      update.style.cssText = "display:block;text-align:center;text-decoration:none;background:" + settings.brand_color + ";color:#080808;font-weight:800;padding:14px;border-radius:14px;margin-bottom:10px;";
-      const later = document.createElement("button");
-      later.type = "button";
-      later.textContent = "Not now";
-      later.style.cssText = "width:100%;padding:12px;border-radius:14px;border:1px solid #555;background:transparent;color:#ddd;font-weight:700;";
-      later.addEventListener("click", function () {
-        sessionStorage.setItem(dismissedKey, "1");
-        overlay.remove();
-      });
-      card.append(heading, message, update, later);
-      overlay.appendChild(card);
-      document.body.appendChild(overlay);
-    } catch (error) { console.warn("Anamika update check skipped:", error); }
-  }
-  checkAndroidUpdate();
-
   function adminToast(message) {
     if (typeof window.showToast === "function") window.showToast(message);
     else if (typeof window.toast === "function") window.toast(message);
@@ -145,8 +82,8 @@
     panel.id = "anamikaBrandPanel";
     panel.className = "glass-card p-5 rounded-2xl border border-gold-500/30 space-y-4";
     panel.innerHTML = `
-      <div><h3 class="text-sm font-bold text-gold-300 uppercase tracking-wider">Brand, App & APK Settings</h3>
-      <p class="text-xs text-neutral-400 mt-1">Changes are saved online and sync to the website and Android app.</p></div>
+      <div><h3 class="text-sm font-bold text-gold-300 uppercase tracking-wider">Brand Settings</h3>
+      <p class="text-xs text-neutral-400 mt-1">Changes are saved online and sync to the website.</p></div>
       <div class="flex items-center gap-4">
         <img id="brandLogoPreview" src="/the-anamika-lux-logo.png" alt="Brand logo preview" class="w-16 h-16 rounded-xl object-contain bg-black border border-white/10">
         <div class="flex-1 min-w-0"><label class="field-label">Upload new logo</label>
@@ -155,9 +92,6 @@
       <div><label class="block text-[10px] text-neutral-400 uppercase font-semibold mb-1">Primary brand colour</label><div class="flex items-center gap-3">
         <input id="brandColorInput" type="color" value="#D4AF37" class="w-12 h-11 rounded-lg border-0 bg-transparent">
         <span id="brandColorValue" class="text-xs font-mono text-neutral-300">#D4AF37</span></div></div>
-      <div><label class="block text-[10px] text-neutral-400 uppercase font-semibold mb-1">Latest APK version</label><input id="brandAppVersion" type="text" value="1.0.2" placeholder="e.g. 1.0.3" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold-400"></div>
-      <div><label class="block text-[10px] text-neutral-400 uppercase font-semibold mb-1">APK download URL</label><input id="brandApkUrl" type="url" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold-400" placeholder="https://.../THE-ANAMIKA-LUX.apk"></div>
-      <div><label class="block text-[10px] text-neutral-400 uppercase font-semibold mb-1">Update notification message</label><textarea id="brandUpdateMessage" rows="2" class="w-full bg-obsidian-850 border border-neutral-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold-400" placeholder="What's new in this update?"></textarea></div>
       <button id="saveBrandSettingsBtn" type="button" class="btn-gold-solid w-full rounded-xl py-3 font-extrabold">Save & publish settings</button>
       <p class="text-[10px] text-neutral-500">APK updates download a new installer. Android may ask the user to confirm installation.</p>`;
     settingsTab.appendChild(panel);
@@ -184,9 +118,6 @@
       panel.querySelector("#brandColorInput").value = settings.brand_color;
       panel.querySelector("#brandColorValue").textContent = settings.brand_color.toUpperCase();
       panel.querySelector("#brandLogoPreview").src = settings.logo_url;
-      panel.querySelector("#brandAppVersion").value = settings.app_version;
-      panel.querySelector("#brandApkUrl").value = settings.apk_url;
-      panel.querySelector("#brandUpdateMessage").value = settings.update_message;
     } catch (error) { adminToast("Could not load brand settings: " + (error.message || "Please retry.")); }
   }
 
@@ -195,13 +126,8 @@
     const button = panel && panel.querySelector("#saveBrandSettingsBtn");
     if (!panel || !button) return;
     const color = panel.querySelector("#brandColorInput").value;
-    const version = panel.querySelector("#brandAppVersion").value.trim();
-    let apkUrl = panel.querySelector("#brandApkUrl").value.trim();
-    const message = panel.querySelector("#brandUpdateMessage").value.trim();
     const file = panel.querySelector("#brandLogoFile").files[0];
     if (!/^#[0-9a-f]{6}$/i.test(color)) { adminToast("Choose a valid brand colour."); return; }
-    if (!/^\d+\.\d+\.\d+$/.test(version)) { adminToast("Enter app version like 1.0.2."); return; }
-    if (!/^https:\/\/.+/i.test(apkUrl)) { adminToast("Enter a valid HTTPS APK download link."); return; }
     button.disabled = true; button.textContent = "Publishing...";
     try {
       let logoUrl = (window.ANAMIKA_BRAND_SETTINGS || DEFAULTS).logo_url;
@@ -216,8 +142,6 @@
       }
       const settings = {
         id: true, brand_color: color, logo_url: logoUrl,
-        app_version: version, apk_url: apkUrl,
-        update_message: message || DEFAULTS.update_message,
         updated_at: new Date().toISOString()
       };
       const result = await db.from("app_settings").upsert(settings, { onConflict: "id" });
@@ -225,7 +149,7 @@
       applyBrandSettings(settings);
       panel.querySelector("#brandLogoPreview").src = logoUrl;
       panel.querySelector("#brandLogoFile").value = "";
-      adminToast("Brand settings published. Website and app will sync online.");
+      adminToast("Website brand settings published.");
     } catch (error) {
       console.error("Brand settings save failed:", error);
       adminToast("Save failed: " + (error.message || "Please retry."));
