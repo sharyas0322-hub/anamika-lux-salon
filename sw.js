@@ -1,5 +1,5 @@
 const CACHE_NAME = "anamika-lux-app-v9";
-const APP_SHELL = ["/app.html", "/app-icon.svg", "/the-anamika-lux-logo.png", "/brand-settings.js", "/app-version.json"];
+const APP_SHELL = ["/app.html", "/app-icon.svg", "/the-anamika-lux-logo.png", "/brand-settings.js"];
 
 self.addEventListener("install", event => {
   event.waitUntil(
