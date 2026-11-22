@@ -279,11 +279,13 @@
                         <label class="text-xs font-semibold text-gray-500 uppercase">Registered Email</label>
                         <input type="email" id="forgot-email" required class="w-full mt-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-brand transition-colors">
                     </div>
-                    <div>
+                    <div id="forgot-password-section" class="hidden">
                         <label class="text-xs font-semibold text-gray-500 uppercase">New Password</label>
-                        <input type="password" id="forgot-password" required class="w-full mt-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-brand transition-colors">
+                        <input type="password" id="forgot-password" minlength="4" class="w-full mt-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-brand transition-colors">
+                        <p class="text-xs text-green-600 mt-2">Phone number and email matched. You can now create a new password.</p>
                     </div>
-                    <button type="submit" class="w-full bg-brand text-white font-bold rounded-xl py-4 mt-4 active:scale-[0.98] transition-transform shadow-md">Reset Password</button>
+                    <button type="button" id="forgot-verify-btn" onclick="verifyForgotDetails()" class="w-full bg-brand text-white font-bold rounded-xl py-4 mt-4 active:scale-[0.98] transition-transform shadow-md">Verify Phone & Email</button>
+                    <button type="submit" id="forgot-reset-btn" class="w-full bg-brand text-white font-bold rounded-xl py-4 mt-4 active:scale-[0.98] transition-transform shadow-md hidden">Create New Password</button>
                     <div class="text-center mt-4">
                         <button type="button" onclick="switchAuthTab('login')" class="text-gray-500 text-sm font-semibold hover:underline">Back to Login</button>
                     </div>
@@ -769,7 +771,7 @@
         // --- SIGNUP: STEP 1 (Send OTP) ---
         function proceedToPassword() {
             const name = document.getElementById('signup-name').value.trim();
-            const phone = document.getElementById('signup-phone').value.trim();
+            const phone = document.getElementById('signup-phone').value.replace(/\D/g, '').trim();
             const email = document.getElementById('signup-email').value.trim();
             const age = document.getElementById('signup-age').value.trim();
             const gender = document.getElementById('signup-gender').value;
@@ -777,7 +779,7 @@
             if(!name || !phone || !email || !age || !gender) {
                 return showToast("Please fill all details to proceed.");
             }
-            if(!/^\\d{10}$/.test(phone)) {
+            if(!/^\d{10}$/.test(phone)) {
                 return showToast("Please enter a valid 10-digit phone number.");
             }
 
@@ -838,7 +840,8 @@
         // --- LOGIN LOGIC ---
         document.getElementById('form-login').addEventListener('submit', (e) => {
             e.preventDefault();
-            const phone = document.getElementById('login-phone').value;
+            const rawPhone = document.getElementById('login-phone').value.trim();
+            const phone = rawPhone.replace(/\D/g, '');
             const password = document.getElementById('login-password').value;
 
             if (phone === 'admin' && password === 'admin') {
@@ -861,23 +864,52 @@
         });
 
         // --- FORGOT PASSWORD LOGIC ---
+        function verifyForgotDetails() {
+            const phone = document.getElementById('forgot-phone').value.replace(/\D/g, '').trim();
+            const email = document.getElementById('forgot-email').value.trim().toLowerCase();
+            const usersDb = JSON.parse(localStorage.getItem('anamika_users')) || {};
+            const user = usersDb[phone];
+
+            if (!/^\d{10}$/.test(phone)) {
+                return showToast("Please enter a valid 10-digit phone number.");
+            }
+            if (!user || String(user.email || '').trim().toLowerCase() !== email) {
+                document.getElementById('forgot-password-section').classList.add('hidden');
+                document.getElementById('forgot-reset-btn').classList.add('hidden');
+                document.getElementById('forgot-verify-btn').classList.remove('hidden');
+                return showToast("Phone number and Email do not match any records.");
+            }
+
+            document.getElementById('forgot-password-section').classList.remove('hidden');
+            document.getElementById('forgot-verify-btn').classList.add('hidden');
+            document.getElementById('forgot-reset-btn').classList.remove('hidden');
+            showToast("Details verified. Create your new password.");
+        }
+
         document.getElementById('form-forgot').addEventListener('submit', (e) => {
             e.preventDefault();
-            const phone = document.getElementById('forgot-phone').value;
-            const email = document.getElementById('forgot-email').value;
+            const phone = document.getElementById('forgot-phone').value.replace(/\D/g, '').trim();
+            const email = document.getElementById('forgot-email').value.trim().toLowerCase();
             const newPassword = document.getElementById('forgot-password').value;
 
             let usersDb = JSON.parse(localStorage.getItem('anamika_users')) || {};
-            
-            if (usersDb[phone] && usersDb[phone].email === email) {
-                usersDb[phone].password = newPassword;
-                localStorage.setItem('anamika_users', JSON.stringify(usersDb));
-                showToast("Password Reset Successful! Please log in.");
-                document.getElementById('form-forgot').reset();
-                switchAuthTab('login');
-            } else {
-                showToast("Phone number and Email do not match any records.");
+            const user = usersDb[phone];
+
+            if (!user || String(user.email || '').trim().toLowerCase() !== email) {
+                return showToast("Please verify your phone number and email first.");
             }
+            if (!newPassword || newPassword.length < 4) {
+                return showToast("New password must be at least 4 characters.");
+            }
+
+            usersDb[phone].password = newPassword;
+            localStorage.setItem('anamika_users', JSON.stringify(usersDb));
+            showToast("Password reset successful! Please log in.");
+            document.getElementById('form-forgot').reset();
+            document.getElementById('forgot-password-section').classList.add('hidden');
+            document.getElementById('forgot-reset-btn').classList.add('hidden');
+            document.getElementById('forgot-verify-btn').classList.remove('hidden');
+            switchAuthTab('login');
         });
 
         function logout() {
