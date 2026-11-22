@@ -241,25 +241,11 @@
                                 </select>
                             </div>
                         </div>
-                        <button type="button" onclick="sendSignupOTP()" class="w-full bg-brand text-white font-bold rounded-xl py-4 mt-4 active:scale-[0.98] transition-transform shadow-md">Send OTP</button>
+                        <button type="button" onclick="proceedToPassword()" class="w-full bg-brand text-white font-bold rounded-xl py-4 mt-4 active:scale-[0.98] transition-transform shadow-md">Continue to Password</button>
                     </div>
 
-                    <!-- Step 2: OTP Verification -->
+                    <!-- Step 2: Password & Photo -->
                     <div id="signup-step-2" class="space-y-4 hidden">
-                        <div class="text-center mb-6">
-                            <h2 class="text-lg font-bold text-textMain">Verify Phone</h2>
-                            <p class="text-sm text-gray-500 mt-1">We've sent a mock OTP to your number.</p>
-                        </div>
-                        <div>
-                            <label class="text-xs font-semibold text-gray-500 uppercase">Enter OTP</label>
-                            <input type="text" id="signup-otp" class="w-full mt-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-brand text-center tracking-widest text-lg font-bold" placeholder="• • • •" maxlength="4">
-                        </div>
-                        <button type="button" onclick="verifySignupOTP()" class="w-full bg-brand text-white font-bold rounded-xl py-4 mt-2 active:scale-[0.98] transition-transform shadow-md">Verify OTP</button>
-                        <button type="button" onclick="backToStep('1')" class="w-full bg-white text-gray-600 font-bold rounded-xl py-3 border border-gray-200 active:bg-gray-50 transition-colors">Back</button>
-                    </div>
-
-                    <!-- Step 3: Password & Photo -->
-                    <div id="signup-step-3" class="space-y-4 hidden">
                         <div class="text-center mb-6">
                             <h2 class="text-lg font-bold text-textMain text-green-600 flex items-center justify-center gap-1"><span class="material-icons-round">verified</span> Verified</h2>
                             <p class="text-sm text-gray-500 mt-1">Set a password and complete your profile.</p>
@@ -781,7 +767,7 @@
         }
 
         // --- SIGNUP: STEP 1 (Send OTP) ---
-        function sendSignupOTP() {
+        function proceedToPassword() {
             const name = document.getElementById('signup-name').value.trim();
             const phone = document.getElementById('signup-phone').value.trim();
             const email = document.getElementById('signup-email').value.trim();
@@ -791,50 +777,31 @@
             if(!name || !phone || !email || !age || !gender) {
                 return showToast("Please fill all details to proceed.");
             }
-            if(phone.length < 10) {
+            if(!/^\\d{10}$/.test(phone)) {
                 return showToast("Please enter a valid 10-digit phone number.");
             }
 
             let usersDb = JSON.parse(localStorage.getItem('anamika_users')) || {};
             if (usersDb[phone] || phone === 'admin') {
-                showToast("An account with this number already exists. Please login.");
-                return;
+                return showToast("An account with this number already exists. Please login.");
             }
 
-            // Save temporarily
             tempSignupData = { name, phone, email, age, gender };
 
-            // Transition UI
             document.getElementById('signup-step-1').classList.add('hidden');
             document.getElementById('signup-step-2').classList.remove('hidden');
-            
-            // Simulate OTP dispatch
-            showToast("Sending OTP...");
-            setTimeout(() => {
-                showToast("Mock OTP is: 1234");
-            }, 1000);
         }
 
         function backToStep(stepNum) {
             document.getElementById('signup-step-1').classList.add('hidden');
             document.getElementById('signup-step-2').classList.add('hidden');
-            document.getElementById('signup-step-3').classList.add('hidden');
-            document.getElementById(`signup-step-${stepNum}`).classList.remove('hidden');
-        }
-
-        // --- SIGNUP: STEP 2 (Verify OTP) ---
-        function verifySignupOTP() {
-            const otp = document.getElementById('signup-otp').value;
-            if (otp === '1234') {
-                showToast("OTP Verified Successfully!");
-                document.getElementById('signup-step-2').classList.add('hidden');
-                document.getElementById('signup-step-3').classList.remove('hidden');
-            } else {
-                showToast("Invalid OTP. Try '1234'.");
+            document.getElementById('signup-step-2').classList.remove('hidden');
+            if (String(stepNum) === '1') {
+                document.getElementById('signup-step-1').classList.remove('hidden');
             }
         }
 
-        // --- SIGNUP: STEP 3 (Password & Photo) ---
+        // --- SIGNUP: PASSWORD & PHOTO ---
         function completeSignup() {
             const pass = document.getElementById('signup-password').value;
             const confirmPass = document.getElementById('signup-confirm-password').value;
@@ -845,7 +812,6 @@
 
             tempSignupData.password = pass;
 
-            // Handle optional photo via FileReader
             if (photoInput.files && photoInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
