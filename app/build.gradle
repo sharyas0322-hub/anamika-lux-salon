@@ -2,6 +2,9 @@ plugins { id 'com.android.application' }
 android {
     namespace 'com.anamika.lux'
     compileSdk 35
+    buildFeatures {
+        buildConfig true
+    }
     defaultConfig {
         applicationId 'com.anamika.lux'
         minSdk 23
