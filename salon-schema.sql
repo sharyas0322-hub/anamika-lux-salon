@@ -158,3 +158,19 @@ begin
 end $$;
 
 grant execute on function public.admin_create_user_profile(uuid,text,text,text,int,text,text,text,numeric) to authenticated;
+
+
+-- Client signup profile trigger
+create or replace function public.handle_new_client()
+returns trigger language plpgsql security definer set search_path = public
+as $$
+begin
+  if coalesce(new.raw_user_meta_data->>'role','client') = 'client' then
+    insert into public.user_profiles(id,full_name,phone,email,age,gender,role,active)
+    values(new.id,coalesce(nullif(trim(new.raw_user_meta_data->>'full_name'),''),'Client'),regexp_replace(coalesce(new.raw_user_meta_data->>'phone',''),'\\D','','g'),lower(coalesce(new.email,'')),nullif(new.raw_user_meta_data->>'age','')::int,nullif(new.raw_user_meta_data->>'gender',''),'client',true)
+    on conflict(id) do update set full_name=excluded.full_name,phone=excluded.phone,email=excluded.email,age=excluded.age,gender=excluded.gender,role='client',active=true;
+  end if;
+  return new;
+end $$;
+drop trigger if exists on_auth_user_created_client on auth.users;
+create trigger on_auth_user_created_client after insert on auth.users for each row execute function public.handle_new_client();
