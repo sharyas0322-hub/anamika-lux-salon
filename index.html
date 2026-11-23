@@ -899,7 +899,7 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
                                 <i class="fa-solid fa-circle-check text-[10px]"></i> Doorstep Kit Included
                             </span>
                             <button type="button" onclick="selectComboForBooking('${pkg.name.replace(/'/g, "\\'")} (₹${pkg.price})')" class="btn-gold-solid px-6 py-2.5 rounded-xl text-xs uppercase font-extrabold tracking-wider active:scale-95 shadow-md">
-                                <span>Select Combo</span>
+                                <span>Select Package</span>
                             </button>
                         </div>
                     </div>
@@ -1574,13 +1574,13 @@ window.addEventListener('DOMContentLoaded', () => {
             + '<span class="text-xl font-cinzel font-black text-gold-300 whitespace-nowrap">₹' + signaturePrice.toLocaleString("en-IN") + '</span></div>'
             + '<ul class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-neutral-300 mb-4 list-disc pl-4">'
             + '<li>Full Leg Wax</li><li>Full Hand Wax</li><li>Full Leg Detan</li><li>Full Hand Detan</li><li>Facial</li><li>Face Detan</li><li>Eyebrow Threading</li><li>Forehead Threading</li><li>Upper Lip Threading</li><li>Basic Haircut</li></ul>'
-            + '<button type="button" data-signature-book="signature" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Select Combo • ₹' + signaturePrice.toLocaleString("en-IN") + '</button></article>'
+            + '<button type="button" data-signature-book="signature" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Select Package • ₹' + signaturePrice.toLocaleString("en-IN") + '</button></article>'
             + '<article class="glass-card-featured rounded-3xl p-5 border-gold-500/50"><div class="flex items-start justify-between gap-2 mb-3">'
             + '<div><span class="text-[9px] text-gold-300 uppercase tracking-wider">Printed Rate Card Package</span><h3 class="font-cinzel text-lg font-bold text-white mt-1">Royal Complete Care Package</h3></div>'
             + '<span class="text-xl font-cinzel font-black text-gold-300 whitespace-nowrap">₹' + royalPrice.toLocaleString("en-IN") + '</span></div>'
             + '<ul class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-neutral-300 mb-4 list-disc pl-4">'
             + '<li>Full Body Wax</li><li>Full Body Polishing</li><li>Eyebrow Threading</li><li>Forehead Threading</li><li>Upper Lip Threading</li><li>O3+ Facial</li><li>Face Detan</li><li>Manicure</li><li>Pedicure</li><li>Haircut</li></ul>'
-            + '<button type="button" data-signature-book="royal" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Select Combo • ₹' + royalPrice.toLocaleString("en-IN") + '</button></article></div>';
+            + '<button type="button" data-signature-book="royal" class="w-full btn-gold-solid py-2.5 rounded-xl text-[11px] uppercase tracking-wider font-extrabold">Select Package • ₹' + royalPrice.toLocaleString("en-IN") + '</button></article></div>';
         container.insertAdjacentHTML("beforeend", signatureCards);
         container.querySelectorAll("[data-signature-book]").forEach(function (button) {
             button.addEventListener("click", function () {
