@@ -1527,7 +1527,12 @@ window.addEventListener('DOMContentLoaded', () => {
             return item.name + " x" + item.qty + " @ " + formatINR(item.price);
         }).join("; ");
         var bookingText = "Custom Service Selection [Total: " + formatINR(total) + "] — " + details;
-        if (window.ANAMIKA_REQUIRE_CLIENT_LOGIN && !(await window.ANAMIKA_REQUIRE_CLIENT_LOGIN(bookingText))) return;
+        if (typeof window.ANAMIKA_REQUIRE_CLIENT_LOGIN !== "function") {
+            try { localStorage.setItem("anamika_pending_booking_package", bookingText); localStorage.setItem("anamika_pending_booking", "1"); } catch (e) {}
+            window.location.href = "portal.html?redirect=booking";
+            return;
+        }
+        if (!(await window.ANAMIKA_REQUIRE_CLIENT_LOGIN(bookingText))) return;
         window.openBookingSheet(bookingText);
         window.__bookingUsesCart = true;
     };
@@ -1536,10 +1541,16 @@ window.addEventListener('DOMContentLoaded', () => {
     var originalOpenBookingSheet = window.openBookingSheet;
     window.openBookingSheet = async function (packageName) {
         // One central auth gate for every booking button and entry point.
-        if (window.ANAMIKA_REQUIRE_CLIENT_LOGIN) {
-            var canBook = await window.ANAMIKA_REQUIRE_CLIENT_LOGIN(packageName);
-            if (!canBook) return false;
+        if (typeof window.ANAMIKA_REQUIRE_CLIENT_LOGIN !== "function") {
+            try {
+                if (packageName) localStorage.setItem("anamika_pending_booking_package", packageName);
+                localStorage.setItem("anamika_pending_booking", "1");
+            } catch (e) {}
+            window.location.href = "portal.html?redirect=booking";
+            return false;
         }
+        var canBook = await window.ANAMIKA_REQUIRE_CLIENT_LOGIN(packageName);
+        if (!canBook) return false;
         window.__bookingUsesCart = false;
         return originalOpenBookingSheet(packageName);
     };
