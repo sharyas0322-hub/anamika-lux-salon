@@ -934,7 +934,7 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
         // Combo selection: login/signup is required immediately when a combo is selected.
         window.selectComboForBooking = async function (comboName) {
             if (window.ANAMIKA_REQUIRE_CLIENT_LOGIN) {
-                const ok = await window.ANAMIKA_REQUIRE_CLIENT_LOGIN();
+                const ok = await window.ANAMIKA_REQUIRE_CLIENT_LOGIN(comboName);
                 if (!ok) return;
             }
             window.openBookingSheet(comboName);
@@ -1675,8 +1675,9 @@ window.addEventListener('DOMContentLoaded', () => {
     .on("postgres_changes", {event:"*", schema:"public", table:"salon_campaign"}, loadPublicSalonData)
     .subscribe();
 
-  async function requireClientLogin() {
+  async function requireClientLogin(pendingPackage) {
     try {
+      if (pendingPackage) localStorage.setItem("anamika_pending_booking_package", pendingPackage);
       const sessionResult = await db.auth.getSession();
       const session = sessionResult && sessionResult.data ? sessionResult.data.session : null;
       if (session && session.user) return true;
@@ -1792,6 +1793,20 @@ window.addEventListener('DOMContentLoaded', () => {
       if (submitButton) submitButton.disabled = false;
     }
   };
+
+  (async function resumePendingBooking() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("redirect") !== "booking") return;
+      const sessionResult = await db.auth.getSession();
+      const session = sessionResult && sessionResult.data ? sessionResult.data.session : null;
+      if (!session || !session.user) return;
+      const packageName = localStorage.getItem("anamika_pending_booking_package");
+      localStorage.removeItem("anamika_pending_booking");
+      localStorage.removeItem("anamika_pending_booking_package");
+      if (packageName && typeof window.openBookingSheet === "function") window.openBookingSheet(packageName);
+    } catch (e) { console.warn("Pending booking resume failed:", e); }
+  })();
 
   loadPublicSalonData().catch(function (error) {
     console.error("Anamika cloud data load failed:", error);
