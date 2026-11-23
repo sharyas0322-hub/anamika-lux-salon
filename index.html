@@ -1517,7 +1517,7 @@ window.addEventListener('DOMContentLoaded', () => {
         window.openCartPage();
     };
 
-    window.bookServiceCart = function () {
+    window.bookServiceCart = async function () {
         if (!window.serviceCart.length) {
             showCartNotice("Please add at least one service to your cart.");
             return;
