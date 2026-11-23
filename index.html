@@ -1740,7 +1740,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const result = await db.from("user_profiles").select("full_name,phone,email").eq("id", session.user.id).maybeSingle();
       if (result.error || !result.data) throw (result.error || new Error("Customer profile not found"));
       const name = String(result.data.full_name || "").trim();
-      const phone = String(result.data.phone || "").replace(/\\D/g, "");
+      const phone = String(result.data.phone || "").replace(/\D/g, "");
       if (!name || phone.length < 10) {
         if (summary) summary.textContent = "Your saved name or mobile number is incomplete. Please update your account profile.";
         return;
