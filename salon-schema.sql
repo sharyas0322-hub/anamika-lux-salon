@@ -117,3 +117,41 @@ grant execute on function public.get_login_email_by_phone(text) to anon, authent
 grant execute on function public.verify_client_identity(text,text) to anon, authenticated;
 grant execute on function public.create_client_profile(uuid,text,text,text,int,text) to authenticated;
 grant execute on function public.my_role() to authenticated;
+
+
+-- Admin-created client/staff profiles.
+-- This function must be run in Supabase SQL Editor once.
+create or replace function public.admin_create_user_profile(
+  p_user_id uuid,
+  p_name text,
+  p_phone text,
+  p_email text,
+  p_age int,
+  p_gender text,
+  p_role text,
+  p_staff_code text default null,
+  p_commission numeric default 0
+) returns public.user_profiles
+language plpgsql security definer set search_path = public
+as $$
+declare v public.user_profiles;
+begin
+  if not exists (select 1 from public.user_profiles where id=auth.uid() and role='admin' and active=true) then
+    raise exception 'Only an active admin can create users';
+  end if;
+  if p_role not in ('client','staff') then raise exception 'Invalid role'; end if;
+  if p_user_id is null then raise exception 'User id is required'; end if;
+  insert into public.user_profiles(id,full_name,phone,email,age,gender,role)
+  values(p_user_id,trim(p_name),regexp_replace(p_phone,'\D','','g'),lower(trim(p_email)),p_age,p_gender,p_role)
+  on conflict (id) do update set full_name=excluded.full_name,phone=excluded.phone,email=excluded.email,age=excluded.age,gender=excluded.gender,role=excluded.role,active=true
+  returning * into v;
+  if p_role='staff' then
+    if nullif(trim(p_staff_code),'') is null then raise exception 'Staff code is required'; end if;
+    insert into public.salon_staff(user_id,staff_code,display_name,phone,commission_percent)
+    values(p_user_id,trim(p_staff_code),trim(p_name),regexp_replace(p_phone,'\D','','g'),coalesce(p_commission,0))
+    on conflict (user_id) do update set staff_code=excluded.staff_code,display_name=excluded.display_name,phone=excluded.phone,commission_percent=excluded.commission_percent,status='active';
+  end if;
+  return v;
+end $$;
+
+grant execute on function public.admin_create_user_profile(uuid,text,text,text,int,text,text,text,numeric) to authenticated;
