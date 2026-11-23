@@ -1532,7 +1532,7 @@ window.addEventListener('DOMContentLoaded', () => {
             return item.name + " x" + item.qty + " @ " + formatINR(item.price);
         }).join("; ");
         var bookingText = "Custom Service Selection [Total: " + formatINR(total) + "] — " + details;
-        if (window.ANAMIKA_REQUIRE_CLIENT_LOGIN && !(await window.ANAMIKA_REQUIRE_CLIENT_LOGIN())) return;
+        if (window.ANAMIKA_REQUIRE_CLIENT_LOGIN && !(await window.ANAMIKA_REQUIRE_CLIENT_LOGIN(bookingText))) return;
         window.openBookingSheet(bookingText);
         window.__bookingUsesCart = true;
     };
