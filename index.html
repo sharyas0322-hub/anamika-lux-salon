@@ -1725,6 +1725,35 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     window.getCurrentLocationForBooking = getCurrentLocationForBooking;
 
+  window.loadBookingCustomerSummary = async function () {
+    const summary = document.getElementById("bookingCustomerSummary");
+    const nameInput = document.getElementById("custName");
+    const phoneInput = document.getElementById("custPhone");
+    if (summary) summary.textContent = "Loading your saved customer details…";
+    try {
+      const sessionResult = await db.auth.getSession();
+      const session = sessionResult && sessionResult.data ? sessionResult.data.session : null;
+      if (!session || !session.user) {
+        if (summary) summary.textContent = "Please sign in to continue your booking.";
+        return;
+      }
+      const result = await db.from("user_profiles").select("full_name,phone,email").eq("id", session.user.id).maybeSingle();
+      if (result.error || !result.data) throw (result.error || new Error("Customer profile not found"));
+      const name = String(result.data.full_name || "").trim();
+      const phone = String(result.data.phone || "").replace(/\\D/g, "");
+      if (!name || phone.length < 10) {
+        if (summary) summary.textContent = "Your saved name or mobile number is incomplete. Please update your account profile.";
+        return;
+      }
+      if (nameInput) nameInput.value = name;
+      if (phoneInput) phoneInput.value = phone;
+      if (summary) summary.textContent = name + " · " + phone;
+    } catch (error) {
+      console.error("Booking customer profile load failed:", error);
+      if (summary) summary.textContent = "Could not load your account details. Please sign in again.";
+    }
+  };
+
   window.handleSheetFormSubmit = async function (event) {
     event.preventDefault();
     if (!(await requireClientLogin())) return;
