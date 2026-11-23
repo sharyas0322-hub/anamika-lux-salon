@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="app-version" content="1.0.4">
-    <meta name="cache-bust" content="2026-11-23-login-flow">
+    <meta name="cache-bust" content="2026-11-23-client-profile-1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>The Anamika Lux | Luxury Doorstep Salon, Patna</title>
     <link rel="icon" href="/the-anamika-lux-logo.png" type="image/png">
@@ -405,6 +405,7 @@
                 </a>
             </div>
         </div>
+    <button id="anamikaProfileButton" type="button" class="w-9 h-9 rounded-full border border-gold-500/40 bg-gold-500/10 flex items-center justify-center text-gold-200" aria-label="My Profile" title="My Profile"><i class="fa-regular fa-user"></i></button>
     </nav>
 
     <!-- Main Content Area -->
@@ -1817,6 +1818,47 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 
     <script src="/brand-settings.js"></script>
+<div id="anamikaProfileModal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6"><div class="max-w-3xl mx-auto my-4 rounded-3xl border border-gold-500/30 bg-[#09090d] shadow-2xl overflow-hidden"><div class="flex items-center justify-between p-5 sm:p-7 border-b border-white/10"><div><p class="text-[10px] tracking-[.24em] text-gold-300 uppercase">The Anamika Lux</p><h2 class="font-playfair text-2xl sm:text-3xl text-white mt-1">My Account</h2><p class="text-xs text-neutral-400 mt-1">Your profile and service bookings</p></div><button id="anamikaProfileClose" class="w-10 h-10 rounded-full border border-white/10 text-neutral-300" aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button></div><div id="anamikaProfileContent" class="p-5 sm:p-7"><div class="text-center py-10 text-neutral-400">Loading your profile...</div></div></div></div>
+<script>
+(function(){
+ const db=window.ANAMIKA_DB;
+ const modal=document.getElementById("anamikaProfileModal");
+ const content=document.getElementById("anamikaProfileContent");
+ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+ const labels={pending:"Booking request received",confirmed:"Booking confirmed",assigned:"Professional assigned",out_for_service:"Out for service",arrived:"Professional arrived",in_progress:"Service in progress",completed:"Service completed",cancelled:"Booking cancelled"};
+ const open=()=>{modal.classList.remove("hidden");document.body.style.overflow="hidden";load();};
+ const close=()=>{modal.classList.add("hidden");document.body.style.overflow="";};
+ document.getElementById("anamikaProfileButton").addEventListener("click",open);
+ document.getElementById("anamikaProfileClose").addEventListener("click",close);
+ modal.addEventListener("click",e=>{if(e.target===modal)close();});
+ async function load(){
+  const {data:{session}}=await db.auth.getSession();
+  if(!session){content.innerHTML='<div class="text-center py-10"><div class="w-16 h-16 mx-auto rounded-full bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-2xl text-gold-300"><i class="fa-regular fa-user"></i></div><h3 class="font-playfair text-2xl mt-5">Welcome to Anamika Lux</h3><p class="text-sm text-neutral-400 mt-2">Login or create your account to manage your bookings.</p><a href="portal.html?redirect=profile" class="inline-flex mt-6 px-7 py-3 rounded-full btn-gold-solid text-sm">Login / Create Account</a></div>';return;}
+  const [{data:profile},{data:bookings},{data:staffRows}]=await Promise.all([
+   db.from("user_profiles").select("full_name,phone,email").eq("id",session.user.id).maybeSingle(),
+   db.from("bookings").select("id,booking_code,selected_package,total_amount,appointment_date,appointment_slot,address,status,created_at").eq("client_id",session.user.id).order("created_at",{ascending:false}).limit(30),
+   db.from("client_booking_staff").select("booking_id,display_name,staff_code")
+  ]);
+  if(!profile){content.innerHTML='<p class="text-center text-neutral-400 py-10">Profile details could not be loaded. Please contact salon support.</p>';return;}
+  const rows=bookings||[],staff={};(staffRows||[]).forEach(x=>staff[x.booking_id]=x);
+  const first=esc((profile.full_name||"Client").trim().split(/\s+/)[0]);
+  const profileCard='<section class="rounded-2xl border border-gold-500/20 bg-gradient-to-br from-[#191710] to-[#0c0c10] p-5"><div class="flex items-center gap-4"><div class="w-14 h-14 rounded-2xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-200 text-xl"><i class="fa-regular fa-user"></i></div><div class="min-w-0"><p class="text-[10px] tracking-[.2em] uppercase text-gold-300">Client profile</p><h3 class="text-xl font-semibold text-white">'+esc(profile.full_name||"Client")+'</h3><p class="text-xs text-neutral-400">'+esc(profile.phone||"")+' · '+esc(profile.email||"")+'</p></div></div></section>';
+  const stats='<div class="grid grid-cols-2 gap-3 mt-4"><div class="rounded-2xl border border-white/10 bg-white/[.03] p-4"><p class="text-[10px] uppercase tracking-wider text-neutral-400">Total bookings</p><b class="text-2xl text-white">'+rows.length+'</b></div><div class="rounded-2xl border border-white/10 bg-white/[.03] p-4"><p class="text-[10px] uppercase tracking-wider text-neutral-400">Completed</p><b class="text-2xl text-white">'+rows.filter(x=>x.status==="completed").length+'</b></div></div>';
+  let cards="";
+  for(const b of rows){
+   const {data:events}=await db.from("booking_status_events").select("status,note,created_at").eq("booking_id",b.id).order("created_at",{ascending:true});
+   const st=staff[b.id];
+   const timeline=(events||[]).map(e=>'<div class="flex gap-3 py-2"><span class="text-gold-300 mt-1">●</span><div class="min-w-0"><p class="text-sm font-semibold text-white">'+esc(labels[e.status]||e.status)+'</p><p class="text-[11px] text-neutral-400">'+new Date(e.created_at).toLocaleString("en-IN")+'</p><p class="text-xs text-neutral-400">'+esc(e.note||"")+'</p></div></div>').join("");
+   cards+='<article class="rounded-2xl border border-gold-500/20 bg-[#101017] p-4 sm:p-5"><div class="flex justify-between gap-3"><div><p class="text-[10px] uppercase tracking-widest text-gold-300">'+esc(b.booking_code)+'</p><h4 class="font-semibold text-white mt-1">'+esc(b.selected_package)+'</h4></div><span class="h-fit text-[10px] rounded-full border border-gold-500/30 px-3 py-1 text-gold-200">'+esc(labels[b.status]||b.status)+'</span></div><div class="grid sm:grid-cols-2 gap-2 mt-4 text-xs text-neutral-300"><p><i class="fa-regular fa-calendar text-gold-300 mr-2"></i>'+esc(b.appointment_date)+'</p><p><i class="fa-regular fa-clock text-gold-300 mr-2"></i>'+esc(b.appointment_slot)+'</p><p><i class="fa-solid fa-indian-rupee-sign text-gold-300 mr-2"></i>'+Number(b.total_amount||0).toLocaleString("en-IN")+'</p><p class="sm:col-span-2"><i class="fa-solid fa-location-dot text-gold-300 mr-2"></i>'+esc(b.address)+'</p></div>'+(st?'<div class="mt-4 rounded-xl border border-gold-500/20 bg-gold-500/[.05] p-3"><p class="text-[10px] tracking-widest text-gold-300 uppercase">Assigned professional</p><p class="text-sm font-semibold text-white mt-1">'+esc(st.display_name)+'</p><p class="text-[10px] text-neutral-400">Staff code: '+esc(st.staff_code)+' · Contact number is private</p></div>':'<p class="text-xs text-neutral-400 mt-3">Professional details will appear here after assignment.</p>')+'<div class="mt-4 border-t border-white/10 pt-3"><p class="text-[10px] uppercase tracking-widest text-gold-300 mb-2">Booking journey</p>'+(timeline||'<p class="text-xs text-neutral-400">Tracking updates will appear here.</p>')+'</div></article>';
+  }
+  content.innerHTML=profileCard+stats+'<div class="flex items-center justify-between mt-7 mb-3"><h3 class="font-playfair text-xl text-white">My Bookings</h3><a href="booking.html" class="text-xs text-gold-200 underline underline-offset-4">Book a service</a></div>'+(rows.length?'<div class="space-y-4">'+cards+'</div>':'<div class="rounded-2xl border border-dashed border-gold-500/25 bg-white/[.02] text-center px-5 py-10 mt-3"><div class="w-14 h-14 rounded-2xl mx-auto bg-gold-500/10 text-gold-300 flex items-center justify-center text-xl"><i class="fa-regular fa-calendar-check"></i></div><h4 class="font-playfair text-xl text-white mt-4">Your first salon experience awaits</h4><p class="text-sm text-neutral-400 mt-2 max-w-sm mx-auto">You haven’t booked a service yet. Explore our packages and choose your preferred service.</p><a href="booking.html" class="inline-flex mt-5 px-7 py-3 rounded-full btn-gold-solid text-sm">Book Your First Service</a></div>')+'<div class="flex justify-between items-center mt-7 pt-4 border-t border-white/10"><button id="anamikaProfileRefresh" class="text-xs text-gold-200"><i class="fa-solid fa-rotate mr-1"></i> Refresh</button><button id="anamikaProfileLogout" class="text-xs text-red-300"><i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Logout</button></div>';
+  document.getElementById("anamikaProfileRefresh").onclick=load;
+  document.getElementById("anamikaProfileLogout").onclick=async()=>{await db.auth.signOut();close();location.reload();};
+ }
+ if(new URLSearchParams(location.search).get("profile")==="1"){open();history.replaceState({},document.title,location.pathname);}
+ db.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_IN"&&modal&&!modal.classList.contains("hidden"))load();});
+})();
+</script>
 </body>
 </html>
 
