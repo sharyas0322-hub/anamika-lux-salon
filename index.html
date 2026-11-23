@@ -1792,7 +1792,10 @@ window.addEventListener('DOMContentLoaded', () => {
     if (summary) summary.textContent = name + " · " + phone;
     const date = document.getElementById("custDate").value;
     const slot = document.getElementById("custSlot").value;
-    const address = document.getElementById("custAddress").value.trim();
+    const addressEl = document.getElementById("custAddress");
+    const address = addressEl ? addressEl.value.trim() : "";
+    const locationLatitude = addressEl && addressEl.dataset.latitude ? Number(addressEl.dataset.latitude) : null;
+    const locationLongitude = addressEl && addressEl.dataset.longitude ? Number(addressEl.dataset.longitude) : null;
     const packageText = document.getElementById("sheetHiddenPackage").value || "Salon Service";
     const usingCart = !!window.__bookingUsesCart && Array.isArray(window.serviceCart) && window.serviceCart.length > 0;
     let items = [];
@@ -1820,7 +1823,9 @@ window.addEventListener('DOMContentLoaded', () => {
         p_address:address,
         p_selected_package:packageText,
         p_total_amount:total,
-        p_items:items
+        p_items:items,
+        p_location_latitude: locationLatitude,
+        p_location_longitude: locationLongitude
       });
       if (response.error) throw response.error;
       const booking = response.data || {};
