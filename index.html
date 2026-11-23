@@ -1748,3 +1748,18 @@ window.addEventListener('DOMContentLoaded', () => {
     <script src="/brand-settings.js"></script>
 </body>
 </html>
+
+<script>
+(function () {
+  if (document.getElementById("anamikaDownloadAppBtn")) return;
+  var btn = document.createElement("a");
+  btn.id = "anamikaDownloadAppBtn";
+  btn.href = "https://github.com/sharyas0322-hub/anamika-lux-salon/releases/latest";
+  btn.target = "_blank";
+  btn.rel = "noopener";
+  btn.innerHTML = '<i class="fa-solid fa-download"></i><span>Download App</span>';
+  btn.setAttribute("aria-label", "Download Anamika Lux App");
+  btn.style.cssText = "position:fixed;right:14px;bottom:82px;z-index:55;display:flex;align-items:center;gap:8px;padding:12px 15px;border:1px solid rgba(212,175,55,.55);border-radius:999px;background:linear-gradient(135deg,#f3e5ab,#d4af37,#9f7612);color:#090909;font:800 12px Plus Jakarta Sans,sans-serif;box-shadow:0 10px 28px rgba(0,0,0,.45),0 4px 16px rgba(212,175,55,.25);text-decoration:none;";
+  document.body.appendChild(btn);
+})();
+</script>
