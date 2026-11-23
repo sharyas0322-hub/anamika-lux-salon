@@ -1613,7 +1613,7 @@ window.addEventListener('DOMContentLoaded', () => {
 (function () {
   const DB_URL = "https://uwbcgwvrvtvggmaejxfu.supabase.co";
   const DB_KEY = "sb_publishable_CqhbUiMSpMpBSl2X_vKdHg_WimgwESl";
-  const db = window.supabase.createClient(DB_URL, DB_KEY);
+  const db = window.supabase.createClient(DB_URL, DB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
   window.ANAMIKA_DB = db;
 
   async function loadPublicSalonData() {
