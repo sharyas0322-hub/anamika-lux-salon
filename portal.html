@@ -55,8 +55,9 @@ async function adminCreateAccount(type){
   if(created.error)return alert(created.error.message);
   const user=created.data.user;
   if(!user)return alert("Account create nahi hua.");
+  const restored=await db.auth.setSession({access_token:adminSession.access_token,refresh_token:adminSession.refresh_token});
+  if(restored.error)return alert("Admin session restore nahi hua: "+restored.error.message);
   const roleResult=await db.rpc("admin_create_user_profile",{p_user_id:user.id,p_name:name,p_phone:phone,p_email:email,p_age:age,p_gender:gender,p_role:type,p_staff_code:type==="staff"?$("adminStaffCode").value.trim():null,p_commission:type==="staff"?(Number($("adminCommission").value)||0):0});
-  await db.auth.setSession({access_token:adminSession.access_token,refresh_token:adminSession.refresh_token});
   if(roleResult.error)return alert("Auth account ban gaya, lekin profile create nahi hui: "+roleResult.error.message);
   ["adminCreateName","adminCreatePhone","adminCreateEmail","adminCreatePassword","adminCreateAge","adminCreateGender","adminStaffCode","adminCommission"].forEach(id=>$(id).value="");
   alert((type==="staff"?"Staff":"Client")+" account successfully create ho gaya.");
