@@ -1887,6 +1887,7 @@ window.addEventListener('DOMContentLoaded', () => {
  const content=document.getElementById("anamikaProfileContent");
  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const labels={pending:"Booking request received",confirmed:"Booking confirmed",assigned:"Professional assigned",out_for_service:"Out for service",arrived:"Professional arrived",in_progress:"Service in progress",completed:"Service completed",cancelled:"Booking cancelled"};
+ let profileLiveChannel=null;
  const open=()=>{modal.classList.remove("hidden");document.body.style.overflow="hidden";load();};
  const close=()=>{modal.classList.add("hidden");document.body.style.overflow="";};
  document.getElementById("anamikaProfileButton").addEventListener("click",open);
@@ -1894,6 +1895,12 @@ window.addEventListener('DOMContentLoaded', () => {
  modal.addEventListener("click",e=>{if(e.target===modal)close();});
  async function load(){
   const {data:{session}}=await db.auth.getSession();
+  if(session && !profileLiveChannel){
+   profileLiveChannel=db.channel("client-profile-live-"+session.user.id)
+    .on("postgres_changes",{event:"*",schema:"public",table:"bookings",filter:"client_id=eq."+session.user.id},()=>{if(!modal.classList.contains("hidden"))load();})
+    .on("postgres_changes",{event:"*",schema:"public",table:"booking_status_events"},()=>{if(!modal.classList.contains("hidden"))load();})
+    .subscribe();
+  }
   if(!session){content.innerHTML='<div class="text-center py-10"><div class="w-16 h-16 mx-auto rounded-full bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-2xl text-gold-300"><i class="fa-regular fa-user"></i></div><h3 class="font-playfair text-2xl mt-5">Welcome to Anamika Lux</h3><p class="text-sm text-neutral-400 mt-2">Login or create your account to manage your bookings.</p><a href="portal.html?redirect=profile" class="inline-flex mt-6 px-7 py-3 rounded-full btn-gold-solid text-sm">Login / Create Account</a></div>';return;}
   const [{data:profile},{data:bookings},{data:staffRows}]=await Promise.all([
    db.from("user_profiles").select("full_name,phone,email").eq("id",session.user.id).maybeSingle(),
