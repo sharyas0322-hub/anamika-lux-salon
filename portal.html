@@ -45,6 +45,12 @@ $("logout").onclick=async()=>{await db.auth.signOut();location.reload()};
 const statusLabels={pending:"Booking Request Received",confirmed:"Booking Confirmed",assigned:"Staff Assigned",out_for_service:"Out for Service",arrived:"Staff Arrived",in_progress:"Service In Progress",completed:"Service Completed",cancelled:"Booking Cancelled"};
 const safeText=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const money=v=>"₹"+Number(v||0).toLocaleString("en-IN");
+const bookingMapLink=x=>{
+  const lat=Number(x?.location_latitude), lng=Number(x?.location_longitude);
+  if(!Number.isFinite(lat)||!Number.isFinite(lng)) return "";
+  const url="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(lat+","+lng);
+  return '<a href="'+url+'" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mt-2 rounded-xl border border-yellow-700/50 bg-yellow-500/[.06] px-3 py-2 text-xs gold font-bold"><i class="fa-solid fa-map-location-dot"></i> Open Exact Customer Location</a>';
+};
 let chosenPortalPackage=null;
 async function clientDash(){
   const u=session.user;
