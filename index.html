@@ -1055,7 +1055,7 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
             }
             fullPackageString += ` [Total: ₹${finalPrice}]`;
 
-            openBookingSheet(fullPackageString);
+            window.openBookingSheet(fullPackageString);
         }
 
         // Touch Before/After Glow Slider
@@ -1221,7 +1221,7 @@ const SALON_WHATSAPP_NUMBER = "918893645998";
                 button.addEventListener("click", () => {
                     const service = decodeURIComponent(button.dataset.service || "");
                     const price = decodeURIComponent(button.dataset.price || "");
-                    openBookingSheet(`${service} (${price})`);
+                    window.openBookingSheet(`${service} (${price})`);
                 });
             });
         }
