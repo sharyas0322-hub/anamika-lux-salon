@@ -31,7 +31,7 @@ const DB_URL="https://uwbcgwvrvtvggmaejxfu.supabase.co",DB_KEY="sb_publishable_C
 const db=window.supabase.createClient(DB_URL,DB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});let role="client",session=null;
 const $=id=>document.getElementById(id),msg=t=>{$("msg").textContent=t};
 
-(async()=>{if(new URLSearchParams(location.search).get("reset")==="1"){const {data}=await db.auth.getSession();if(data.session){session=data.session;$("clientSignup").classList.add("hidden");$("loginFields").classList.add("hidden");$("forgotBox").classList.add("hidden");$("resetBox").classList.remove("hidden");document.querySelectorAll(".tab").forEach(x=>x.classList.add("hidden"));msg("Naya password set karein.");}}})();
+
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{role=b.dataset.role;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");$("clientSignup").classList.toggle("hidden",role!=="client");$("switchSignup").classList.toggle("hidden",role!=="client");$("forgot").classList.toggle("hidden",role!=="client");$("identifier").placeholder=role==="client"||role==="staff"?"Mobile number":"Admin email";$("clientSignup").classList.add("hidden");$("loginFields").classList.remove("hidden");$("forgotBox").classList.add("hidden");msg("")});
 $("switchSignup").onclick=()=>{$("loginFields").classList.add("hidden");$("clientSignup").classList.remove("hidden")};
 $("switchLogin").onclick=()=>{$("clientSignup").classList.add("hidden");$("loginFields").classList.remove("hidden")};
