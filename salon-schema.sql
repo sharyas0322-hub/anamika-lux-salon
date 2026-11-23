@@ -79,6 +79,9 @@ alter table public.salon_bills enable row level security;
 drop policy if exists "users own profile" on public.user_profiles;
 create policy "users own profile" on public.user_profiles for select using (id = auth.uid());
 
+drop policy if exists "users can insert own profile" on public.user_profiles;
+create policy "users can insert own profile" on public.user_profiles for insert with check (id = auth.uid() and role = 'client');
+
 drop policy if exists "client own appointments" on public.salon_appointments;
 create policy "client own appointments" on public.salon_appointments for select using (client_id = auth.uid());
 
