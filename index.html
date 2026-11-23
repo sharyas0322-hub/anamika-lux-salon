@@ -1522,6 +1522,7 @@ window.addEventListener('DOMContentLoaded', () => {
             return item.name + " x" + item.qty + " @ " + formatINR(item.price);
         }).join("; ");
         var bookingText = "Custom Service Selection [Total: " + formatINR(total) + "] — " + details;
+        if (window.ANAMIKA_REQUIRE_CLIENT_LOGIN && !(await window.ANAMIKA_REQUIRE_CLIENT_LOGIN())) return;
         window.openBookingSheet(bookingText);
         window.__bookingUsesCart = true;
     };
@@ -1575,9 +1576,9 @@ window.addEventListener('DOMContentLoaded', () => {
         container.querySelectorAll("[data-signature-book]").forEach(function (button) {
             button.addEventListener("click", function () {
                 if (button.dataset.signatureBook === "signature") {
-                    window.openBookingSheet("Signature Beauty Package (₹" + signaturePrice + ")");
+                    if (window.ANAMIKA_REQUIRE_CLIENT_LOGIN) { window.ANAMIKA_REQUIRE_CLIENT_LOGIN().then(function(ok){ if(ok) window.openBookingSheet("Signature Beauty Package (₹" + signaturePrice + ")"); }); } else window.openBookingSheet("Signature Beauty Package (₹" + signaturePrice + ")");
                 } else {
-                    window.openBookingSheet("Royal Complete Care Package (₹" + royalPrice + ")");
+                    if (window.ANAMIKA_REQUIRE_CLIENT_LOGIN) { window.ANAMIKA_REQUIRE_CLIENT_LOGIN().then(function(ok){ if(ok) window.openBookingSheet("Royal Complete Care Package (₹" + royalPrice + ")"); }); } else window.openBookingSheet("Royal Complete Care Package (₹" + royalPrice + ")");
                 }
             });
         });
@@ -1665,8 +1666,26 @@ window.addEventListener('DOMContentLoaded', () => {
     .on("postgres_changes", {event:"*", schema:"public", table:"salon_campaign"}, loadPublicSalonData)
     .subscribe();
 
+  async function requireClientLogin() {
+    try {
+      const sessionResult = await db.auth.getSession();
+      const session = sessionResult && sessionResult.data ? sessionResult.data.session : null;
+      if (session && session.user) return true;
+    } catch (e) {
+      console.warn("Login check failed:", e);
+    }
+    try {
+      localStorage.setItem("anamika_pending_booking", "1");
+    } catch (e) {}
+    window.alert("Booking karne se pehle Login ya Sign Up karna zaroori hai. OTP ki zaroorat nahi hai.");
+    window.location.href = "portal.html?redirect=booking";
+    return false;
+  }
+  window.ANAMIKA_REQUIRE_CLIENT_LOGIN = requireClientLogin;
+
   window.handleSheetFormSubmit = async function (event) {
     event.preventDefault();
+    if (!(await requireClientLogin())) return;
     const submitButton = document.getElementById("sheetSubmitBtn");
     const btnText = document.getElementById("sheetBtnText");
     const name = document.getElementById("custName").value.trim();
