@@ -99,6 +99,9 @@ language plpgsql security definer set search_path = public
 as $$
 declare v public.user_profiles;
 begin
+  if auth.uid() is null or p_user_id <> auth.uid() then
+    raise exception 'You can only create your own client profile';
+  end if;
   insert into public.user_profiles(id,full_name,phone,email,age,gender,role)
   values(p_user_id,p_name,regexp_replace(p_phone,'\D','','g'),lower(p_email),p_age,p_gender,'client')
   returning * into v;
