@@ -1534,7 +1534,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Keep single-package flow; guard the cart total before checkout.
     var originalOpenBookingSheet = window.openBookingSheet;
-    window.openBookingSheet = function (packageName) {
+    window.openBookingSheet = async function (packageName) {
+        // One central auth gate for every booking button and entry point.
+        if (window.ANAMIKA_REQUIRE_CLIENT_LOGIN) {
+            var canBook = await window.ANAMIKA_REQUIRE_CLIENT_LOGIN(packageName);
+            if (!canBook) return false;
+        }
         window.__bookingUsesCart = false;
         return originalOpenBookingSheet(packageName);
     };
