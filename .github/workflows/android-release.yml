@@ -2,10 +2,6 @@ name: Build and publish Anamika Lux Android update
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "android/**"
-      - ".github/workflows/android-release.yml"
 
 permissions:
   contents: write
@@ -34,6 +30,22 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.9"
+      - name: Read app version and prepare update manifest
+        id: app
+        run: |
+          VERSION_CODE=$(sed -n 's/.*versionCode = \\([0-9][0-9]*\\).*/\\1/p' android/app/build.gradle.kts)
+          VERSION_NAME=$(sed -n 's/.*versionName = "\\([^"]*\\)".*/\\1/p' android/app/build.gradle.kts)
+          test -n "$VERSION_CODE" && test -n "$VERSION_NAME"
+          echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
+          echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          cat > android/update.json <<EOF
+          {
+            "versionCode": $VERSION_CODE,
+            "versionName": "$VERSION_NAME",
+            "apkUrl": "https://github.com/sharyas0322-hub/anamika-lux-salon/releases/latest/download/app-release.apk",
+            "releaseNotes": "Anamika Lux app improvements and fixes."
+          }
+          EOF
       - name: Prepare signing key
         env:
           KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -51,8 +63,10 @@ jobs:
       - name: Publish update
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.1
-          name: Anamika Lux v1.0.1
+          tag_name: v${{ steps.app.outputs.version_name }}
+          name: Anamika Lux v${{ steps.app.outputs.version_name }}
           target_commitish: main
           make_latest: true
-          files: android/app/build/outputs/apk/release/app-release.apk
+          files: |
+            android/app/build/outputs/apk/release/app-release.apk
+            android/update.json
