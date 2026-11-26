@@ -1,4 +1,4 @@
-name: Build Anamika Lux Android APK
+name: Build and publish Anamika Lux Android update
 
 on:
   workflow_dispatch:
@@ -8,10 +8,10 @@ on:
       - ".github/workflows/android-apk.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -49,13 +49,61 @@ jobs:
               canvas.save(res/f'mipmap-{density}/ic_launcher.png')
               canvas.save(res/f'mipmap-{density}/ic_launcher_round.png')
           PY
-      - name: Build debug APK
+      - name: Configure Android release signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "Missing GitHub secret ANDROID_KEYSTORE_BASE64" >&2
+            exit 1
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/anamika-upload.jks"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/anamika-upload.jks" >> "$GITHUB_ENV"
+      - name: Build signed release APK
         working-directory: android
-        run: gradle --no-daemon assembleDebug
-      - name: Upload APK
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          gradle --no-daemon assembleRelease
+          cp app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/anamika-lux.apk
+      - name: Create update manifest
+        id: version
+        run: |
+          python - <<'PY'
+          import re, json
+          from pathlib import Path
+          p = Path('android/app/build.gradle.kts').read_text()
+          code = int(re.search(r'versionCode\s*=\s*(\d+)', p).group(1))
+          name = re.search(r'versionName\s*=\s*"([^"]+)"', p).group(1)
+          out = {
+            "versionCode": code,
+            "versionName": name,
+            "apkUrl": "https://github.com/sharyas0322-hub/anamika-lux-salon/releases/latest/download/anamika-lux.apk",
+            "releaseNotes": "Anamika Lux app update with the latest improvements and fixes."
+          }
+          Path('android/app/build/outputs/apk/release/update.json').write_text(json.dumps(out, indent=2))
+          Path('android/app/build/outputs/apk/release/release-notes.md').write_text(
+            f"## Anamika Lux {name}\n\n- Latest app improvements and fixes\n- In-app update download and Android installer flow\n"
+          )
+          Path('version.txt').write_text(name)
+          PY
+          echo "version_name=$(cat version.txt)" >> "$GITHUB_OUTPUT"
+      - name: Publish latest Android release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version_name }}
+          name: Anamika Lux v${{ steps.version.outputs.version_name }}
+          body_path: android/app/build/outputs/apk/release/release-notes.md
+          make_latest: true
+          files: |
+            android/app/build/outputs/apk/release/anamika-lux.apk
+            android/app/build/outputs/apk/release/update.json
+      - name: Upload APK build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: anamika-lux-android-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: anamika-lux-android-release-apk
+          path: android/app/build/outputs/apk/release/anamika-lux.apk
           if-no-files-found: error
           retention-days: 30
