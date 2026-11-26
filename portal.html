@@ -156,12 +156,11 @@ async function adminResetClientPassword(requestId){
     const roleResult=await db.rpc("my_role");
     if(roleResult.error||!roleResult.data){msg("Saved login verify nahi ho paya. Please login again.");return;}
     const actual=roleResult.data;
-    if(actual==="client"){
-      const requestedRedirect=new URLSearchParams(location.search).get("redirect");const redirect=requestedRedirect==="booking"?"?redirect=booking":requestedRedirect==="profile"?"?profile=1":"";
-      location.replace("index.html"+redirect);
+    if(actual==="client"||actual==="admin"||actual==="staff"){
+      role=actual;
+      await loadDashboard(actual);
       return;
     }
-    if(actual==="admin"||actual==="staff"){role=actual;await loadDashboard(actual);return;}
     msg("Account role verify nahi hua. Admin se contact karein.");
   }catch(error){
     console.error("Session restore failed:",error);
