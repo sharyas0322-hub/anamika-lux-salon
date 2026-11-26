@@ -2,6 +2,7 @@ package com.anamikalux.app;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,15 +17,24 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebResourceRequest;
 import android.widget.Toast;
-
+import org.json.JSONObject;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
     private static final int LOCATION_PERMISSION = 4101;
     private static final int FILE_CHOOSER = 4102;
+    private static final String UPDATE_URL = "https://raw.githubusercontent.com/sharyas0322-hub/anamika-lux-salon/main/android/update.json";
     private WebView webView;
     private GeolocationPermissions.Callback pendingGeoCallback;
     private String pendingGeoOrigin;
     private ValueCallback<Uri[]> fileCallback;
+    private final ExecutorService updateExecutor = Executors.newSingleThreadExecutor();
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +92,56 @@ public class MainActivity extends Activity {
 
         if (savedInstanceState != null) webView.restoreState(savedInstanceState);
         else webView.loadUrl("https://anamika-lux-salon.onrender.com/portal.html");
+
+        checkForAppUpdate();
+    }
+
+    private void checkForAppUpdate() {
+        updateExecutor.execute(() -> {
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) new URL(UPDATE_URL).openConnection();
+                connection.setConnectTimeout(7000);
+                connection.setReadTimeout(7000);
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Cache-Control", "no-cache");
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) return;
+                StringBuilder body = new StringBuilder();
+                try (InputStream input = connection.getInputStream();
+                     BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) body.append(line);
+                }
+                JSONObject update = new JSONObject(body.toString());
+                int latestCode = update.optInt("versionCode", 0);
+                String latestName = update.optString("versionName", "");
+                String apkUrl = update.optString("apkUrl", "");
+                String notes = update.optString("releaseNotes", "Performance improvements and bug fixes.");
+                int installedCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+                if (latestCode <= installedCode || apkUrl.isEmpty()) return;
+                runOnUiThread(() -> showUpdateDialog(latestName, notes, apkUrl));
+            } catch (Exception ignored) {
+                // Update checks are best-effort; the app must still open when offline.
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+        });
+    }
+
+    private void showUpdateDialog(String version, String notes, String apkUrl) {
+        if (isFinishing() || isDestroyed()) return;
+        new AlertDialog.Builder(this)
+            .setTitle("Anamika Lux update available")
+            .setMessage("New version " + version + " is ready.\n\n" + notes + "\n\nUpdate now for the latest app experience.")
+            .setPositiveButton("Update Now", (dialog, which) -> {
+                try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(apkUrl))); }
+                catch (ActivityNotFoundException e) {
+                    Toast.makeText(this, "Unable to open the update link.", Toast.LENGTH_LONG).show();
+                }
+            })
+            .setNegativeButton("Later", (dialog, which) -> dialog.dismiss())
+            .setCancelable(true)
+            .show();
     }
 
     private boolean handleUrl(Uri uri) {
@@ -142,6 +202,7 @@ public class MainActivity extends Activity {
     }
 
     @Override protected void onDestroy() {
+        updateExecutor.shutdownNow();
         if (webView != null) { webView.stopLoading(); webView.destroy(); }
         super.onDestroy();
     }
