@@ -1926,12 +1926,13 @@ window.addEventListener('DOMContentLoaded', () => {
    db.from("client_booking_staff").select("booking_id,display_name,staff_code"),
    db.from("booking_visit_otps").select("booking_id,otp_code,expires_at,verified_at")
   ]);
-  if(profileResult.error||bookingResult.error||staffResult.error||otpResult.error){
-   console.error("Account data load failed",profileResult.error,bookingResult.error,staffResult.error,otpResult.error);
-   content.innerHTML='<div class="text-center py-10"><p class="text-red-300">Your account data could not be loaded right now.</p><p class="text-xs text-neutral-400 mt-2">Your login is still active. Please try again.</p><button id="anamikaProfileRetry" class="mt-5 px-6 py-2 rounded-full border border-gold-500/40 text-gold-200">Try Again</button></div>';
+  if(profileResult.error){
+   console.error("Customer profile load failed:",profileResult.error);
+   content.innerHTML='<div class="text-center py-10"><p class="text-red-300">Your profile could not be loaded right now.</p><p class="text-xs text-neutral-400 mt-2">Your login is still active. Please try again.</p><button id="anamikaProfileRetry" class="mt-5 px-6 py-2 rounded-full border border-gold-500/40 text-gold-200">Try Again</button></div>';
    document.getElementById("anamikaProfileRetry").onclick=load;return;
   }
-  const profile=profileResult.data,bookings=bookingResult.data,staffRows=staffResult.data,visitOtps=otpResult.data;
+  if(bookingResult.error||staffResult.error||otpResult.error)console.warn("Optional booking details unavailable:",bookingResult.error,staffResult.error,otpResult.error);
+  const profile=profileResult.data,bookings=bookingResult.data||[],staffRows=staffResult.data||[],visitOtps=otpResult.data||[];
   if(!profile){content.innerHTML='<div class="text-center py-10"><p class="text-red-300">Your customer profile is not linked to this login.</p><p class="text-xs text-neutral-400 mt-2">Please contact salon support. Booking is disabled until your profile is verified.</p></div>';return;}
   const rows=bookings||[],staff={},visitOtp={};(staffRows||[]).forEach(x=>staff[x.booking_id]=x);(visitOtps||[]).forEach(x=>visitOtp[x.booking_id]=x);
   const first=esc((profile.full_name||"Client").trim().split(/\s+/)[0]);
