@@ -23,3 +23,9 @@ async function callMaskedBooking(bookingId,direction,button){
     }
   }
 }
+
+document.addEventListener("click",function(event){
+  const button=event.target.closest("[data-masked-call]");
+  if(!button)return;
+  callMaskedBooking(button.dataset.bookingId,button.dataset.direction,button);
+});
