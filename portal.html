@@ -145,5 +145,27 @@ async function adminResetClientPassword(requestId){
   alert("Password reset ho gaya. Temporary password customer ko securely share karein.");
   await adminDash();
 }
-(async()=>{session=null;await db.auth.signOut();$("auth").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");})();
+(async()=>{
+  $("auth").classList.remove("hidden");
+  $("app").classList.add("hidden");
+  $("logout").classList.add("hidden");
+  try{
+    const current=await db.auth.getSession();
+    session=current?.data?.session||null;
+    if(!session)return;
+    const roleResult=await db.rpc("my_role");
+    if(roleResult.error||!roleResult.data){msg("Saved login verify nahi ho paya. Please login again.");return;}
+    const actual=roleResult.data;
+    if(actual==="client"){
+      const redirect=new URLSearchParams(location.search).get("redirect")==="booking"?"?redirect=booking":"";
+      location.replace("index.html"+redirect);
+      return;
+    }
+    if(actual==="admin"||actual==="staff"){role=actual;await loadDashboard(actual);return;}
+    msg("Account role verify nahi hua. Admin se contact karein.");
+  }catch(error){
+    console.error("Session restore failed:",error);
+    msg("Login session restore nahi ho paya. Please login again.");
+  }
+})();
 </script><script src="./brand-settings.js"></script></body></html>
