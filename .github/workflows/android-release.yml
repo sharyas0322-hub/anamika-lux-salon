@@ -33,8 +33,8 @@ jobs:
       - name: Read app version and prepare update manifest
         id: app
         run: |
-          VERSION_CODE=$(sed -n 's/.*versionCode = \\([0-9][0-9]*\\).*/\\1/p' android/app/build.gradle.kts)
-          VERSION_NAME=$(sed -n 's/.*versionName = "\\([^"]*\\)".*/\\1/p' android/app/build.gradle.kts)
+          VERSION_CODE=$(sed -n 's/.*versionCode = \([0-9][0-9]*\\).*/\\1/p' android/app/build.gradle.kts)
+          VERSION_NAME=$(sed -n 's/.*versionName = "\([^"]*\\)".*/\\1/p' android/app/build.gradle.kts)
           test -n "$VERSION_CODE" && test -n "$VERSION_NAME"
           echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
           echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
