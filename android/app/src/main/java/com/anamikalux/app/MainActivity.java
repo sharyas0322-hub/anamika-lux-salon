@@ -3,11 +3,22 @@ package com.anamikalux.app;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
 import android.webkit.CookieManager;
 import android.webkit.GeolocationPermissions;
 import android.webkit.ValueCallback;
@@ -29,12 +40,65 @@ import java.util.concurrent.Executors;
 public class MainActivity extends Activity {
     private static final int LOCATION_PERMISSION = 4101;
     private static final int FILE_CHOOSER = 4102;
+    private static final int INSTALL_PERMISSION = 4103;
     private static final String UPDATE_URL = "https://github.com/sharyas0322-hub/anamika-lux-salon/releases/latest/download/update.json";
     private WebView webView;
     private GeolocationPermissions.Callback pendingGeoCallback;
     private String pendingGeoOrigin;
     private ValueCallback<Uri[]> fileCallback;
     private final ExecutorService updateExecutor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private DownloadManager downloadManager;
+    private long activeDownloadId = -1;
+    private Uri pendingInstallUri;
+    private ProgressDialog downloadProgress;
+    private boolean receiverRegistered = false;
+
+    private final BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
+        @Override public void onReceive(Context context, Intent intent) {
+            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction()) &&
+                intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1) == activeDownloadId) {
+                mainHandler.removeCallbacks(progressUpdater);
+                if (downloadProgress != null) downloadProgress.dismiss();
+                DownloadManager.Query query = new DownloadManager.Query().setFilterById(activeDownloadId);
+                try (Cursor cursor = downloadManager.query(query)) {
+                    if (cursor != null && cursor.moveToFirst() &&
+                        cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+                        Uri apkUri = downloadManager.getUriForDownloadedFile(activeDownloadId);
+                        if (apkUri != null) installDownloadedApk(apkUri);
+                        else Toast.makeText(MainActivity.this, "APK download could not be opened.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Update download failed. Please try again.", Toast.LENGTH_LONG).show();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Unable to verify downloaded update.", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    };
+
+    private final Runnable progressUpdater = new Runnable() {
+        @Override public void run() {
+            if (activeDownloadId < 0 || downloadManager == null || downloadProgress == null) return;
+            DownloadManager.Query query = new DownloadManager.Query().setFilterById(activeDownloadId);
+            try (Cursor cursor = downloadManager.query(query)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS));
+                    long downloaded = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                    long total = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                    if (total > 0) {
+                        downloadProgress.setIndeterminate(false);
+                        downloadProgress.setMax(100);
+                        downloadProgress.setProgress((int) (downloaded * 100 / total));
+                        downloadProgress.setMessage("Downloading update… " + (downloaded * 100 / total) + "%");
+                    }
+                    if (status == DownloadManager.STATUS_RUNNING || status == DownloadManager.STATUS_PENDING) {
+                        mainHandler.postDelayed(this, 500);
+                    }
+                }
+            } catch (Exception ignored) { }
+        }
+    };
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +157,11 @@ public class MainActivity extends Activity {
         if (savedInstanceState != null) webView.restoreState(savedInstanceState);
         else webView.loadUrl("https://anamika-lux-salon.onrender.com/portal.html");
 
+        downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        IntentFilter filter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        if (Build.VERSION.SDK_INT >= 33) registerReceiver(downloadReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        else registerReceiver(downloadReceiver, filter);
+        receiverRegistered = true;
         checkForAppUpdate();
     }
 
@@ -121,7 +190,7 @@ public class MainActivity extends Activity {
                 if (latestCode <= installedCode || apkUrl.isEmpty()) return;
                 runOnUiThread(() -> showUpdateDialog(latestName, notes, apkUrl));
             } catch (Exception ignored) {
-                // Update checks are best-effort; the app must still open when offline.
+                // Update checks are best-effort; the app still opens when offline.
             } finally {
                 if (connection != null) connection.disconnect();
             }
@@ -131,17 +200,64 @@ public class MainActivity extends Activity {
     private void showUpdateDialog(String version, String notes, String apkUrl) {
         if (isFinishing() || isDestroyed()) return;
         new AlertDialog.Builder(this)
-            .setTitle("Anamika Lux update available")
-            .setMessage("New version " + version + " is ready.\n\n" + notes + "\n\nUpdate now for the latest app experience.")
-            .setPositiveButton("Update Now", (dialog, which) -> {
-                try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(apkUrl))); }
-                catch (ActivityNotFoundException e) {
-                    Toast.makeText(this, "Unable to open the update link.", Toast.LENGTH_LONG).show();
-                }
-            })
-            .setNegativeButton("Later", (dialog, which) -> dialog.dismiss())
+            .setTitle("🎉 Anamika Lux update available")
+            .setMessage("Discover the new version " + version + "\n\n" + notes +
+                "\n\nDownload the latest version now for the best experience.")
+            .setPositiveButton("Update Now", (dialog, which) -> downloadUpdate(apkUrl))
+            .setNegativeButton("Not now", (dialog, which) -> dialog.dismiss())
             .setCancelable(true)
             .show();
+    }
+
+    private void downloadUpdate(String apkUrl) {
+        try {
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(apkUrl));
+            request.setTitle("Anamika Lux update");
+            request.setDescription("Downloading the latest app version…");
+            request.setMimeType("application/vnd.android.package-archive");
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setDestinationInExternalFilesDir(this, Environment.DIRECTORY_DOWNLOADS, "anamika-lux-update.apk");
+            activeDownloadId = downloadManager.enqueue(request);
+            downloadProgress = new ProgressDialog(this);
+            downloadProgress.setTitle("Anamika Lux");
+            downloadProgress.setMessage("Preparing update download…");
+            downloadProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            downloadProgress.setIndeterminate(true);
+            downloadProgress.setCancelable(false);
+            downloadProgress.show();
+            mainHandler.post(progressUpdater);
+        } catch (Exception e) {
+            Toast.makeText(this, "Could not start update download. Please try again.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void installDownloadedApk(Uri apkUri) {
+        pendingInstallUri = apkUri;
+        if (Build.VERSION.SDK_INT >= 26 && !getPackageManager().canRequestPackageInstalls()) {
+            new AlertDialog.Builder(this)
+                .setTitle("Allow app updates")
+                .setMessage("Allow Anamika Lux to open the Android installer so you can update the app.")
+                .setPositiveButton("Continue", (dialog, which) -> {
+                    Intent settings = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                        Uri.parse("package:" + getPackageName()));
+                    startActivityForResult(settings, INSTALL_PERMISSION);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+            return;
+        }
+        launchInstaller(apkUri);
+    }
+
+    private void launchInstaller(Uri apkUri) {
+        try {
+            Intent install = new Intent(Intent.ACTION_VIEW);
+            install.setDataAndType(apkUri, "application/vnd.android.package-archive");
+            install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(install);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "Android installer is not available on this device.", Toast.LENGTH_LONG).show();
+        }
     }
 
     private boolean handleUrl(Uri uri) {
@@ -177,6 +293,9 @@ public class MainActivity extends Activity {
             Uri[] results = WebChromeClient.FileChooserParams.parseResult(resultCode, data);
             fileCallback.onReceiveValue(results);
             fileCallback = null;
+        } else if (requestCode == INSTALL_PERMISSION && pendingInstallUri != null) {
+            if (Build.VERSION.SDK_INT < 26 || getPackageManager().canRequestPackageInstalls()) launchInstaller(pendingInstallUri);
+            else Toast.makeText(this, "Update installation permission was not enabled.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -203,6 +322,8 @@ public class MainActivity extends Activity {
 
     @Override protected void onDestroy() {
         updateExecutor.shutdownNow();
+        mainHandler.removeCallbacks(progressUpdater);
+        if (receiverRegistered) unregisterReceiver(downloadReceiver);
         if (webView != null) { webView.stopLoading(); webView.destroy(); }
         super.onDestroy();
     }
