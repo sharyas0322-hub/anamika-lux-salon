@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>The Anamika Lux | Luxury Doorstep Salon, Patna</title>
     <link rel="icon" href="/the-anamika-lux-logo.png" type="image/png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#050507">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Pro Icons -->
@@ -601,7 +603,7 @@
         <footer class="text-center text-[11px] text-neutral-500 space-y-2 pt-4 border-t border-white/5">
             <p>&copy; <span id="currentYear"></span> The Anamika Lux &bull; Home Service Salon, Patna</p>
             <p>Direct Booking Helpline: <a href="tel:8893645998" class="text-gold-400 underline">+91 8893645998</a></p>
-            <p class="pt-3"><a href="app.html" class="inline-flex items-center gap-2 px-5 py-2.5 mr-2 mb-2 rounded-xl bg-gold-500/10 border border-gold-500/50 text-gold-200 text-xs font-bold hover:bg-gold-500/20 transition-all"><i class="fa-solid fa-mobile-screen-button"></i><span>Customer &amp; Beautician App</span></a></p>
+            <p class="pt-3"><button type="button" id="installAnamikaAppBtn" class="inline-flex items-center gap-2 px-5 py-2.5 mr-2 mb-2 rounded-xl bg-gold-500/10 border border-gold-500/50 text-gold-200 text-xs font-bold hover:bg-gold-500/20 transition-all"><i class="fa-solid fa-mobile-screen-button"></i><span>Customer &amp; Beautician App</span></button></p>
             <p class="pt-3"><a href="admin.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-obsidian-850 border border-gold-500/50 text-gold-300 text-xs font-bold hover:bg-gold-500 hover:text-obsidian-950 transition-all"><i class="fa-solid fa-lock"></i><span>Owner / Admin Login</span></a></p>
             <div class="creator-credit mt-7 pt-5 pb-2 border-t border-gold-500/20">
                 <span class="creator-credit-kicker">A Digital Experience Crafted By</span>
@@ -1941,6 +1943,72 @@ window.addEventListener('DOMContentLoaded', () => {
 })();
 </script>
 </body>
+
+<script>
+(function () {
+  let deferredPrompt = null;
+  const button = document.getElementById("installAnamikaAppBtn");
+
+  function isStandalone() {
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  }
+
+  function showInstallHelp() {
+    const existing = document.getElementById("anamikaInstallHelp");
+    if (existing) { existing.classList.remove("hidden"); return; }
+    const box = document.createElement("div");
+    box.id = "anamikaInstallHelp";
+    box.className = "fixed inset-0 z-[120] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4";
+    box.innerHTML = '<div class="w-full max-w-md rounded-3xl border border-gold-500/30 bg-[#101017] p-6 shadow-2xl text-center">' +
+      '<div class="mx-auto w-14 h-14 rounded-2xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-300 text-xl"><i class="fa-solid fa-mobile-screen-button"></i></div>' +
+      '<h3 class="font-playfair text-2xl text-white mt-4">Install Anamika Lux App</h3>' +
+      '<p class="text-sm text-neutral-400 mt-2 leading-6">Browser ke menu me <b class="text-gold-200">Install app</b> ya <b class="text-gold-200">Add to Home screen</b> select karein.</p>' +
+      '<p class="text-xs text-neutral-500 mt-3">Chrome/Android: ⋮ → Install app. iPhone Safari: Share → Add to Home Screen.</p>' +
+      '<button type="button" id="closeAnamikaInstallHelp" class="mt-5 px-6 py-3 rounded-full btn-gold-solid text-sm">Done</button>' +
+      '</div>';
+    document.body.appendChild(box);
+    document.getElementById("closeAnamikaInstallHelp").onclick = () => box.remove();
+    box.onclick = (e) => { if (e.target === box) box.remove(); };
+  }
+
+  window.addEventListener("beforeinstallprompt", function (event) {
+    event.preventDefault();
+    deferredPrompt = event;
+    if (button) button.querySelector("span").textContent = "Install Customer & Beautician App";
+  });
+
+  window.addEventListener("appinstalled", function () {
+    deferredPrompt = null;
+    if (button) button.querySelector("span").textContent = "App Installed ✓";
+  });
+
+  if (button) button.addEventListener("click", async function () {
+    if (isStandalone()) {
+      alert("Anamika Lux App already installed/opened as an app.");
+      return;
+    }
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (choice && choice.outcome === "accepted") {
+        button.querySelector("span").textContent = "App Installed ✓";
+      }
+      return;
+    }
+    showInstallHelp();
+  });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js").catch(function (error) {
+        console.warn("Anamika service worker registration failed:", error);
+      });
+    });
+  }
+})();
+</script>
+
 </html>
 
 <script>
