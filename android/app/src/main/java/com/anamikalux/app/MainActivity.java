@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.webkit.CookieManager;
 import android.webkit.GeolocationPermissions;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -31,6 +32,9 @@ public class MainActivity extends Activity {
         getWindow().setNavigationBarColor(android.graphics.Color.rgb(5, 5, 7));
         webView = new WebView(this);
         setContentView(webView);
+
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -77,7 +81,7 @@ public class MainActivity extends Activity {
         });
 
         if (savedInstanceState != null) webView.restoreState(savedInstanceState);
-        else webView.loadUrl("https://anamika-lux-salon.onrender.com/");
+        else webView.loadUrl("https://anamika-lux-salon.onrender.com/portal.html");
     }
 
     private boolean handleUrl(Uri uri) {
@@ -124,6 +128,17 @@ public class MainActivity extends Activity {
     @Override public void onBackPressed() {
         if (webView != null && webView.canGoBack()) webView.goBack();
         else super.onBackPressed();
+    }
+
+    @Override protected void onPause() {
+        if (webView != null) webView.onPause();
+        CookieManager.getInstance().flush();
+        super.onPause();
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        if (webView != null) webView.onResume();
     }
 
     @Override protected void onDestroy() {
