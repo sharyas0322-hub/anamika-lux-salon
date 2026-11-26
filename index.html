@@ -398,16 +398,11 @@
 
             <!-- Right Actions -->
             <div class="flex items-center gap-2">
-                <a href="tel:8893645998" class="w-8 h-8 rounded-full border border-gold-500/30 flex items-center justify-center text-gold-300 active:scale-95 transition-transform" title="Direct Phone Call">
-                    <i class="fa-solid fa-phone text-xs"></i>
-                </a>
-                <a href="/booking.html" class="btn-gold-solid px-3.5 py-1.5 rounded-full text-[11px] tracking-wider uppercase font-bold flex items-center gap-1.5 active:scale-95 shadow-sm">
-                    <i class="fa-regular fa-calendar-check text-[10px]"></i>
-                    <span>Book</span>
-                </a>
+                <a href="tel:8893645998" class="w-9 h-9 rounded-full border border-gold-500/30 flex items-center justify-center text-gold-300 active:scale-95 transition-transform" title="Call Anamika Lux" aria-label="Call Anamika Lux"><i class="fa-solid fa-phone text-xs"></i></a>
+                <a href="/booking.html" class="btn-gold-solid px-3.5 py-2 rounded-full text-[11px] tracking-wider uppercase font-bold flex items-center gap-1.5 active:scale-95 shadow-sm"><i class="fa-regular fa-calendar-check text-[10px]"></i><span>Book</span></a>
+                <button id="anamikaProfileButton" type="button" class="min-h-9 px-3 rounded-full border border-gold-500/40 bg-gold-500/10 flex items-center justify-center gap-2 text-gold-200 text-[11px] font-bold whitespace-nowrap" aria-label="Login or My Account" title="Login or My Account"><i class="fa-regular fa-user"></i><span id="anamikaAccountLabel">Account</span></button>
             </div>
         </div>
-    <button id="anamikaProfileButton" type="button" class="w-9 h-9 rounded-full border border-gold-500/40 bg-gold-500/10 flex items-center justify-center text-gold-200" aria-label="My Profile" title="My Profile"><i class="fa-regular fa-user"></i></button>
     </nav>
 
     <!-- Main Content Area -->
@@ -1899,7 +1894,17 @@ window.addEventListener('DOMContentLoaded', () => {
  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const labels={pending:"Booking request received",confirmed:"Booking confirmed",assigned:"Professional assigned",out_for_service:"Out for service",arrived:"Professional arrived",in_progress:"Service in progress",completed:"Service completed",cancelled:"Booking cancelled"};
  let profileLiveChannel=null;
- const open=()=>{modal.classList.remove("hidden");document.body.style.overflow="hidden";load();};
+ const accountButton=document.getElementById("anamikaProfileButton");
+ function updateAccountButton(session){
+  if(!accountButton)return;
+  const label=accountButton.querySelector("#anamikaAccountLabel");
+  if(label)label.textContent=session&&session.user?"My Account":"Login";
+  accountButton.title=session&&session.user?"Signed in · Open your account":"Login or create your customer account";
+  accountButton.setAttribute("aria-label",accountButton.title);
+  accountButton.classList.toggle("border-emerald-500/50",!!(session&&session.user));
+  accountButton.classList.toggle("text-emerald-200",!!(session&&session.user));
+ }
+ const open=()=>{modal.classList.remove("hidden");document.body.style.overflow="hidden";content.innerHTML='<div class="text-center py-10 text-neutral-400"><i class="fa-solid fa-circle-notch fa-spin text-gold-300 text-2xl"></i><p class="mt-3">Checking your account…</p></div>';load();};
  const close=()=>{modal.classList.add("hidden");document.body.style.overflow="";};
  document.getElementById("anamikaProfileButton").addEventListener("click",open);
  document.getElementById("anamikaProfileClose").addEventListener("click",close);
@@ -1913,14 +1918,21 @@ window.addEventListener('DOMContentLoaded', () => {
     .on("postgres_changes",{event:"*",schema:"public",table:"booking_visit_otps",filter:"client_id=eq."+session.user.id},()=>{if(!modal.classList.contains("hidden"))load();})
     .subscribe();
   }
-  if(!session){content.innerHTML='<div class="text-center py-10"><div class="w-16 h-16 mx-auto rounded-full bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-2xl text-gold-300"><i class="fa-regular fa-user"></i></div><h3 class="font-playfair text-2xl mt-5">Welcome to Anamika Lux</h3><p class="text-sm text-neutral-400 mt-2">Login or create your account to manage your bookings.</p><a href="portal.html?redirect=profile" class="inline-flex mt-6 px-7 py-3 rounded-full btn-gold-solid text-sm">Login / Create Account</a></div>';return;}
-  const [{data:profile},{data:bookings},{data:staffRows},{data:visitOtps}]=await Promise.all([
+  updateAccountButton(session);
+  if(!session){content.innerHTML='<div class="text-center py-10"><div class="w-16 h-16 mx-auto rounded-full bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-2xl text-gold-300"><i class="fa-regular fa-user"></i></div><h3 class="font-playfair text-2xl mt-5">Welcome to Anamika Lux</h3><p class="text-sm text-neutral-400 mt-2">You are browsing as a guest. Sign in to book services and manage your bookings.</p><a href="portal.html?redirect=profile" class="inline-flex mt-6 px-7 py-3 rounded-full btn-gold-solid text-sm">Login / Create Account</a></div>';return;}
+  const [profileResult,bookingResult,staffResult,otpResult]=await Promise.all([
    db.from("user_profiles").select("full_name,phone,email").eq("id",session.user.id).maybeSingle(),
    db.from("bookings").select("id,booking_code,selected_package,total_amount,appointment_date,appointment_slot,address,status,created_at").eq("client_id",session.user.id).order("created_at",{ascending:false}).limit(30),
    db.from("client_booking_staff").select("booking_id,display_name,staff_code"),
    db.from("booking_visit_otps").select("booking_id,otp_code,expires_at,verified_at")
   ]);
-  if(!profile){content.innerHTML='<p class="text-center text-neutral-400 py-10">Profile details could not be loaded. Please contact salon support.</p>';return;}
+  if(profileResult.error||bookingResult.error||staffResult.error||otpResult.error){
+   console.error("Account data load failed",profileResult.error,bookingResult.error,staffResult.error,otpResult.error);
+   content.innerHTML='<div class="text-center py-10"><p class="text-red-300">Your account data could not be loaded right now.</p><p class="text-xs text-neutral-400 mt-2">Your login is still active. Please try again.</p><button id="anamikaProfileRetry" class="mt-5 px-6 py-2 rounded-full border border-gold-500/40 text-gold-200">Try Again</button></div>';
+   document.getElementById("anamikaProfileRetry").onclick=load;return;
+  }
+  const profile=profileResult.data,bookings=bookingResult.data,staffRows=staffResult.data,visitOtps=otpResult.data;
+  if(!profile){content.innerHTML='<div class="text-center py-10"><p class="text-red-300">Your customer profile is not linked to this login.</p><p class="text-xs text-neutral-400 mt-2">Please contact salon support. Booking is disabled until your profile is verified.</p></div>';return;}
   const rows=bookings||[],staff={},visitOtp={};(staffRows||[]).forEach(x=>staff[x.booking_id]=x);(visitOtps||[]).forEach(x=>visitOtp[x.booking_id]=x);
   const first=esc((profile.full_name||"Client").trim().split(/\s+/)[0]);
   const profileCard='<section class="rounded-2xl border border-gold-500/20 bg-gradient-to-br from-[#191710] to-[#0c0c10] p-5"><div class="flex items-center gap-4"><div class="w-14 h-14 rounded-2xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-200 text-xl"><i class="fa-regular fa-user"></i></div><div class="min-w-0"><p class="text-[10px] tracking-[.2em] uppercase text-gold-300">Client profile</p><h3 class="text-xl font-semibold text-white">'+esc(profile.full_name||"Client")+'</h3><p class="text-xs text-neutral-400">'+esc(profile.phone||"")+' · '+esc(profile.email||"")+'</p></div></div></section>';
@@ -1938,8 +1950,9 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById("anamikaProfileRefresh").onclick=load;
   document.getElementById("anamikaProfileLogout").onclick=async()=>{await db.auth.signOut();close();location.reload();};
  }
+ db.auth.getSession().then(({data})=>updateAccountButton(data?.session||null)).catch(error=>console.warn("Account status check failed",error));
+ db.auth.onAuthStateChange((event,session)=>{updateAccountButton(session);});
  if(new URLSearchParams(location.search).get("profile")==="1"){open();history.replaceState({},document.title,location.pathname);}
- db.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_IN"&&modal&&!modal.classList.contains("hidden"))load();});
 })();
 </script>
 </body>
