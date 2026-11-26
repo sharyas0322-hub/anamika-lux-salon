@@ -1,4 +1,4 @@
-const CACHE_NAME = "anamika-lux-v2";
+const CACHE_NAME = "anamika-lux-v3";
 const CORE = ["./", "./index.html", "./portal.html", "./manifest.webmanifest", "./the-anamika-lux-logo.png"];
 
 self.addEventListener("install", event => {
@@ -37,17 +37,14 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  // Static assets can be cached, but refresh the cache when online.
+  // Always try the latest deployed asset first; use cache only when offline.
   event.respondWith(
-    caches.match(request).then(cached => {
-      const network = fetch(request).then(response => {
-        if (response && response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => {});
-        }
-        return response;
-      });
-      return cached || network;
-    })
+    fetch(request, { cache: "no-store" }).then(response => {
+      if (response && response.ok) {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => {});
+      }
+      return response;
+    }).catch(() => caches.match(request))
   );
 });
