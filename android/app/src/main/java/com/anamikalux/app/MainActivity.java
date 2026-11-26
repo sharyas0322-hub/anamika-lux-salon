@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
 public class MainActivity extends Activity {
     private static final int LOCATION_PERMISSION = 4101;
     private static final int FILE_CHOOSER = 4102;
-    private static final String UPDATE_URL = "https://raw.githubusercontent.com/sharyas0322-hub/anamika-lux-salon/main/android/update.json";
+    private static final String UPDATE_URL = "https://github.com/sharyas0322-hub/anamika-lux-salon/releases/latest/download/update.json";
     private WebView webView;
     private GeolocationPermissions.Callback pendingGeoCallback;
     private String pendingGeoOrigin;
