@@ -29,7 +29,7 @@ jobs:
         run: |
           python -m pip install --quiet pillow
           mkdir -p android/app/src/main/res/drawable-nodpi android/app/src/main/res/mipmap-mdpi android/app/src/main/res/mipmap-hdpi android/app/src/main/res/mipmap-xhdpi android/app/src/main/res/mipmap-xxhdpi android/app/src/main/res/mipmap-xxxhdpi
-          cat android/logo-source/logo-*.b64 | base64 -d > /tmp/anamika-logo.png
+          cp the-anamika-lux-logo.png /tmp/anamika-logo.png
           python - <<'PY'
           from PIL import Image
           from pathlib import Path
